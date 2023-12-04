@@ -16,4 +16,4 @@ Editor Bar is a Visual Studio extension designed to enhance your coding experien
 Apache 2.0
 
 ## Author 
-[Ji¯Ì Pol·öek](https://jiripolasek.com)
+[Ji≈ô√≠ Pol√°≈°ek](https://jiripolasek.com)
