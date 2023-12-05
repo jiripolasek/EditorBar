@@ -1,4 +1,10 @@
-﻿using System.ComponentModel.Composition;
+﻿// ------------------------------------------------------------
+//
+// Copyright (c) Jiří Polášek. All rights reserved.
+//
+// ------------------------------------------------------------
+
+using System.ComponentModel.Composition;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
@@ -8,15 +14,16 @@ namespace JPSoftworks.EditorBar;
 
 [Export(typeof(IWpfTextViewMarginProvider))]
 [Name("EditorBar-Top")]
-[Order(After = "Wpf Horizontal Scrollbar")]
+[Order(After = PredefinedMarginNames.HorizontalScrollBar)]
 [MarginContainer(PredefinedMarginNames.Top)]
-[ContentType("text")]
+[ContentType(StandardContentTypeNames.Text)]
 [TextViewRole(PredefinedTextViewRoles.Editable)]
+[DeferCreation(OptionName = DefaultTextViewHostOptions.EditingStateMarginOptionName)]
 public class TopEditorBarFactory : IWpfTextViewMarginProvider
 {
     private bool _isTop;
-    private IWpfTextView _textView;
-    private IWpfTextViewMargin _currentMargin;
+    private IWpfTextView? _textView;
+    private IWpfTextViewMargin? _currentMargin;
 
     public TopEditorBarFactory()
     {
@@ -40,7 +47,7 @@ public class TopEditorBarFactory : IWpfTextViewMarginProvider
         _isTop = obj.BarPosition == BarPosition.Top;
     }
 
-    public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)
+    public IWpfTextViewMargin? CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)
     {
         _isTop = GeneralPage.Instance.BarPosition == BarPosition.Top;
         _textView = wpfTextViewHost.TextView;

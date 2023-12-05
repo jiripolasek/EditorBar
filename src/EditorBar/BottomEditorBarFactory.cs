@@ -1,4 +1,10 @@
-﻿using System.ComponentModel.Composition;
+﻿// ------------------------------------------------------------
+//
+// Copyright (c) Jiří Polášek. All rights reserved.
+//
+// ------------------------------------------------------------
+
+using System.ComponentModel.Composition;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
@@ -8,15 +14,15 @@ namespace JPSoftworks.EditorBar;
 
 [Export(typeof(IWpfTextViewMarginProvider))]
 [Name("EditorBar-Bottom")]
-[Order(After = "Wpf Horizontal Scrollbar")]
+[Order(After = PredefinedMarginNames.HorizontalScrollBar)]
 [MarginContainer(PredefinedMarginNames.Bottom)]
-[ContentType("text")]
+[ContentType(StandardContentTypeNames.Text)]
 [TextViewRole(PredefinedTextViewRoles.Editable)]
 public class BottomEditorBarFactory : IWpfTextViewMarginProvider
 {
     private bool _isBottom;
     private IWpfTextView? _textView;
-    private IWpfTextViewMargin _currentMargin;
+    private IWpfTextViewMargin? _currentMargin;
 
     public BottomEditorBarFactory()
     {
@@ -50,7 +56,7 @@ public class BottomEditorBarFactory : IWpfTextViewMarginProvider
     }
 
 
-    public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)
+    public IWpfTextViewMargin? CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)
     {
         _isBottom = GeneralPage.Instance.BarPosition == BarPosition.Bottom;
         _textView = wpfTextViewHost.TextView;

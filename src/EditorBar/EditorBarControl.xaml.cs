@@ -1,27 +1,24 @@
-﻿#nullable enable
+﻿// ------------------------------------------------------------
+//
+// Copyright (c) Jiří Polášek. All rights reserved.
+//
+// ------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using Community.VisualStudio.Toolkit;
-using EnvDTE;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
-using Project = EnvDTE.Project;
 
 namespace JPSoftworks.EditorBar;
 
 /// <summary>
 ///     Interaction logic for EditorBarControl.xaml
 /// </summary>
-public partial class EditorBarControl : UserControl, IWpfTextViewMargin
+public partial class EditorBarControl : IWpfTextViewMargin
 {
     private readonly IWpfTextView? _textView;
 
@@ -35,14 +32,14 @@ public partial class EditorBarControl : UserControl, IWpfTextViewMargin
 
         InitializeComponent();
 
-        Loaded += async (_, _) => await UpdateAsync();
-        GeneralPage.Saved += async _ => await UpdateAsync();
-        VS.Events.ProjectItemsEvents.AfterRenameProjectItems += async _ => await UpdateAsync();
-        VS.Events.ProjectItemsEvents.AfterAddProjectItems += async _ => await UpdateAsync();
-        VS.Events.ProjectItemsEvents.AfterRemoveProjectItems += async _ => await UpdateAsync();
-        VS.Events.DocumentEvents.Saved += async _ => await UpdateAsync();
-        VS.Events.SolutionEvents.OnAfterRenameProject += async _ => await UpdateAsync();
-        VS.Events.SolutionEvents.OnAfterOpenSolution += async _ => await UpdateAsync();
+        Loaded += (_, _) => UpdateAsync().FireAndForget();
+        GeneralPage.Saved += _ => UpdateAsync().FireAndForget();
+        VS.Events.ProjectItemsEvents.AfterRenameProjectItems += _ => UpdateAsync().FireAndForget();
+        VS.Events.ProjectItemsEvents.AfterAddProjectItems += _ => UpdateAsync().FireAndForget();
+        VS.Events.ProjectItemsEvents.AfterRemoveProjectItems += _ => UpdateAsync().FireAndForget();
+        VS.Events.DocumentEvents.Saved += _ => UpdateAsync().FireAndForget();
+        VS.Events.SolutionEvents.OnAfterRenameProject += _ => UpdateAsync().FireAndForget();
+        VS.Events.SolutionEvents.OnAfterOpenSolution += _ => UpdateAsync().FireAndForget();
     }
 
     public void Dispose()
@@ -81,11 +78,11 @@ public partial class EditorBarControl : UserControl, IWpfTextViewMargin
         document.FileActionOccurred -= DocumentOnFileActionOccurred;
         document.FileActionOccurred += DocumentOnFileActionOccurred;
         UpdateFilePathLabel(document);
-        var project = await GetProjectFromDocumentAsync(document);
+        var project = await VisualStudioHelper.GetProjectFromDocumentAsync(document);
         ProjectNameLabel.Content = project == null ? "(no project)" : project.Name;
         if (project != null)
         {
-            var parents = await GetSolutionFolderPathAsync(await ConvertToSolutionItemAsync(project));
+            var parents = await VisualStudioHelper.GetSolutionFolderPathAsync(await VisualStudioHelper.ConvertToSolutionItemAsync(project));
             SolutionFoldersList.ItemsSource = parents;
         }
         else
@@ -95,7 +92,7 @@ public partial class EditorBarControl : UserControl, IWpfTextViewMargin
             if (project2 != null)
             {
                 ProjectNameLabel.Content = project2.Name;
-                var parents = await GetSolutionFolderPathAsync(project2);
+                var parents = await VisualStudioHelper.GetSolutionFolderPathAsync(project2);
                 SolutionFoldersList.ItemsSource = parents;
             }
         }
@@ -110,7 +107,7 @@ public partial class EditorBarControl : UserControl, IWpfTextViewMargin
         {
             var slnPath = currentSolution.FullPath;
             var slnDir = Path.GetDirectoryName(slnPath);
-            RelativePath = GetRelativePath(FilePath, slnDir);
+            RelativePath = slnDir == null ? FilePath : GetRelativePath(FilePath, slnDir);
         }
         else
         {
@@ -132,57 +129,11 @@ public partial class EditorBarControl : UserControl, IWpfTextViewMargin
         return documentFilePath.Substring(slnDir.Length);
     }
 
-    private async Task<SolutionItem> ConvertToSolutionItemAsync(Project dteProject)
-    {
-        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-        var all = await VS.Solutions.GetAllProjectsAsync(ProjectStateFilter.All);
-        return all.FirstOrDefault(t => t.FullPath == dteProject.FullName);
-    }
-
-
-    private async Task<Project?> GetProjectFromDocumentAsync(ITextDocument document)
-    {
-        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-        var dte = (DTE)Package.GetGlobalService(typeof(DTE));
-        var projects = dte.Solution.Projects.OfType<Project>().ToList();
-        var projectFile = projects.FirstOrDefault(t => string.Equals(t.FullName, document.FilePath, StringComparison.OrdinalIgnoreCase));
-        if (projectFile != null)
-        {
-            return projectFile;
-        }
-
-        var projectItem = dte?.Solution.FindProjectItem(document.FilePath);
-        return projectItem?.ContainingProject;
-    }
-
-    private async Task<List<string>> GetSolutionFolderPathAsync(SolutionItem? project)
-    {
-        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-        var folderPath = new List<string>();
-        if (project == null)
-        {
-            return folderPath;
-        }
-
-        var parent = project.FindParent(SolutionItemType.SolutionFolder);
-        while (parent != null)
-        {
-            folderPath.Add(parent.Name);
-            parent = parent.FindParent(SolutionItemType.SolutionFolder);
-        }
-
-        // Reverse to get the order from solution to project
-        folderPath.Reverse();
-        return folderPath;
-    }
-
 
     private async void DocumentOnFileActionOccurred(object sender, TextDocumentFileActionEventArgs e)
     {
         FilePath = e.FilePath;
-        await UpdateAsync();
+        UpdateAsync().FireAndForget();
     }
 
     private ITextDocument? GetCurrentDocument()
@@ -204,7 +155,7 @@ public partial class EditorBarControl : UserControl, IWpfTextViewMargin
             var directoryName = Path.GetDirectoryName(fileName);
             if (!string.IsNullOrWhiteSpace(directoryName) && Directory.Exists(directoryName))
             {
-                System.Diagnostics.Process.Start(new ProcessStartInfo("explorer.exe", "/select, " + fileName) { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo("explorer.exe", "/select, " + fileName) { UseShellExecute = true });
             }
         }
     }

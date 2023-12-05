@@ -1,9 +1,13 @@
-﻿using System;
+﻿// ------------------------------------------------------------
+//
+// Copyright (c) Jiří Polášek. All rights reserved.
+//
+// ------------------------------------------------------------
+
 using System.Runtime.InteropServices;
 using System.Threading;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.Shell;
-using Task = System.Threading.Tasks.Task;
 
 namespace JPSoftworks.EditorBar;
 
@@ -35,8 +39,6 @@ public sealed class EditorBarPackage : AsyncPackage
     /// </summary>
     public const string PackageGuidString = "ef5d9a25-5e0d-4428-8762-56d4dc816eeb";
 
-    #region Package Members
-
     /// <summary>
     /// Initialization of the package; this method is called right after the package is sited, so this is the place
     /// where you can put all the initialization code that rely on services provided by VisualStudio.
@@ -50,6 +52,4 @@ public sealed class EditorBarPackage : AsyncPackage
         // Do any initialization that requires the UI thread after switching to the UI thread.
         await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
     }
-
-    #endregion
 }

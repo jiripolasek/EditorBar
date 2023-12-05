@@ -1,18 +1,13 @@
-﻿using System;
+﻿// ------------------------------------------------------------
+//
+// Copyright (c) Jiří Polášek. All rights reserved.
+//
+// ------------------------------------------------------------
+
 using System.ComponentModel;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Community.VisualStudio.Toolkit;
 
 namespace JPSoftworks.EditorBar.Options;
-
-internal partial class OptionsProvider
-{
-    // Register the options with this attribute on your package class:
-    // [ProvideOptionPage(typeof(OptionsProvider.GeneralPageOptions), "EditorBar.Options", "GeneralPage", 0, 0, true, SupportsProfiles = true)]
-    [ComVisible(true)]
-    public class GeneralPageOptions : BaseOptionPage<GeneralPage> { }
-}
 
 public class GeneralPage : BaseOptionModel<GeneralPage>
 {
@@ -22,7 +17,7 @@ public class GeneralPage : BaseOptionModel<GeneralPage>
     [DefaultValue(Options.BarPosition.Top)]
     [TypeConverter(typeof(EnumConverter))]
     public BarPosition BarPosition { get; set; } = BarPosition.Top;
-        
+
     [Category("Apperance")]
     [DisplayName("Show relative path")]
     [Description("Show path relative to the solution root")]
@@ -34,10 +29,4 @@ public class GeneralPage : BaseOptionModel<GeneralPage>
         Console.WriteLine("Saving...");
         return base.SaveAsync();
     }
-}
-
-public enum BarPosition
-{
-    Top = 0,
-    Bottom = 1
 }

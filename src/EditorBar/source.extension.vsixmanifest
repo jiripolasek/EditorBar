@@ -1,11 +1,14 @@
 ﻿<?xml version="1.0" ?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="EditorBar.845db93c-66e4-41b8-a73d-eedf60470c04" Version="1.0" Language="en-US" Publisher="Jiří Polášek" />
+        <Identity Id="EditorBar.d5a61a21-bc87-477e-b916-ead20fb3fafb" Version="1.0.1" Language="en-US" Publisher="Jiří Polášek" />
         <DisplayName>Editor Bar</DisplayName>
-        <Description xml:space="preserve">Editor bar - status bar for text editor highlighting project of a current file.</Description>
+        <Description xml:space="preserve">Editor bar - bar for the text editor, highlighting parent project of the opened document.</Description>
+        <MoreInfo>https://jiripolasek.com</MoreInfo>
+        <License>Resources\LICENSE.txt</License>
         <Icon>Resources\Icon.png</Icon>
         <Tags>editor bar path</Tags>
+        <Preview>true</Preview>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">

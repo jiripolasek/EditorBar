@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34310.174
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorBar", "src\EditorBar\EditorBar.csproj", "{097E6F5A-F198-49F5-B4CC-28128E82FE43}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPSoftworks.EditorBar", "src\EditorBar\JPSoftworks.EditorBar.csproj", "{097E6F5A-F198-49F5-B4CC-28128E82FE43}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7FAD5B22-8341-4C9B-ACE6-4BE9AAD2D3EF}"
 	ProjectSection(SolutionItems) = preProject
