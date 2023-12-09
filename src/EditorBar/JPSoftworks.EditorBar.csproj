@@ -68,6 +68,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BaseEditorBarFactory.cs" />
     <Compile Include="BottomEditorBarFactory.cs" />
     <Compile Include="EditorBarControl.xaml.cs">
       <DependentUpon>EditorBarControl.xaml</DependentUpon>
@@ -75,10 +76,10 @@
     <Compile Include="GlobalUsings.cs" />
     <Compile Include="Options\BarPosition.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
-    <Compile Include="TopEditorBarFactory.cs" />
     <Compile Include="Options\GeneralPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EditorBarPackage.cs" />
+    <Compile Include="TopEditorBarFactory.cs" />
     <Compile Include="VisualStudioHelper.cs" />
   </ItemGroup>
   <ItemGroup>
