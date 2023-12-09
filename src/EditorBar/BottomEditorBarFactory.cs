@@ -17,7 +17,7 @@ namespace JPSoftworks.EditorBar;
 [Order(After = PredefinedMarginNames.HorizontalScrollBar)]
 [MarginContainer(PredefinedMarginNames.Bottom)]
 [ContentType(StandardContentTypeNames.Text)]
-[TextViewRole(PredefinedTextViewRoles.Editable)]
+[TextViewRole(PredefinedTextViewRoles.Document)]
 public class BottomEditorBarFactory : IWpfTextViewMarginProvider
 {
     private bool _isBottom;

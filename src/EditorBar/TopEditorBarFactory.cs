@@ -17,7 +17,7 @@ namespace JPSoftworks.EditorBar;
 [Order(After = PredefinedMarginNames.HorizontalScrollBar)]
 [MarginContainer(PredefinedMarginNames.Top)]
 [ContentType(StandardContentTypeNames.Text)]
-[TextViewRole(PredefinedTextViewRoles.Editable)]
+[TextViewRole(PredefinedTextViewRoles.Document)]
 [DeferCreation(OptionName = DefaultTextViewHostOptions.EditingStateMarginOptionName)]
 public class TopEditorBarFactory : IWpfTextViewMarginProvider
 {

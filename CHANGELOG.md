@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.0.2
+- [x] Fixed: Editor bar was displayed in appropriate text views. Not the display is limited to documents only.
+
 ## 1.0.1
 - [x] Update `README.md` file and markeplace summary
 
