@@ -4,15 +4,15 @@
 //
 // ------------------------------------------------------------
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Community.VisualStudio.Toolkit;
 
 namespace JPSoftworks.EditorBar.Options;
 
-internal partial class OptionsProvider
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global", Justification = "Used by attribute on EditorBarPackage")]
+internal class OptionsProvider
 {
-    // Register the options with this attribute on your package class:
-    // [ProvideOptionPage(typeof(OptionsProvider.GeneralPageOptions), "EditorBar.Options", "GeneralPage", 0, 0, true, SupportsProfiles = true)]
     [ComVisible(true)]
-    public class GeneralPageOptions : BaseOptionPage<GeneralPage> { }
+    public class GeneralPageOptions : BaseOptionPage<GeneralPage>;
 }

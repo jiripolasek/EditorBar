@@ -73,12 +73,16 @@
     <Compile Include="EditorBarControl.xaml.cs">
       <DependentUpon>EditorBarControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="EditorBarMargin.cs" />
     <Compile Include="GlobalUsings.cs" />
+    <Compile Include="Helpers\NullabilityPolyfil.cs" />
     <Compile Include="Options\BarPosition.cs" />
+    <Compile Include="Options\DisplayStyle.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
     <Compile Include="Options\GeneralPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EditorBarPackage.cs" />
+    <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="TopEditorBarFactory.cs" />
     <Compile Include="VisualStudioHelper.cs" />
   </ItemGroup>
@@ -112,6 +116,13 @@
     <Page Include="EditorBarControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\CompactStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\NormalStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup />

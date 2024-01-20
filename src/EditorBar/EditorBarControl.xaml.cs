@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using Community.VisualStudio.Toolkit;
+using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
@@ -16,74 +17,83 @@ using Microsoft.VisualStudio.Text.Editor;
 namespace JPSoftworks.EditorBar;
 
 /// <summary>
-///     Interaction logic for EditorBarControl.xaml
+/// Interaction logic for EditorBarControl.xaml
 /// </summary>
-public partial class EditorBarControl : IWpfTextViewMargin
+public partial class EditorBarControl
 {
     private readonly IWpfTextView? _textView;
 
-    public string? FilePath { get; private set; }
-
-    public string? RelativePath { get; private set; }
-
     public EditorBarControl(IWpfTextView textView)
     {
-        _textView = textView;
+        this.InitializeComponent();
 
-        InitializeComponent();
+        this._textView = textView;
+        this.Loaded += (_, _) =>
+        {
+            this.OnSomethingAboutDocumentNameChanged();
+            this.OnSettingsChanged();
+        };
+        this.IsVisibleChanged += this.OnIsVisibleChanged;
 
-        Loaded += (_, _) => UpdateAsync().FireAndForget();
-        GeneralPage.Saved += _ => UpdateAsync().FireAndForget();
-        VS.Events.ProjectItemsEvents.AfterRenameProjectItems += _ => UpdateAsync().FireAndForget();
-        VS.Events.ProjectItemsEvents.AfterAddProjectItems += _ => UpdateAsync().FireAndForget();
-        VS.Events.ProjectItemsEvents.AfterRemoveProjectItems += _ => UpdateAsync().FireAndForget();
-        VS.Events.DocumentEvents.Saved += _ => UpdateAsync().FireAndForget();
-        VS.Events.SolutionEvents.OnAfterRenameProject += _ => UpdateAsync().FireAndForget();
-        VS.Events.SolutionEvents.OnAfterOpenSolution += _ => UpdateAsync().FireAndForget();
+        GeneralPage.Saved += _ => this.OnSettingsChanged();
+
+        VS.Events.ProjectItemsEvents.AfterRenameProjectItems += _ => this.OnSomethingAboutDocumentNameChanged();
+        VS.Events.ProjectItemsEvents.AfterAddProjectItems += _ => this.OnSomethingAboutDocumentNameChanged();
+        VS.Events.ProjectItemsEvents.AfterRemoveProjectItems += _ => this.OnSomethingAboutDocumentNameChanged();
+        VS.Events.DocumentEvents.Saved += _ => this.OnSomethingAboutDocumentNameChanged();
+        VS.Events.SolutionEvents.OnAfterRenameProject += _ => this.OnSomethingAboutDocumentNameChanged();
+        VS.Events.SolutionEvents.OnAfterOpenSolution += _ => this.OnSomethingAboutDocumentNameChanged();
     }
 
-    public void Dispose()
+    private string? FilePath { get; set; }
+
+    private string? RelativePath { get; set; }
+
+    private void OnSomethingAboutDocumentNameChanged()
     {
-        // TODO: handle margin position change
-        //if (this.Parent is Panel parentPanel)
-        //{
-        //    parentPanel.Children.Remove(this);
-        //}
+        this.UpdateAsync().FireAndForget();
     }
 
-    public ITextViewMargin? GetTextViewMargin(string marginName)
+    private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        return !string.Equals(marginName, nameof(EditorBarControl), StringComparison.OrdinalIgnoreCase)
-            ? null
-            : this as ITextViewMargin;
+        if ((bool)e.NewValue)
+        {
+            this.UpdateAsync().FireAndForget();
+        }
     }
 
-
-    public double MarginSize => ActualHeight;
-
-    public bool Enabled => true;
-
-    public FrameworkElement VisualElement => this;
-
-    private async Task UpdateAsync()
+    private void OnSettingsChanged()
     {
-        var document = GetCurrentDocument();
+        this.UpdateAsync(true).FireAndForget();
+        this.ReloadStyles();
+    }
+
+    private async Task UpdateAsync(bool forced = false)
+    {
+        if (this.IsVisible == false)
+        {
+            return;
+        }
+
+        var document = this.GetCurrentDocument();
         if (document == null)
         {
             return;
         }
 
-        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+        await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync();
 
-        document.FileActionOccurred -= DocumentOnFileActionOccurred;
-        document.FileActionOccurred += DocumentOnFileActionOccurred;
-        UpdateFilePathLabel(document);
+        document.FileActionOccurred -= this.HandleDocumentOnFileAction;
+        document.FileActionOccurred += this.HandleDocumentOnFileAction;
+        this.UpdateFilePathLabel(document, forced);
         var project = await VisualStudioHelper.GetProjectFromDocumentAsync(document);
-        ProjectNameLabel.Content = project == null ? "(no project)" : project.Name;
+        this.ProjectNameLabel!.Content = project?.Name ?? "(no project)";
         if (project != null)
         {
-            var parents = await VisualStudioHelper.GetSolutionFolderPathAsync(await VisualStudioHelper.ConvertToSolutionItemAsync(project));
-            SolutionFoldersList.ItemsSource = parents;
+            var parents =
+                await VisualStudioHelper.GetSolutionFolderPathAsync(
+                    await VisualStudioHelper.ConvertToSolutionItemAsync(project));
+            this.SolutionFoldersList!.ItemsSource = parents;
         }
         else
         {
@@ -91,84 +101,107 @@ public partial class EditorBarControl : IWpfTextViewMargin
             var project2 = allProjects.FirstOrDefault(t => t.FullPath == document.FilePath);
             if (project2 != null)
             {
-                ProjectNameLabel.Content = project2.Name;
+                this.ProjectNameLabel.Content = project2.Name;
                 var parents = await VisualStudioHelper.GetSolutionFolderPathAsync(project2);
-                SolutionFoldersList.ItemsSource = parents;
+                this.SolutionFoldersList!.ItemsSource = parents;
             }
         }
     }
 
-    private void UpdateFilePathLabel(ITextDocument document)
+    private void ReloadStyles()
     {
-        FilePath = document.FilePath;
+        // remove old style (remove only styles from this extension), we have also VS theme loaded on the control (toolkit:Themes.UseVsTheme="True"
+        var currentStyleResourceDictionaries = this.Resources.MergedDictionaries
+            .Where(t => t.Source != null && t.Source.IsAbsoluteUri && t.Source.AbsolutePath.Contains("/EditorBar;") &&
+                        t.Source.AbsolutePath.Contains("Style.xaml"))
+            .ToList();
 
-        var currentSolution = VS.Solutions.GetCurrentSolution();
-        if (currentSolution != null)
+        foreach (var c in currentStyleResourceDictionaries)
         {
-            var slnPath = currentSolution.FullPath;
-            var slnDir = Path.GetDirectoryName(slnPath);
-            RelativePath = slnDir == null ? FilePath : GetRelativePath(FilePath, slnDir);
-        }
-        else
-        {
-            RelativePath = FilePath;
+            this.Resources.MergedDictionaries.Remove(c);
         }
 
-        PathLabel.Content = GeneralPage.Instance.ShowPathRelativeToSolutionRoot
-            ? RelativePath
-            : FilePath;
+        // add new style
+        var newStyleUri =
+            new Uri($"pack://application:,,,/EditorBar;component/Styles/{GeneralPage.Instance.DisplayStyle}Style.xaml");
+        var newResourceDict = new ResourceDictionary { Source = newStyleUri };
+        this.Resources.MergedDictionaries.Add(newResourceDict);
     }
 
-    private string GetRelativePath(string documentFilePath, string slnDir)
+    private void UpdateFilePathLabel(ITextDocument document, bool forced = false)
     {
-        if (!documentFilePath.StartsWith(slnDir, StringComparison.OrdinalIgnoreCase))
+        if (!forced && string.Equals(this.FilePath!, document.FilePath!, StringComparison.Ordinal))
         {
-            return documentFilePath;
+            return;
         }
 
-        return documentFilePath.Substring(slnDir.Length);
+        this.FilePath = document.FilePath;
+        this.RelativePath = this.GetRelativePathToSolution(this.FilePath);
+
+        var pathLabelText = GeneralPage.Instance.ShowPathRelativeToSolutionRoot ? this.RelativePath : this.FilePath;
+        this.PathLabel!.Content = pathLabelText ?? "(unnamed document)";
     }
 
-
-    private async void DocumentOnFileActionOccurred(object sender, TextDocumentFileActionEventArgs e)
+    private string? GetRelativePathToSolution(string? path)
     {
-        FilePath = e.FilePath;
-        UpdateAsync().FireAndForget();
-    }
-
-    private ITextDocument? GetCurrentDocument()
-    {
-        if (_textView == null)
+        if (path == null)
         {
             return null;
         }
 
-        _textView.TextDataModel.DocumentBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out var document);
+        var currentSolution = VS.Solutions.GetCurrentSolution();
+        var slnPath = currentSolution?.FullPath;
+        if (string.IsNullOrWhiteSpace(slnPath!))
+        {
+            return path;
+        }
+
+        var slnDir = Path.GetDirectoryName(slnPath!);
+        return slnDir == null ? path : GetRelativePath(path, slnDir);
+    }
+
+    private static string GetRelativePath(string filePath, string slnDir)
+    {
+        return !filePath.StartsWith(slnDir, StringComparison.OrdinalIgnoreCase)
+            ? filePath
+            : filePath.Substring(slnDir.Length);
+    }
+
+
+    private void HandleDocumentOnFileAction(object sender, TextDocumentFileActionEventArgs e)
+    {
+        this.UpdateAsync().FireAndForget();
+    }
+
+    private ITextDocument? GetCurrentDocument()
+    {
+        ITextDocument? document = null;
+        this._textView?.TextDataModel?.DocumentBuffer?.Properties?.TryGetProperty(typeof(ITextDocument), out document);
         return document;
     }
 
     private void OpenFolderClicked(object sender, RoutedEventArgs e)
     {
         var fileName = this.FilePath;
-        if (!string.IsNullOrWhiteSpace(fileName))
+        if (!StringHelper.IsNullOrWhiteSpace(fileName))
         {
             var directoryName = Path.GetDirectoryName(fileName);
-            if (!string.IsNullOrWhiteSpace(directoryName) && Directory.Exists(directoryName))
+            if (!StringHelper.IsNullOrWhiteSpace(directoryName!) && Directory.Exists(directoryName))
             {
                 Process.Start(new ProcessStartInfo("explorer.exe", "/select, " + fileName) { UseShellExecute = true });
             }
         }
     }
 
-    private async void SettingsClicked(object sender, RoutedEventArgs e)
+    private void SettingsClicked(object sender, RoutedEventArgs e)
     {
-        await VS.Settings.OpenAsync<OptionsProvider.GeneralPageOptions>();
+        VS.Settings.OpenAsync<OptionsProvider.GeneralPageOptions>().FireAndForget();
     }
 
     private void CopyPathClicked(object sender, RoutedEventArgs e)
     {
-        var filePath = FilePath;
-        if (!string.IsNullOrWhiteSpace(filePath))
+        var filePath = this.FilePath;
+        if (!StringHelper.IsNullOrWhiteSpace(filePath))
         {
             Clipboard.SetText(filePath, TextDataFormat.UnicodeText);
         }
@@ -176,8 +209,8 @@ public partial class EditorBarControl : IWpfTextViewMargin
 
     private void CopyRelativePathClicked(object sender, RoutedEventArgs e)
     {
-        var filePath = RelativePath;
-        if (!string.IsNullOrWhiteSpace(filePath))
+        var filePath = this.RelativePath;
+        if (!StringHelper.IsNullOrWhiteSpace(filePath))
         {
             Clipboard.SetText(filePath, TextDataFormat.UnicodeText);
         }

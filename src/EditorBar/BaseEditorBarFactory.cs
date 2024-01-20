@@ -1,55 +1,27 @@
-﻿using JPSoftworks.EditorBar.Options;
-using Microsoft.VisualStudio.Text;
+﻿// ------------------------------------------------------------
+//
+// Copyright (c) Jiří Polášek. All rights reserved.
+//
+// ------------------------------------------------------------
+
+using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.Text.Editor;
 
 namespace JPSoftworks.EditorBar;
 
-public abstract class BaseEditorBarFactory : IWpfTextViewMarginProvider
+/// <summary>
+/// Base for a factory for creating a margin that will hold the Editor bar.
+/// </summary>
+/// <seealso cref="Microsoft.VisualStudio.Text.Editor.IWpfTextViewMarginProvider" />
+abstract class BaseEditorBarFactory(BarPosition targetBarPosition) : IWpfTextViewMarginProvider
 {
-    private BarPosition TargetBarPosition { get; }
-
-    private bool _shouldBeVisible;
     private IWpfTextView? _textView;
-    private IWpfTextViewMargin? _currentMargin;
+    private BarPosition TargetBarPosition { get; } = targetBarPosition;
 
-    protected BaseEditorBarFactory(BarPosition targetBarPosition)
-    {
-        TargetBarPosition = targetBarPosition;
-        GeneralPage.Saved += GeneralPageOnSaved;
-        _shouldBeVisible = GeneralPage.Instance.BarPosition == TargetBarPosition;
-    }
-
-    private void GeneralPageOnSaved(GeneralPage optionsPage)
-    {
-        _currentMargin?.Dispose();
-
-        if (!_shouldBeVisible && optionsPage.BarPosition == TargetBarPosition)
-        {
-            // recreate margin
-            _shouldBeVisible = true;
-            if (_textView != null)
-            {
-                RefreshTextView(_textView);
-            }
-        }
-        _shouldBeVisible = optionsPage.BarPosition == TargetBarPosition;
-    }
-
-    private static void RefreshTextView(IWpfTextView textView)
-    {
-        textView.DisplayTextLineContainingBufferPosition(new SnapshotPoint(textView.TextSnapshot, 0), 0, ViewRelativePosition.Top);
-
-        var originalZoomLevel = textView.ZoomLevel;
-        textView.ZoomLevel = originalZoomLevel + 0.01;  // Slight zoom change
-        textView.ZoomLevel = originalZoomLevel;         // Revert the zoom change
-    }
-
-
+    /// <inheritdoc />
     public IWpfTextViewMargin? CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)
     {
-        _shouldBeVisible = GeneralPage.Instance.BarPosition == TargetBarPosition;
-        _textView = wpfTextViewHost.TextView;
-        _currentMargin = _shouldBeVisible ? new EditorBarControl(_textView) : null;
-        return _currentMargin;
+        this._textView = wpfTextViewHost.TextView;
+        return this._textView != null ? new EditorBarMargin(this._textView, this.TargetBarPosition) : null;
     }
 }

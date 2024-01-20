@@ -1,7 +1,7 @@
 // ------------------------------------------------------------
-// 
-// Copyright (c) Ji¯Ì Pol·öek. All rights reserved.
-// 
+//
+// Copyright (c) Ji≈ô√≠ Pol√°≈°ek. All rights reserved.
+//
 // ------------------------------------------------------------
 
 global using System;
