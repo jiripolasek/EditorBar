@@ -10,7 +10,8 @@
         <Setter Property="BorderBrush" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarBorderKey}}" />
         <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarGradientKey}}" />
         <Setter Property="CornerRadius" Value="2" />
-        <Setter Property="TextElement.FontSize" Value="11" />
+        <Setter Property="TextElement.FontFamily" Value="{DynamicResource {x:Static shell:VsFonts.EnvironmentFontFamilyKey}}" />
+        <Setter Property="TextElement.FontSize" Value="{DynamicResource {x:Static shell:VsFonts.Environment90PercentFontSizeKey}}" />
     </Style>
 
     <Style x:Key="BreadcrumbElement" TargetType="Border">
