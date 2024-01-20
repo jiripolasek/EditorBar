@@ -20,11 +20,9 @@
 
     <Style x:Key="BreadcrumbElementFirst" TargetType="Border" BasedOn="{StaticResource BreadcrumbElement}">
         <Setter Property="CornerRadius" Value="2,0,0,2" />
-        <Setter Property="Background" Value="Purple" />
     </Style>
 
     <Style x:Key="BreadcrumbElementFolder" TargetType="Border" BasedOn="{StaticResource BreadcrumbElement}">
-        <Setter Property="Background" Value="#FFE0B900" />
     </Style>
 
     <Style x:Key="BreadcrumbElementLast" TargetType="Border" BasedOn="{StaticResource BreadcrumbElement}">
@@ -32,7 +30,6 @@
     </Style>
 
     <Style x:Key="BreadcrumbElementProject" TargetType="Border" BasedOn="{StaticResource BreadcrumbElementLast}">
-        <Setter Property="Background" Value="LightSkyBlue" />
     </Style>
 
     <Style x:Key="DocumentPathElement" TargetType="Border">

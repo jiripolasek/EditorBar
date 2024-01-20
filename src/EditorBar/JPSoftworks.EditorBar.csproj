@@ -75,6 +75,7 @@
     </Compile>
     <Compile Include="EditorBarMargin.cs" />
     <Compile Include="GlobalUsings.cs" />
+    <Compile Include="Helpers\ColorExtensions.cs" />
     <Compile Include="Helpers\NullabilityPolyfil.cs" />
     <Compile Include="Options\BarPosition.cs" />
     <Compile Include="Options\DisplayStyle.cs" />

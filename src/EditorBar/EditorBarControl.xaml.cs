@@ -7,6 +7,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Media;
 using Community.VisualStudio.Toolkit;
 using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Options;
@@ -21,6 +22,30 @@ namespace JPSoftworks.EditorBar;
 /// </summary>
 public partial class EditorBarControl
 {
+    public static readonly DependencyProperty SolutionElementBackgroundProperty =
+        DependencyProperty.Register(nameof(SolutionElementBackground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.Purple));
+
+    public static readonly DependencyProperty SolutionElementForegroundProperty =
+        DependencyProperty.Register(nameof(SolutionElementForeground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.Black));
+
+    public static readonly DependencyProperty ProjectElementBackgroundProperty =
+        DependencyProperty.Register(nameof(ProjectElementBackground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.LightSkyBlue));
+
+    public static readonly DependencyProperty ProjectElementForegroundProperty =
+        DependencyProperty.Register(nameof(ProjectElementForeground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.Black));
+
+    public static readonly DependencyProperty SolutionFolderElementBackgroundProperty =
+        DependencyProperty.Register(nameof(SolutionFolderElementBackground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.Gold));
+
+    public static readonly DependencyProperty SolutionFolderElementForegroundProperty =
+        DependencyProperty.Register(nameof(SolutionFolderElementForeground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.Black));
+
+    public static readonly DependencyProperty ShowSolutionFoldersProperty = DependencyProperty.Register(
+        nameof(ShowSolutionFolders), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(default(bool)));
+
+    public static readonly DependencyProperty ShowSolutionRootProperty = DependencyProperty.Register(
+        nameof(ShowSolutionRoot), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(default(bool)));
+
     private readonly IWpfTextView? _textView;
 
     public EditorBarControl(IWpfTextView textView)
@@ -45,13 +70,61 @@ public partial class EditorBarControl
         VS.Events.SolutionEvents.OnAfterOpenSolution += _ => this.OnSomethingAboutDocumentNameChanged();
     }
 
+    public Brush SolutionElementBackground
+    {
+        get => (Brush)this.GetValue(SolutionElementBackgroundProperty)!;
+        set => this.SetValue(SolutionElementBackgroundProperty, value);
+    }
+
+    public Brush SolutionElementForeground
+    {
+        get => (Brush)this.GetValue(SolutionElementForegroundProperty)!;
+        set => this.SetValue(SolutionElementForegroundProperty, value);
+    }
+
+    public Brush ProjectElementBackground
+    {
+        get => (Brush)this.GetValue(ProjectElementBackgroundProperty)!;
+        set => this.SetValue(ProjectElementBackgroundProperty, value);
+    }
+
+    public Brush ProjectElementForeground
+    {
+        get => (Brush)this.GetValue(ProjectElementForegroundProperty)!;
+        set => this.SetValue(ProjectElementForegroundProperty, value);
+    }
+
+    public Brush SolutionFolderElementBackground
+    {
+        get => (Brush)this.GetValue(SolutionFolderElementBackgroundProperty)!;
+        set => this.SetValue(SolutionFolderElementBackgroundProperty, value);
+    }
+
+    public Brush SolutionFolderElementForeground
+    {
+        get => (Brush)this.GetValue(SolutionFolderElementForegroundProperty)!;
+        set => this.SetValue(SolutionFolderElementForegroundProperty, value);
+    }
+
+    public bool ShowSolutionFolders
+    {
+        get => (bool)this.GetValue(ShowSolutionFoldersProperty);
+        set => this.SetValue(ShowSolutionFoldersProperty, value);
+    }
+
+    public bool ShowSolutionRoot
+    {
+        get => (bool)this.GetValue(ShowSolutionRootProperty);
+        set => this.SetValue(ShowSolutionRootProperty, value);
+    }
+
     private string? FilePath { get; set; }
 
     private string? RelativePath { get; set; }
 
     private void OnSomethingAboutDocumentNameChanged()
     {
-        this.UpdateAsync().FireAndForget();
+        this.UpdateAsync(true).FireAndForget();
     }
 
     private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -65,7 +138,7 @@ public partial class EditorBarControl
     private void OnSettingsChanged()
     {
         this.UpdateAsync(true).FireAndForget();
-        this.ReloadStyles();
+        this.ReapplySettings();
     }
 
     private async Task UpdateAsync(bool forced = false)
@@ -108,13 +181,27 @@ public partial class EditorBarControl
         }
     }
 
-    private void ReloadStyles()
+    private void ReapplySettings()
+    {
+        this.SolutionElementBackground = new SolidColorBrush(GeneralPage.Instance.SolutionBackground.ToMediaColor());
+        this.SolutionElementForeground = new SolidColorBrush(GeneralPage.Instance.SolutionForeground.ToMediaColor());
+
+        this.ProjectElementBackground = new SolidColorBrush(GeneralPage.Instance.ProjectBackground.ToMediaColor());
+        this.ProjectElementForeground = new SolidColorBrush(GeneralPage.Instance.ProjectForeground.ToMediaColor());
+
+        this.SolutionFolderElementBackground = new SolidColorBrush(GeneralPage.Instance.SolutionFolderBackground.ToMediaColor());
+        this.SolutionFolderElementForeground = new SolidColorBrush(GeneralPage.Instance.SolutionFolderForeground.ToMediaColor());
+
+        this.ShowSolutionFolders = GeneralPage.Instance.ShowSolutionFolders;
+        this.ShowSolutionRoot = GeneralPage.Instance.ShowSolutionRoot;
+
+        this.ReloadStyle();
+    }
+
+    private void ReloadStyle()
     {
         // remove old style (remove only styles from this extension), we have also VS theme loaded on the control (toolkit:Themes.UseVsTheme="True"
-        var currentStyleResourceDictionaries = this.Resources.MergedDictionaries
-            .Where(t => t.Source != null && t.Source.IsAbsoluteUri && t.Source.AbsolutePath.Contains("/EditorBar;") &&
-                        t.Source.AbsolutePath.Contains("Style.xaml"))
-            .ToList();
+        var currentStyleResourceDictionaries = this.Resources.MergedDictionaries.Where(IsEditorBarStyleXamlComponent).ToList();
 
         foreach (var c in currentStyleResourceDictionaries)
         {
@@ -122,10 +209,16 @@ public partial class EditorBarControl
         }
 
         // add new style
-        var newStyleUri =
-            new Uri($"pack://application:,,,/EditorBar;component/Styles/{GeneralPage.Instance.DisplayStyle}Style.xaml");
+        var newStyleUri = new Uri($"pack://application:,,,/EditorBar;component/Styles/{GeneralPage.Instance.DisplayStyle}Style.xaml");
         var newResourceDict = new ResourceDictionary { Source = newStyleUri };
         this.Resources.MergedDictionaries.Add(newResourceDict);
+        return;
+
+        static bool IsEditorBarStyleXamlComponent(ResourceDictionary resourceDictionary) =>
+            resourceDictionary.Source != null
+            && resourceDictionary.Source.IsAbsoluteUri
+            && resourceDictionary.Source.AbsolutePath.Contains("/EditorBar;")
+            && resourceDictionary.Source.AbsolutePath.Contains("Style.xaml");
     }
 
     private void UpdateFilePathLabel(ITextDocument document, bool forced = false)
