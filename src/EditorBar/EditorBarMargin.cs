@@ -39,6 +39,7 @@ public class EditorBarMargin : IWpfTextViewMargin
     public void Dispose()
     {
         GeneralPage.Saved -= this.GeneralPageOnSaved;
+        this._editorBarControl.Dispose();
     }
 
     /// <summary>

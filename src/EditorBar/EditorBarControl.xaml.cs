@@ -20,7 +20,7 @@ namespace JPSoftworks.EditorBar;
 /// <summary>
 /// Interaction logic for EditorBarControl.xaml
 /// </summary>
-public partial class EditorBarControl
+public partial class EditorBarControl : IDisposable
 {
     public static readonly DependencyProperty SolutionElementBackgroundProperty =
         DependencyProperty.Register(nameof(SolutionElementBackground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.Purple));
@@ -60,14 +60,14 @@ public partial class EditorBarControl
         };
         this.IsVisibleChanged += this.OnIsVisibleChanged;
 
-        GeneralPage.Saved += _ => this.OnSettingsChanged();
+        GeneralPage.Saved += this.OnGeneralPageOnSaved;
 
-        VS.Events.ProjectItemsEvents.AfterRenameProjectItems += _ => this.OnSomethingAboutDocumentNameChanged();
-        VS.Events.ProjectItemsEvents.AfterAddProjectItems += _ => this.OnSomethingAboutDocumentNameChanged();
-        VS.Events.ProjectItemsEvents.AfterRemoveProjectItems += _ => this.OnSomethingAboutDocumentNameChanged();
-        VS.Events.DocumentEvents.Saved += _ => this.OnSomethingAboutDocumentNameChanged();
-        VS.Events.SolutionEvents.OnAfterRenameProject += _ => this.OnSomethingAboutDocumentNameChanged();
-        VS.Events.SolutionEvents.OnAfterOpenSolution += _ => this.OnSomethingAboutDocumentNameChanged();
+        VS.Events.ProjectItemsEvents.AfterRenameProjectItems += this.OnProjectItemsEventsOnAfterRenameProjectItems;
+        VS.Events.ProjectItemsEvents.AfterAddProjectItems += this.OnProjectItemsEventsOnAfterAddProjectItems;
+        VS.Events.ProjectItemsEvents.AfterRemoveProjectItems += this.OnProjectItemsEventsOnAfterRemoveProjectItems;
+        VS.Events.DocumentEvents.Saved += this.OnDocumentEventsOnSaved;
+        VS.Events.SolutionEvents.OnAfterRenameProject += this.OnSolutionEventsOnOnAfterRenameProject;
+        VS.Events.SolutionEvents.OnAfterOpenSolution += this.OnSolutionEventsOnOnAfterOpenSolution;
     }
 
     public Brush SolutionElementBackground
@@ -122,23 +122,21 @@ public partial class EditorBarControl
 
     private string? RelativePath { get; set; }
 
+    public void Dispose()
+    {
+        GeneralPage.Saved -= this.OnGeneralPageOnSaved;
+
+        VS.Events.ProjectItemsEvents.AfterRenameProjectItems -= this.OnProjectItemsEventsOnAfterRenameProjectItems;
+        VS.Events.ProjectItemsEvents.AfterAddProjectItems -= this.OnProjectItemsEventsOnAfterAddProjectItems;
+        VS.Events.ProjectItemsEvents.AfterRemoveProjectItems -= this.OnProjectItemsEventsOnAfterRemoveProjectItems;
+        VS.Events.DocumentEvents.Saved -= this.OnDocumentEventsOnSaved;
+        VS.Events.SolutionEvents.OnAfterRenameProject -= this.OnSolutionEventsOnOnAfterRenameProject;
+        VS.Events.SolutionEvents.OnAfterOpenSolution -= this.OnSolutionEventsOnOnAfterOpenSolution;
+    }
+
     private void OnSomethingAboutDocumentNameChanged()
     {
         this.UpdateAsync(true).FireAndForget();
-    }
-
-    private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-    {
-        if ((bool)e.NewValue)
-        {
-            this.UpdateAsync().FireAndForget();
-        }
-    }
-
-    private void OnSettingsChanged()
-    {
-        this.UpdateAsync(true).FireAndForget();
-        this.ReapplySettings();
     }
 
     private async Task UpdateAsync(bool forced = false)
@@ -307,5 +305,54 @@ public partial class EditorBarControl
         {
             Clipboard.SetText(filePath, TextDataFormat.UnicodeText);
         }
+    }
+
+    private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if ((bool)e.NewValue)
+        {
+            this.UpdateAsync().FireAndForget();
+        }
+    }
+
+    private void OnSettingsChanged()
+    {
+        this.UpdateAsync(true).FireAndForget();
+        this.ReapplySettings();
+    }
+
+    private void OnGeneralPageOnSaved(GeneralPage _)
+    {
+        this.OnSettingsChanged();
+    }
+
+    private void OnProjectItemsEventsOnAfterRenameProjectItems(AfterRenameProjectItemEventArgs? _)
+    {
+        this.OnSomethingAboutDocumentNameChanged();
+    }
+
+    private void OnProjectItemsEventsOnAfterAddProjectItems(IEnumerable<SolutionItem> _)
+    {
+        this.OnSomethingAboutDocumentNameChanged();
+    }
+
+    private void OnProjectItemsEventsOnAfterRemoveProjectItems(AfterRemoveProjectItemEventArgs? _)
+    {
+        this.OnSomethingAboutDocumentNameChanged();
+    }
+
+    private void OnDocumentEventsOnSaved(string _)
+    {
+        this.OnSomethingAboutDocumentNameChanged();
+    }
+
+    private void OnSolutionEventsOnOnAfterRenameProject(Project? _)
+    {
+        this.OnSomethingAboutDocumentNameChanged();
+    }
+
+    private void OnSolutionEventsOnOnAfterOpenSolution(Solution? _)
+    {
+        this.OnSomethingAboutDocumentNameChanged();
     }
 }
