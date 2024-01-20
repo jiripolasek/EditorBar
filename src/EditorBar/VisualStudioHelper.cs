@@ -4,6 +4,7 @@
 //
 // ------------------------------------------------------------
 
+using System.Threading;
 using Community.VisualStudio.Toolkit;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
@@ -12,33 +13,81 @@ using Project = EnvDTE.Project;
 
 namespace JPSoftworks.EditorBar;
 
+/// <summary>
+/// Helper methods for operations on Visual Studio objects.
+/// </summary>
 internal static class VisualStudioHelper
 {
-    internal static async Task<SolutionItem?> ConvertToSolutionItemAsync(Project dteProject)
+    /// <summary>
+    /// Converts to solution item asynchronous.
+    /// </summary>
+    /// <param name="dteProject">The DTE project.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns></returns>
+    /// <exception cref="System.ArgumentNullException">dteProject</exception>
+    /// <exception cref="OperationCanceledException">
+    /// Thrown back at the awaiting caller if <paramref name="cancellationToken" /> is canceled,
+    /// even if the caller is already on the main thread.
+    /// </exception>
+    internal static async Task<SolutionItem?> ConvertToSolutionItemAsync(Project dteProject,
+        CancellationToken cancellationToken = default)
     {
         if (dteProject == null)
         {
             throw new ArgumentNullException(nameof(dteProject));
         }
 
-        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+        await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
 
         var allProjects = await VS.Solutions.GetAllProjectsAsync(ProjectStateFilter.All).ConfigureAwait(false);
-        return allProjects.FirstOrDefault(t => t.FullPath == dteProject.FullName);
+        return allProjects.FirstOrDefault(t =>
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            return t.FullPath == dteProject.FullName;
+        });
     }
 
-    internal static async Task<Project?> GetProjectFromDocumentAsync(ITextDocument document)
+    /// <summary>
+    /// Gets the project the <paramref name="document" /> belongs to.
+    /// </summary>
+    /// <param name="document">The document.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>
+    /// The instance of project the document belongs to or <c>null</c>.
+    /// </returns>
+    /// <exception cref="System.ArgumentNullException">document</exception>
+    /// <exception cref="OperationCanceledException">
+    /// Thrown back at the awaiting caller if <paramref name="cancellationToken" /> is canceled, even if the caller is
+    /// already on the main thread.
+    /// </exception>
+    internal static async Task<Project?> GetProjectFromDocumentAsync(ITextDocument document,
+        CancellationToken cancellationToken = default)
     {
         if (document == null)
         {
             throw new ArgumentNullException(nameof(document));
         }
 
-        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+        if (document.FilePath == null)
+        {
+            return null;
+        }
 
-        var dte = (DTE)Package.GetGlobalService(typeof(DTE));
-        var projects = dte.Solution.Projects.OfType<Project>().ToList();
-        var projectFile = projects.FirstOrDefault(t => string.Equals(t.FullName, document.FilePath, StringComparison.OrdinalIgnoreCase));
+        await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
+
+        var dte = (DTE?)Package.GetGlobalService(typeof(DTE));
+        if (dte?.Solution?.Projects == null)
+        {
+            return null;
+        }
+
+        var projects = dte.Solution!.Projects.OfType<Project>().ToList();
+        var projectFile = projects.FirstOrDefault(t =>
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            return string.Equals(t.FullName!, document.FilePath!, StringComparison.OrdinalIgnoreCase);
+        });
+
         if (projectFile != null)
         {
             return projectFile;
@@ -48,25 +97,36 @@ internal static class VisualStudioHelper
         return projectItem?.ContainingProject;
     }
 
-    internal static async Task<List<string>> GetSolutionFolderPathAsync(SolutionItem? project)
+    /// <summary>
+    /// Gets the solution folder path asynchronous.
+    /// </summary>
+    /// <param name="project">The project.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns></returns>
+    /// <exception cref="OperationCanceledException">
+    /// Thrown back at the awaiting caller if <paramref name="cancellationToken" /> is canceled,
+    /// even if the caller is already on the main thread.
+    /// </exception>
+    internal static async Task<List<string>> GetSolutionFolderPathAsync(SolutionItem? project,
+        CancellationToken cancellationToken = default)
     {
-        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
         var folderPath = new List<string>();
         if (project == null)
         {
             return folderPath;
         }
 
+        await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
+
         var parent = project.FindParent(SolutionItemType.SolutionFolder);
         while (parent != null)
         {
-            folderPath.Add(parent.Name);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            folderPath.Insert(0, parent.Name);
             parent = parent.FindParent(SolutionItemType.SolutionFolder);
         }
 
-        // Reverse to get the order from solution to project
-        folderPath.Reverse();
         return folderPath;
     }
 }

@@ -1,23 +1,23 @@
 ﻿// ------------------------------------------------------------
-//
+// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-//
+// 
 // ------------------------------------------------------------
 
 namespace JPSoftworks.EditorBar.Options;
 
 /// <summary>
-/// Represents Editor Bar position options.
+/// Represents the display style options for the Editor bar.
 /// </summary>
-public enum BarPosition
+public enum DisplayStyle
 {
     /// <summary>
-    /// The top of the text view.
+    /// The normal display style.
     /// </summary>
-    Top = 0,
+    Normal,
 
     /// <summary>
-    /// The bottom of the text view.
+    /// The compact display style.
     /// </summary>
-    Bottom = 1
+    Compact
 }
