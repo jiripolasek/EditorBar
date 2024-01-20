@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Jiří Polášek")]
 [assembly: AssemblyProduct("Editor Bar")]
-[assembly: AssemblyCopyright("(c) 2023 Jiří Polášek")]
+[assembly: AssemblyCopyright("(c) 2024 Jiří Polášek")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
