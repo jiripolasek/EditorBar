@@ -59,15 +59,15 @@ public partial class EditorBarControl : IDisposable
             this.OnSettingsChanged();
         };
         this.IsVisibleChanged += this.OnIsVisibleChanged;
-        
-        GeneralPage.Saved += OnGeneralPageOnSaved;
 
-        VS.Events.ProjectItemsEvents.AfterRenameProjectItems += OnProjectItemsEventsOnAfterRenameProjectItems;
-        VS.Events.ProjectItemsEvents.AfterAddProjectItems += OnProjectItemsEventsOnAfterAddProjectItems;
-        VS.Events.ProjectItemsEvents.AfterRemoveProjectItems += OnProjectItemsEventsOnAfterRemoveProjectItems;
-        VS.Events.DocumentEvents.Saved += OnDocumentEventsOnSaved;
-        VS.Events.SolutionEvents.OnAfterRenameProject += OnSolutionEventsOnOnAfterRenameProject;
-        VS.Events.SolutionEvents.OnAfterOpenSolution += OnSolutionEventsOnOnAfterOpenSolution;
+        GeneralPage.Saved += this.OnGeneralPageOnSaved;
+
+        VS.Events.ProjectItemsEvents.AfterRenameProjectItems += this.OnProjectItemsEventsOnAfterRenameProjectItems;
+        VS.Events.ProjectItemsEvents.AfterAddProjectItems += this.OnProjectItemsEventsOnAfterAddProjectItems;
+        VS.Events.ProjectItemsEvents.AfterRemoveProjectItems += this.OnProjectItemsEventsOnAfterRemoveProjectItems;
+        VS.Events.DocumentEvents.Saved += this.OnDocumentEventsOnSaved;
+        VS.Events.SolutionEvents.OnAfterRenameProject += this.OnSolutionEventsOnOnAfterRenameProject;
+        VS.Events.SolutionEvents.OnAfterOpenSolution += this.OnSolutionEventsOnOnAfterOpenSolution;
     }
 
     public Brush SolutionElementBackground
@@ -121,6 +121,18 @@ public partial class EditorBarControl : IDisposable
     private string? FilePath { get; set; }
 
     private string? RelativePath { get; set; }
+
+    public void Dispose()
+    {
+        GeneralPage.Saved -= this.OnGeneralPageOnSaved;
+
+        VS.Events.ProjectItemsEvents.AfterRenameProjectItems -= this.OnProjectItemsEventsOnAfterRenameProjectItems;
+        VS.Events.ProjectItemsEvents.AfterAddProjectItems -= this.OnProjectItemsEventsOnAfterAddProjectItems;
+        VS.Events.ProjectItemsEvents.AfterRemoveProjectItems -= this.OnProjectItemsEventsOnAfterRemoveProjectItems;
+        VS.Events.DocumentEvents.Saved -= this.OnDocumentEventsOnSaved;
+        VS.Events.SolutionEvents.OnAfterRenameProject -= this.OnSolutionEventsOnOnAfterRenameProject;
+        VS.Events.SolutionEvents.OnAfterOpenSolution -= this.OnSolutionEventsOnOnAfterOpenSolution;
+    }
 
     private void OnSomethingAboutDocumentNameChanged()
     {
@@ -307,17 +319,6 @@ public partial class EditorBarControl : IDisposable
     {
         this.UpdateAsync(true).FireAndForget();
         this.ReapplySettings();
-    }
-
-    public void Dispose()
-    {
-        GeneralPage.Saved -= OnGeneralPageOnSaved;
-        VS.Events.ProjectItemsEvents.AfterRenameProjectItems -= OnProjectItemsEventsOnAfterRenameProjectItems;
-        VS.Events.ProjectItemsEvents.AfterAddProjectItems -= OnProjectItemsEventsOnAfterAddProjectItems;
-        VS.Events.ProjectItemsEvents.AfterRemoveProjectItems -= OnProjectItemsEventsOnAfterRemoveProjectItems;
-        VS.Events.DocumentEvents.Saved -= OnDocumentEventsOnSaved;
-        VS.Events.SolutionEvents.OnAfterRenameProject -= OnSolutionEventsOnOnAfterRenameProject;
-        VS.Events.SolutionEvents.OnAfterOpenSolution -= OnSolutionEventsOnOnAfterOpenSolution;
     }
 
     private void OnGeneralPageOnSaved(GeneralPage _)
