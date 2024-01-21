@@ -24,6 +24,8 @@ public class GeneralPage : BaseOptionModel<GeneralPage>
     private const string AppearanceCategoryName = "Appearance";
     private const string GeneralCategoryName = "General";
     private const string ColorsCategoryName = "Colors";
+    private const string AdditionalActionCategoryName = "Actions";
+    private const string ExternalEditorCategoryName = "External Editor";
 
     // -------------------------------------------  
     // Appearance category
@@ -219,4 +221,38 @@ public class GeneralPage : BaseOptionModel<GeneralPage>
     }
 
     #endregion
+
+    // -------------------------------------------
+    // External Editor category
+    // -------------------------------------------
+
+    [Category(ExternalEditorCategoryName)]
+    [DisplayName("External editor executable")]
+    [Description("Path to external editor or command.")]
+    [DefaultValue("notepad.exe")]
+    public string? ExternalEditorCommand { get; set; } = "notepad.exe";
+
+    [Category(ExternalEditorCategoryName)]
+    [DisplayName("External editor executable arguments")]
+    [Description("Path to external editor or command. " + Launcher.FileNamePlaceholderConstant + " represents the file name.")]
+    [DefaultValue(Launcher.FileNamePlaceholderConstant)]
+    public string? ExternalEditorCommandArguments { get; set; } = Launcher.FileNamePlaceholderConstant;
+
+    // -------------------------------------------
+    // Additional Actions category
+    // -------------------------------------------
+
+    [Category(AdditionalActionCategoryName)]
+    [DisplayName("Double-click action")]
+    [Description("Action to be performed when double-clicking on the file path.")]
+    [DefaultValue(typeof(FileAction), nameof(FileAction.OpenContainingFolder))]
+    [TypeConverter(typeof(EnumToDescriptionConverter))]
+    public FileAction FileAction { get; set; } = FileAction.OpenContainingFolder;
+
+    [Category(AdditionalActionCategoryName)]
+    [DisplayName("Double-click + CTRL action")]
+    [Description("Action to be performed when double-clicking on the file path.")]
+    [DefaultValue(typeof(FileAction), nameof(FileAction.OpenInExternalEditor))]
+    [TypeConverter(typeof(EnumToDescriptionConverter))]
+    public FileAction AlternateFileAction { get; set; } = FileAction.OpenInExternalEditor;
 }

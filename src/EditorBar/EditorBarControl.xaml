@@ -82,10 +82,13 @@
                                 <MenuItem Header="Copy _Relative Path" Click="CopyRelativePathClicked" />
                                 <Separator />
                                 <MenuItem Header="Open Containing _Folder" Click="OpenFolderClicked" />
+                                <Separator />
+                                <MenuItem Header="Open External _Editor" Click="OpenExternalEditorClicked" />
                             </ContextMenu>
                         </Border.ContextMenu>
                         <Label Style="{DynamicResource LabelWithoutAccelerator}"
                                Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}"
+                               MouseDoubleClick="PathLabel_OnMouseDoubleClick"
                                Name="PathLabel">
                             (document path placeholder)
                         </Label>

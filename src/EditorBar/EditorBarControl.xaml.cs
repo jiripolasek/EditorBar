@@ -4,9 +4,9 @@
 //
 // ------------------------------------------------------------
 
-using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using Community.VisualStudio.Toolkit;
 using JPSoftworks.EditorBar.Helpers;
@@ -161,9 +161,7 @@ public partial class EditorBarControl : IDisposable
         this.ProjectNameLabel!.Content = project?.Name ?? "(no project)";
         if (project != null)
         {
-            var parents =
-                await VisualStudioHelper.GetSolutionFolderPathAsync(
-                    await VisualStudioHelper.ConvertToSolutionItemAsync(project));
+            var parents = await VisualStudioHelper.GetSolutionFolderPathAsync(await VisualStudioHelper.ConvertToSolutionItemAsync(project));
             this.SolutionFoldersList!.ItemsSource = parents;
         }
         else
@@ -227,13 +225,13 @@ public partial class EditorBarControl : IDisposable
         }
 
         this.FilePath = document.FilePath;
-        this.RelativePath = this.GetRelativePathToSolution(this.FilePath);
+        this.RelativePath = GetRelativePathToSolution(this.FilePath);
 
         var pathLabelText = GeneralPage.Instance.ShowPathRelativeToSolutionRoot ? this.RelativePath : this.FilePath;
         this.PathLabel!.Content = pathLabelText ?? "(unnamed document)";
     }
 
-    private string? GetRelativePathToSolution(string? path)
+    private static string? GetRelativePathToSolution(string? path)
     {
         if (path == null)
         {
@@ -273,15 +271,7 @@ public partial class EditorBarControl : IDisposable
 
     private void OpenFolderClicked(object sender, RoutedEventArgs e)
     {
-        var fileName = this.FilePath;
-        if (!StringHelper.IsNullOrWhiteSpace(fileName))
-        {
-            var directoryName = Path.GetDirectoryName(fileName);
-            if (!StringHelper.IsNullOrWhiteSpace(directoryName!) && Directory.Exists(directoryName))
-            {
-                Process.Start(new ProcessStartInfo("explorer.exe", "/select, " + fileName) { UseShellExecute = true });
-            }
-        }
+        Launcher.OpenContaingFolder(this.FilePath);
     }
 
     private void SettingsClicked(object sender, RoutedEventArgs e)
@@ -289,22 +279,47 @@ public partial class EditorBarControl : IDisposable
         VS.Settings.OpenAsync<OptionsProvider.GeneralPageOptions>().FireAndForget();
     }
 
+    private void PathLabel_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        var hasControl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+        var action = hasControl
+            ? GeneralPage.Instance.AlternateFileAction
+            : GeneralPage.Instance.FileAction;
+
+        switch (action)
+        {
+            case FileAction.None:
+                break;
+            case FileAction.OpenContainingFolder:
+                Launcher.OpenContaingFolder(this.FilePath);
+                break;
+            case FileAction.OpenInExternalEditor:
+                Launcher.OpenInExternalEditor(this.FilePath);
+                break;
+            case FileAction.CopyRelativePath:
+                Launcher.CopyRelativePath(this.RelativePath);
+                break;
+            case FileAction.CopyAbsolutePath:
+                Launcher.CopyAbsolutePath(this.FilePath);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private void OpenExternalEditorClicked(object sender, RoutedEventArgs e)
+    {
+        Launcher.OpenInExternalEditor(this.FilePath);
+    }
+
     private void CopyPathClicked(object sender, RoutedEventArgs e)
     {
-        var filePath = this.FilePath;
-        if (!StringHelper.IsNullOrWhiteSpace(filePath))
-        {
-            Clipboard.SetText(filePath, TextDataFormat.UnicodeText);
-        }
+        Launcher.CopyAbsolutePath(this.FilePath);
     }
 
     private void CopyRelativePathClicked(object sender, RoutedEventArgs e)
     {
-        var filePath = this.RelativePath;
-        if (!StringHelper.IsNullOrWhiteSpace(filePath))
-        {
-            Clipboard.SetText(filePath, TextDataFormat.UnicodeText);
-        }
+        Launcher.CopyRelativePath(this.RelativePath);
     }
 
     private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
