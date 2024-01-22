@@ -191,6 +191,9 @@ public partial class EditorBarControl : IDisposable
         this.ShowSolutionFolders = GeneralPage.Instance.ShowSolutionFolders;
         this.ShowSolutionRoot = GeneralPage.Instance.ShowSolutionRoot;
 
+        this.OpenExternalEditorButton!.Visibility = StringHelper.IsNullOrWhiteSpace(GeneralPage.Instance.ExternalEditorCommand) ? Visibility.Collapsed : Visibility.Visible;
+        this.OpenExternalEditorMenuItem!.IsEnabled = !StringHelper.IsNullOrWhiteSpace(GeneralPage.Instance.ExternalEditorCommand);
+
         this.ReloadStyle();
     }
 
