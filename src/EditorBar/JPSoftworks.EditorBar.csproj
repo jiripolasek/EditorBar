@@ -77,6 +77,9 @@
     <Compile Include="GlobalUsings.cs" />
     <Compile Include="Helpers\ColorExtensions.cs" />
     <Compile Include="Helpers\NullabilityPolyfil.cs" />
+    <Compile Include="Launcher.cs" />
+    <Compile Include="Options\FileAction.cs" />
+    <Compile Include="Options\EnumToDescriptionConverter.cs" />
     <Compile Include="Options\BarPosition.cs" />
     <Compile Include="Options\DisplayStyle.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
