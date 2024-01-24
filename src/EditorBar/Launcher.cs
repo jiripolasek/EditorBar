@@ -22,14 +22,14 @@ internal static class Launcher
 
     internal static void OpenInExternalEditor(string? filePath)
     {
-        if (StringHelper.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath) || StringHelper.IsNullOrWhiteSpace(GeneralPage.Instance.ExternalEditorCommand))
+        if (StringHelper.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath) || StringHelper.IsNullOrWhiteSpace(GeneralOptionsModel.Instance.ExternalEditorCommand))
         {
             return;
         }
 
-        var command = GeneralPage.Instance.ExternalEditorCommand;
+        var command = GeneralOptionsModel.Instance.ExternalEditorCommand;
 
-        var commandArgs = (GeneralPage.Instance.ExternalEditorCommandArguments ?? "");
+        var commandArgs = (GeneralOptionsModel.Instance.ExternalEditorCommandArguments ?? "");
 
         // ensure file path as passed to the command arguments: if the arguments does not contain the placeholder, append it
         var hasPathPlaceholder = commandArgs.IndexOf(FileNamePlaceholderConstant, StringComparison.InvariantCultureIgnoreCase) > -1;

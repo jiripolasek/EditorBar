@@ -15,7 +15,7 @@ internal sealed class ToggleEditorBarCommand : BaseCommand<ToggleEditorBarComman
 {
     protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
     {
-        GeneralPage.Instance.Enabled = !GeneralPage.Instance.Enabled;
-        await GeneralPage.Instance.SaveAsync();
+        GeneralOptionsModel.Instance.Enabled = !GeneralOptionsModel.Instance.Enabled;
+        await GeneralOptionsModel.Instance.SaveAsync();
     }
 }

@@ -60,7 +60,7 @@ public partial class EditorBarControl : IDisposable
         };
         this.IsVisibleChanged += this.OnIsVisibleChanged;
 
-        GeneralPage.Saved += this.OnGeneralPageOnSaved;
+        GeneralOptionsModel.Saved += this.OnGeneralPageOnSaved;
 
         VS.Events.ProjectItemsEvents.AfterRenameProjectItems += this.OnProjectItemsEventsOnAfterRenameProjectItems;
         VS.Events.ProjectItemsEvents.AfterAddProjectItems += this.OnProjectItemsEventsOnAfterAddProjectItems;
@@ -124,7 +124,7 @@ public partial class EditorBarControl : IDisposable
 
     public void Dispose()
     {
-        GeneralPage.Saved -= this.OnGeneralPageOnSaved;
+        GeneralOptionsModel.Saved -= this.OnGeneralPageOnSaved;
 
         VS.Events.ProjectItemsEvents.AfterRenameProjectItems -= this.OnProjectItemsEventsOnAfterRenameProjectItems;
         VS.Events.ProjectItemsEvents.AfterAddProjectItems -= this.OnProjectItemsEventsOnAfterAddProjectItems;
@@ -179,20 +179,20 @@ public partial class EditorBarControl : IDisposable
 
     private void ReapplySettings()
     {
-        this.SolutionElementBackground = new SolidColorBrush(GeneralPage.Instance.SolutionBackground.ToMediaColor());
-        this.SolutionElementForeground = new SolidColorBrush(GeneralPage.Instance.SolutionForeground.ToMediaColor());
+        this.SolutionElementBackground = new SolidColorBrush(GeneralOptionsModel.Instance.SolutionBackground.ToMediaColor());
+        this.SolutionElementForeground = new SolidColorBrush(GeneralOptionsModel.Instance.SolutionForeground.ToMediaColor());
 
-        this.ProjectElementBackground = new SolidColorBrush(GeneralPage.Instance.ProjectBackground.ToMediaColor());
-        this.ProjectElementForeground = new SolidColorBrush(GeneralPage.Instance.ProjectForeground.ToMediaColor());
+        this.ProjectElementBackground = new SolidColorBrush(GeneralOptionsModel.Instance.ProjectBackground.ToMediaColor());
+        this.ProjectElementForeground = new SolidColorBrush(GeneralOptionsModel.Instance.ProjectForeground.ToMediaColor());
 
-        this.SolutionFolderElementBackground = new SolidColorBrush(GeneralPage.Instance.SolutionFolderBackground.ToMediaColor());
-        this.SolutionFolderElementForeground = new SolidColorBrush(GeneralPage.Instance.SolutionFolderForeground.ToMediaColor());
+        this.SolutionFolderElementBackground = new SolidColorBrush(GeneralOptionsModel.Instance.SolutionFolderBackground.ToMediaColor());
+        this.SolutionFolderElementForeground = new SolidColorBrush(GeneralOptionsModel.Instance.SolutionFolderForeground.ToMediaColor());
 
-        this.ShowSolutionFolders = GeneralPage.Instance.ShowSolutionFolders;
-        this.ShowSolutionRoot = GeneralPage.Instance.ShowSolutionRoot;
+        this.ShowSolutionFolders = GeneralOptionsModel.Instance.ShowSolutionFolders;
+        this.ShowSolutionRoot = GeneralOptionsModel.Instance.ShowSolutionRoot;
 
-        this.OpenExternalEditorButton!.Visibility = StringHelper.IsNullOrWhiteSpace(GeneralPage.Instance.ExternalEditorCommand) ? Visibility.Collapsed : Visibility.Visible;
-        this.OpenExternalEditorMenuItem!.IsEnabled = !StringHelper.IsNullOrWhiteSpace(GeneralPage.Instance.ExternalEditorCommand);
+        this.OpenExternalEditorButton!.Visibility = StringHelper.IsNullOrWhiteSpace(GeneralOptionsModel.Instance.ExternalEditorCommand) ? Visibility.Collapsed : Visibility.Visible;
+        this.OpenExternalEditorMenuItem!.IsEnabled = !StringHelper.IsNullOrWhiteSpace(GeneralOptionsModel.Instance.ExternalEditorCommand);
 
         this.ReloadStyle();
     }
@@ -208,7 +208,7 @@ public partial class EditorBarControl : IDisposable
         }
 
         // add new style
-        var newStyleUri = new Uri($"pack://application:,,,/EditorBar;component/Styles/{GeneralPage.Instance.DisplayStyle}Style.xaml");
+        var newStyleUri = new Uri($"pack://application:,,,/EditorBar;component/Styles/{GeneralOptionsModel.Instance.DisplayStyle}Style.xaml");
         var newResourceDict = new ResourceDictionary { Source = newStyleUri };
         this.Resources.MergedDictionaries.Add(newResourceDict);
         return;
@@ -230,7 +230,7 @@ public partial class EditorBarControl : IDisposable
         this.FilePath = document.FilePath;
         this.RelativePath = GetRelativePathToSolution(this.FilePath);
 
-        var pathLabelText = GeneralPage.Instance.ShowPathRelativeToSolutionRoot ? this.RelativePath : this.FilePath;
+        var pathLabelText = GeneralOptionsModel.Instance.ShowPathRelativeToSolutionRoot ? this.RelativePath : this.FilePath;
         this.PathLabel!.Content = pathLabelText ?? "(unnamed document)";
     }
 
@@ -279,15 +279,15 @@ public partial class EditorBarControl : IDisposable
 
     private void SettingsClicked(object sender, RoutedEventArgs e)
     {
-        VS.Settings.OpenAsync<OptionsProvider.GeneralPageOptions>().FireAndForget();
+        VS.Settings.OpenAsync<GeneralOptionPage>().FireAndForget();
     }
 
     private void PathLabel_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         var hasControl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
         var action = hasControl
-            ? GeneralPage.Instance.AlternateFileAction
-            : GeneralPage.Instance.FileAction;
+            ? GeneralOptionsModel.Instance.AlternateFileAction
+            : GeneralOptionsModel.Instance.FileAction;
 
         switch (action)
         {
@@ -339,7 +339,7 @@ public partial class EditorBarControl : IDisposable
         this.ReapplySettings();
     }
 
-    private void OnGeneralPageOnSaved(GeneralPage _)
+    private void OnGeneralPageOnSaved(GeneralOptionsModel _)
     {
         this.OnSettingsChanged();
     }
