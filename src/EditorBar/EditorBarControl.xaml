@@ -101,7 +101,7 @@
                                 <Separator />
                                 <MenuItem Header="Open Containing _Folder" Click="OpenFolderClicked" />
                                 <Separator />
-                                <MenuItem x:Name="OpenExternalEditorMenuItem" Header="Open External _Editor" Click="OpenExternalEditorClicked" />
+                                <MenuItem x:Name="OpenExternalEditorMenuItem" Header="Open in External _Editor" Click="OpenExternalEditorClicked" />
                             </ContextMenu>
                         </Border.ContextMenu>
                         <Label Style="{DynamicResource LabelWithoutAccelerator}"
