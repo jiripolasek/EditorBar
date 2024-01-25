@@ -5,7 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:JPSoftworks.EditorBar.Controls"
              xmlns:presentation="clr-namespace:JPSoftworks.EditorBar.Presentation"
+             xmlns:platformUi="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
              mc:Ignorable="d" 
+             x:Name="Root"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <presentation:ColorToBrushConverter x:Key="ColorToBrushConverter" />
@@ -30,36 +32,41 @@
             </StackPanel>
         </Button>
 
-        <Popup x:Name="Popup" PlacementTarget="{x:Reference ToggleButton}" Placement="Bottom" StaysOpen="False">
-            <Popup.Effect>
-                <DropShadowEffect />
-            </Popup.Effect>
-            <Border Background="{x:Static SystemColors.ControlBrush}" BorderBrush="{x:Static SystemColors.ControlDarkBrush}" BorderThickness="1">
-                <StackPanel>
-                    <Border Margin="4">
-                        <ItemsControl ItemsSource="{StaticResource Colors}" MaxWidth="140">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate> 
-                                    <WrapPanel IsItemsHost="True" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="{x:Type Color}">
-                                    <Button Margin="2" Tag="{Binding}" Click="SetColor_Click">
-                                        <Border Background="{Binding Converter={StaticResource ColorToBrushConverter}}" Width="20" Height="20" />
-                                    </Button>
-                                </DataTemplate> 
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Border>
-                    <Border Margin="4">
-                        <StackPanel>
-                            <Button Background="Transparent" BorderBrush="Transparent" Margin="4" Content="Transparent" Click="SetColor_Click" Tag="{x:Static Colors.Transparent}" />
-                            <Button Background="Transparent" BorderBrush="Transparent" Margin="4" Content="More Colors..." Click="ButtonBase_OnClick" />
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </Border>
+        <Popup x:Name="Popup" 
+               PlacementTarget="{x:Reference ToggleButton}" 
+               Placement="Bottom" 
+               StaysOpen="False" 
+               AllowsTransparency="True" 
+               SnapsToDevicePixels="True"
+               PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
+            <platformUi:SystemDropShadowChrome Color="#71000000" MinWidth="{Binding ActualWidth, ElementName=Root}" Margin="0,0,5,5">
+                <Border Background="{x:Static SystemColors.ControlBrush}" BorderBrush="{x:Static SystemColors.ControlDarkBrush}" BorderThickness="1">
+                    <StackPanel>
+                        <Border Margin="4">
+                            <ItemsControl ItemsSource="{StaticResource Colors}" MaxWidth="140">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel IsItemsHost="True" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type Color}">
+                                        <Button Margin="2" Tag="{Binding}" Click="SetColor_Click">
+                                            <Border Background="{Binding Converter={StaticResource ColorToBrushConverter}}" Width="20" Height="20" />
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                        <Border Margin="4">
+                            <StackPanel>
+                                <Button Background="Transparent" BorderBrush="Transparent" Margin="4" Content="Transparent" Click="SetColor_Click" Tag="{x:Static Colors.Transparent}" />
+                                <Button Background="Transparent" BorderBrush="Transparent" Margin="4" Content="More Colors..." Click="ButtonBase_OnClick" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </platformUi:SystemDropShadowChrome>
         </Popup>
     </Grid>
 </UserControl>

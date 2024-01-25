@@ -54,6 +54,7 @@ public partial class ColorButton
     private void ToggleButton_OnClick(object sender, RoutedEventArgs e)
     {
         this.Popup!.IsOpen = true;
+        this.Popup!.Focus();
     }
 
     private void SetColor_Click(object sender, RoutedEventArgs e)
