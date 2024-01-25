@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:controls="clr-namespace:JPSoftworks.EditorBar.Controls"
+             xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance Type=controls:GeneralOptionsControl, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -19,12 +20,22 @@
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Padding" Value="2" />
         </Style>
+        <Style x:Key="HintTextBlockStyle" TargetType="TextBlock">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="FontSize" Value="{DynamicResource {x:Static shell:VsFonts.Environment90PercentFontSizeKey}}" />
+            <Setter Property="Foreground" Value="{x:Static SystemColors.GrayTextBrush}" />
+        </Style>
     </UserControl.Resources>
     <ScrollViewer>
         <StackPanel>
 
             <GroupBox Header="Editor Bar">
-                <CheckBox Content="_Enabled" IsChecked="{Binding ViewModel.IsEnabled}" />
+                <StackPanel>
+                    <CheckBox Content="_Enabled" IsChecked="{Binding ViewModel.IsEnabled}" />
+                    <TextBlock Margin="20,4,0,0" Style="{StaticResource HintTextBlockStyle}">
+                        You can toggle Editor Bar using a menu command <Run FontWeight="SemiBold">View / Editor Bar</Run> or assign a keyboard shortcut to toggle Editor Bar on and off using <Hyperlink Click="CustomizeKeyboardHyperlink_OnClick">Environment -> Keyboard</Hyperlink> options.
+                    </TextBlock>
+                </StackPanel>
             </GroupBox>
 
             <GroupBox Header="Appearance">
@@ -100,7 +111,7 @@
                     <Label Grid.Column="0" Grid.Row="1" Content="Editor _arguments:" Target="{x:Reference ExternalEditorArgumentsTextBox}" />
                     <TextBox x:Name="ExternalEditorArgumentsTextBox" Grid.Column="1" Grid.Row="1" Text="{Binding ViewModel.ExternalEditorArguments}" VerticalAlignment="Center" />
 
-                    <TextBlock Grid.Column="1" Grid.Row="2" Foreground="Gray" TextWrapping="WrapWithOverflow" FontSize="10" MaxWidth="240">Use $(FileName) as placeholder for name of the current file.</TextBlock>
+                    <TextBlock Style="{StaticResource HintTextBlockStyle}" Grid.Column="1" Grid.Row="2" MaxWidth="240">Use $(FileName) as placeholder for name of the current file.</TextBlock>
                 </Grid>
             </GroupBox>
         </StackPanel>
