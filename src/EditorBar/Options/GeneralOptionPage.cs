@@ -23,7 +23,32 @@ public class GeneralOptionPage : UIElementDialogPage
     /// <summary>
     /// Gets or sets the child element of the options page.
     /// </summary>
-    protected override UIElement Child => this._control ??= new GeneralOptionsControl();
+    protected override UIElement Child
+    {
+        get
+        {
+            if (this._control == null)
+            {
+                this._control = new GeneralOptionsControl();
+                this._control.Initialize();
+            }
+
+            return this._control;
+        }
+    }
+
+    public GeneralOptionPage()
+    {
+        // Subscribe to the Saved event to reinitialize the control when the settings are saved.
+        // LoadSettingsFromStorage method is invoked only once when the page is created - once in VS lifetime,
+        // then it's just reused. (tl;dr: it is NOT invoked when Options dialog is opened). OnActivate event is
+        // on the other hand invoked every time the page is accessed, even when switching between different pages.
+        // So we need to reinitialize the control when the settings are saved.
+        GeneralOptionsModel.Saved += _ =>
+        {
+            this._control?.Initialize();
+        };
+    }
 
     /// <summary>
     /// Loads the settings from storage.
