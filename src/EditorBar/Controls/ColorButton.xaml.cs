@@ -50,4 +50,18 @@ public partial class ColorButton
             this.SelectedColor = colorDialog.Color.ToMediaColor();
         }
     }
+
+    private void ToggleButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        this.Popup!.IsOpen = true;
+    }
+
+    private void SetColor_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is System.Windows.Controls.Button { Tag: Color color })
+        {
+            this.SelectedColor = color;
+            this.Popup!.IsOpen = false;
+        }
+    }
 }

@@ -12,12 +12,19 @@
             <Setter Property="Margin" Value="0,0,0,12" />
             <Setter Property="Padding" Value="4" />
         </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Padding" Value="2" />
+        </Style>
     </UserControl.Resources>
     <ScrollViewer>
         <StackPanel>
 
             <GroupBox Header="Editor Bar">
-                <CheckBox Margin="4" Content="_Enabled" IsChecked="{Binding ViewModel.IsEnabled}" />
+                <CheckBox Content="_Enabled" IsChecked="{Binding ViewModel.IsEnabled}" />
             </GroupBox>
 
             <GroupBox Header="Appearance">
@@ -33,14 +40,14 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <Label Grid.Column="0" Grid.Row="0" Content="_Position:" Margin="4" Target="{x:Reference BarPositionComboBox}" />
-                    <ComboBox x:Name="BarPositionComboBox" Grid.Column="1" Grid.Row="0" Margin="4" ItemsSource="{Binding ViewModel.BarPositions}" SelectedValue="{Binding ViewModel.BarPosition, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
+                    <Label Grid.Column="0" Grid.Row="0" Content="_Position:" Target="{x:Reference BarPositionComboBox}" />
+                    <ComboBox x:Name="BarPositionComboBox" Grid.Column="1" Grid.Row="0" ItemsSource="{Binding ViewModel.BarPositions}" SelectedValue="{Binding ViewModel.BarPosition, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
 
-                    <Label Grid.Column="0" Grid.Row="1" Content="Display _mode:" Margin="4"  Target="{x:Reference DisplayModeComboBox}"/>
-                    <ComboBox x:Name="DisplayModeComboBox" Grid.Column="1" Grid.Row="1" Margin="4" ItemsSource="{Binding ViewModel.DisplayStyles}" SelectedValue="{Binding ViewModel.DisplayStyle, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
+                    <Label Grid.Column="0" Grid.Row="1" Content="Display _mode:" Target="{x:Reference DisplayModeComboBox}" />
+                    <ComboBox x:Name="DisplayModeComboBox" Grid.Column="1" Grid.Row="1" ItemsSource="{Binding ViewModel.DisplayStyles}" SelectedValue="{Binding ViewModel.DisplayStyle, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
 
-                    <Label Grid.Column="0" Grid.Row="2" Content="Pat_h display:" Margin="4" Target="{x:Reference PathStyleComboBox}" />
-                    <ComboBox x:Name="PathStyleComboBox" Grid.Column="1" Grid.Row="2" Margin="4" ItemsSource="{Binding ViewModel.PathStyles}" SelectedValue="{Binding ViewModel.ShowRelativePath, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
+                    <Label Grid.Column="0" Grid.Row="2" Content="Pat_h display:" Target="{x:Reference PathStyleComboBox}" />
+                    <ComboBox x:Name="PathStyleComboBox" Grid.Column="1" Grid.Row="2" ItemsSource="{Binding ViewModel.PathStyles}" SelectedValue="{Binding ViewModel.ShowRelativePath, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
                 </Grid>
             </GroupBox>
 
@@ -64,11 +71,11 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <Label Grid.Column="0" Grid.Row="0" Content="_Double-click:" Margin="4" Target="{x:Reference DoubleClickActionComboBox}" />
-                    <ComboBox x:Name="DoubleClickActionComboBox" Grid.Column="1" Grid.Row="0" Margin="4" ItemsSource="{Binding ViewModel.DoubleClickActions}" SelectedValue="{Binding ViewModel.DoubleClickAction, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
+                    <Label Grid.Column="0" Grid.Row="0" Content="_Double-click:" Target="{x:Reference DoubleClickActionComboBox}" />
+                    <ComboBox x:Name="DoubleClickActionComboBox" Grid.Column="1" Grid.Row="0" ItemsSource="{Binding ViewModel.DoubleClickActions}" SelectedValue="{Binding ViewModel.DoubleClickAction, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
 
-                    <Label Grid.Column="0" Grid.Row="1" Content="_Ctrl + Double-click:" Margin="4" Target="{x:Reference DoubleClickCtrlActionComboBox}"/>
-                    <ComboBox x:Name="DoubleClickCtrlActionComboBox" Grid.Column="1" Grid.Row="1" Margin="4" ItemsSource="{Binding ViewModel.DoubleClickActions}" SelectedValue="{Binding ViewModel.DoubleClickCtrlAction, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
+                    <Label Grid.Column="0" Grid.Row="1" Content="_Ctrl + Double-click:" Target="{x:Reference DoubleClickCtrlActionComboBox}"/>
+                    <ComboBox x:Name="DoubleClickCtrlActionComboBox" Grid.Column="1" Grid.Row="1" ItemsSource="{Binding ViewModel.DoubleClickActions}" SelectedValue="{Binding ViewModel.DoubleClickCtrlAction, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
                 </Grid>
             </GroupBox>
 
@@ -84,16 +91,16 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <Label Grid.Column="0" Grid.Row="0" Content="_Editor path:" Margin="4" Target="{x:Reference ExternalEditorPathTextBox}" />
-                    <DockPanel Grid.Column="1" Grid.Row="0" >
-                        <Button MinWidth="24" DockPanel.Dock="Right" Margin="4" Content="..." Command="{Binding ViewModel.BrowseForExternalEditorCommand}" />
-                        <TextBox x:Name="ExternalEditorPathTextBox" Margin="4" Text="{Binding ViewModel.ExternalEditorPath}" />
+                    <Label Grid.Column="0" Grid.Row="0" Content="_Editor path:" Target="{x:Reference ExternalEditorPathTextBox}" />
+                    <DockPanel Grid.Column="1" Grid.Row="0">
+                        <Button MinWidth="24" DockPanel.Dock="Right" Content="..." Command="{Binding ViewModel.BrowseForExternalEditorCommand}" VerticalAlignment="Center" MinHeight="{Binding ActualHeight, ElementName=ExternalEditorPathTextBox}" Margin="4,0,0,0" />
+                        <TextBox x:Name="ExternalEditorPathTextBox" Text="{Binding ViewModel.ExternalEditorPath}" VerticalAlignment="Center" />
                     </DockPanel>
 
-                    <Label Grid.Column="0" Grid.Row="1" Content="Editor _arguments:" Margin="4" Target="{x:Reference ExternalEditorArgumentsTextBox}" />
-                    <TextBox x:Name="ExternalEditorArgumentsTextBox" Grid.Column="1" Grid.Row="1" Margin="4" Text="{Binding ViewModel.ExternalEditorArguments}" />
+                    <Label Grid.Column="0" Grid.Row="1" Content="Editor _arguments:" Target="{x:Reference ExternalEditorArgumentsTextBox}" />
+                    <TextBox x:Name="ExternalEditorArgumentsTextBox" Grid.Column="1" Grid.Row="1" Text="{Binding ViewModel.ExternalEditorArguments}" VerticalAlignment="Center" />
 
-                    <TextBlock Grid.Column="1" Grid.Row="2" Foreground="Gray" TextWrapping="WrapWithOverflow" FontSize="10">Use $(FileName) as placeholder for name of the current file.</TextBlock>
+                    <TextBlock Grid.Column="1" Grid.Row="2" Foreground="Gray" TextWrapping="WrapWithOverflow" FontSize="10" MaxWidth="240">Use $(FileName) as placeholder for name of the current file.</TextBlock>
                 </Grid>
             </GroupBox>
         </StackPanel>

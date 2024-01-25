@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="JPSoftworks.EditorBar.Controls.ColorSelector"
+<UserControl x:Class="JPSoftworks.EditorBar.Controls.ColorSelector"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -11,7 +11,7 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <presentation:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" />
     </UserControl.Resources>
-    <Grid Margin="4">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="160" SharedSizeGroup="Label" />
             <ColumnDefinition Width="Auto" SharedSizeGroup="Foreground" />
@@ -25,16 +25,17 @@
                   VerticalContentAlignment="Center" />
 
         <Label Grid.Column="0"
+               Margin="0"
                Content="{Binding LabelContent, RelativeSource={RelativeSource AncestorType=local:ColorSelector}, Mode=TwoWay}"
                Visibility="{Binding IsCheckable, RelativeSource={RelativeSource AncestorType=local:ColorSelector}, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
                VerticalContentAlignment="Center" />
 
         <StackPanel Grid.Column="1" Orientation="Horizontal">
-            <local:ColorButton Margin="4,0" Label="Foreground" SelectedColor="{Binding ForegroundColor, RelativeSource={RelativeSource AncestorType=local:ColorSelector}, Mode=TwoWay}" />
+            <local:ColorButton Margin="0,2" Label="Foreground" SelectedColor="{Binding ForegroundColor, RelativeSource={RelativeSource AncestorType=local:ColorSelector}, Mode=TwoWay}" />
         </StackPanel>
 
         <StackPanel Grid.Column="2" Orientation="Horizontal">
-            <local:ColorButton Margin="4,0" Label="Background" SelectedColor="{Binding BackgroundColor, RelativeSource={RelativeSource AncestorType=local:ColorSelector}, Mode=TwoWay}" />
+            <local:ColorButton Margin="4,2,0,2" Label="Background" SelectedColor="{Binding BackgroundColor, RelativeSource={RelativeSource AncestorType=local:ColorSelector}, Mode=TwoWay}" />
         </StackPanel>
 
     </Grid>
