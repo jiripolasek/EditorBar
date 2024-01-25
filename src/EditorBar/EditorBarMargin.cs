@@ -29,8 +29,8 @@ public class EditorBarMargin : IWpfTextViewMargin
         this._position = position;
         this._editorBarControl = new EditorBarControl(textView);
 
-        GeneralPage.Saved += this.GeneralPageOnSaved;
-        this.GeneralPageOnSaved(GeneralPage.Instance);
+        GeneralOptionsModel.Saved += this.GeneralPageOnSaved;
+        this.GeneralPageOnSaved(GeneralOptionsModel.Instance);
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ public class EditorBarMargin : IWpfTextViewMargin
     /// </summary>
     public void Dispose()
     {
-        GeneralPage.Saved -= this.GeneralPageOnSaved;
+        GeneralOptionsModel.Saved -= this.GeneralPageOnSaved;
         this._editorBarControl.Dispose();
     }
 
@@ -81,9 +81,9 @@ public class EditorBarMargin : IWpfTextViewMargin
     /// </summary>
     public FrameworkElement VisualElement => this._editorBarControl;
 
-    private void GeneralPageOnSaved(GeneralPage generalPage)
+    private void GeneralPageOnSaved(GeneralOptionsModel generalOptionsModel)
     {
-        this.Enabled = generalPage.Enabled && generalPage.BarPosition == this._position;
+        this.Enabled = generalOptionsModel.Enabled && generalOptionsModel.BarPosition == this._position;
         this._editorBarControl.Visibility = this.Enabled ? Visibility.Visible : Visibility.Collapsed;
     }
 }

@@ -19,8 +19,11 @@ namespace JPSoftworks.EditorBar.Options;
 /// <seealso cref="BaseOptionModel{GeneralPage}" />
 [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global", Justification = "Used implicitly.")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Setters are used implicitly by PropertyGrid.")]
-public class GeneralPage : BaseOptionModel<GeneralPage>
+public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
 {
+    // keep legacy name to  keep settings for existing users intact
+    protected override string CollectionName => "JPSoftworks.EditorBar.Options.GeneralPage";
+
     private const string AppearanceCategoryName = "Appearance";
     private const string GeneralCategoryName = "General";
     private const string ColorsCategoryName = "Colors";
