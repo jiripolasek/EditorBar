@@ -111,7 +111,9 @@
                     <Label Grid.Column="0" Grid.Row="1" Content="Editor _arguments:" Target="{x:Reference ExternalEditorArgumentsTextBox}" />
                     <TextBox x:Name="ExternalEditorArgumentsTextBox" Grid.Column="1" Grid.Row="1" Text="{Binding ViewModel.ExternalEditorArguments}" VerticalAlignment="Center" />
 
-                    <TextBlock Style="{StaticResource HintTextBlockStyle}" Grid.Column="1" Grid.Row="2" MaxWidth="240">Use $(FileName) as placeholder for name of the current file.</TextBlock>
+                    <TextBlock Style="{StaticResource HintTextBlockStyle}" Grid.Column="1" Grid.Row="2" MaxWidth="240">
+                        Use $(FilePath) as a placeholder for name of the current file.
+                    </TextBlock>
                 </Grid>
             </GroupBox>
         </StackPanel>
