@@ -105,11 +105,11 @@
                     <Label Grid.Column="0" Grid.Row="0" Content="_Editor path:" Target="{x:Reference ExternalEditorPathTextBox}" />
                     <DockPanel Grid.Column="1" Grid.Row="0">
                         <Button MinWidth="24" DockPanel.Dock="Right" Content="..." Command="{Binding ViewModel.BrowseForExternalEditorCommand}" VerticalAlignment="Center" MinHeight="{Binding ActualHeight, ElementName=ExternalEditorPathTextBox}" Margin="4,0,0,0" />
-                        <TextBox x:Name="ExternalEditorPathTextBox" Text="{Binding ViewModel.ExternalEditorPath}" VerticalAlignment="Center" />
+                        <TextBox x:Name="ExternalEditorPathTextBox" Text="{Binding ViewModel.ExternalEditorPath, UpdateSourceTrigger=PropertyChanged, Delay=0}" VerticalAlignment="Center" />
                     </DockPanel>
 
                     <Label Grid.Column="0" Grid.Row="1" Content="Editor _arguments:" Target="{x:Reference ExternalEditorArgumentsTextBox}" />
-                    <TextBox x:Name="ExternalEditorArgumentsTextBox" Grid.Column="1" Grid.Row="1" Text="{Binding ViewModel.ExternalEditorArguments}" VerticalAlignment="Center" />
+                    <TextBox x:Name="ExternalEditorArgumentsTextBox" Grid.Column="1" Grid.Row="1" Text="{Binding ViewModel.ExternalEditorArguments, UpdateSourceTrigger=PropertyChanged, Delay=0}" VerticalAlignment="Center" />
 
                     <TextBlock Style="{StaticResource HintTextBlockStyle}" Grid.Column="1" Grid.Row="2" MaxWidth="240">
                         Use $(FilePath) as a placeholder for name of the current file.
