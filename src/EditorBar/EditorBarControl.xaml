@@ -56,7 +56,7 @@
                                 Style="{DynamicResource NoBorderButtonStyle}">
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.OpenFolder}" />
                         </Button>
-                        <Button Click="SettingsClicked" ToolTip="Settings..."
+                        <Button Click="OpenOptionsButtonClicked" ToolTip="Options..."
                                 Style="{DynamicResource NoBorderButtonStyle}">
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.Settings}"  />
                         </Button>

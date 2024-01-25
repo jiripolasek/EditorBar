@@ -277,7 +277,7 @@ public partial class EditorBarControl : IDisposable
         Launcher.OpenContaingFolder(this.FilePath);
     }
 
-    private void SettingsClicked(object sender, RoutedEventArgs e)
+    private void OpenOptionsButtonClicked(object sender, RoutedEventArgs e)
     {
         VS.Settings.OpenAsync<GeneralOptionPage>().FireAndForget();
     }
