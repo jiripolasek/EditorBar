@@ -31,6 +31,7 @@ namespace JPSoftworks.EditorBar
         public const int EditorBarViewSubMenuGroup = 0x1231;
         public const int EditorBarTextEditorToolbarGroup = 0x1140;
         public const int ToggleEditorBarCommand = 0x0100;
+        public const int EditorBarOptionsCommand = 0x0101;
         public const int bmpToggleEditorBar = 0x0001;
     }
 }
