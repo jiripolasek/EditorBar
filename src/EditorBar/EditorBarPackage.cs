@@ -55,5 +55,6 @@ public sealed class EditorBarPackage : AsyncPackage
         await this.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
 
         await ToggleEditorBarCommand.InitializeAsync(this);
+        await EditorBarOptionsCommand.InitializeAsync(this);
     }
 }

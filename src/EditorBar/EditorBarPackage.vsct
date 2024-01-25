@@ -5,34 +5,32 @@
 	<Extern href="vsshlids.h"/>
 	<Include href="VSGlobals.vsct" />
 	<Include href="KnownImageIds.vsct"/>
-	
-	
+
+
 
 	<Commands package="guidEditorBarPackage">
-		
+
 		<Menus>
 			<!-- View / Editor Bar -->
 			<Menu guid="guidEditorBarPackageCmdSet" id="EditorBarViewSubMenu" priority="0x0100" type="Menu">
 				<Parent guid="guidEditorBarPackageCmdSet" id="EditorBarViewMenuGroup" />
 				<Strings>
-					<ButtonText>Editor Bar</ButtonText>
+					<ButtonText>&amp;Editor Bar</ButtonText>
 				</Strings>
-				<CommandFlag>AlwaysCreate</CommandFlag>
-				<CommandFlag>DynamicVisibility</CommandFlag>
 			</Menu>
 		</Menus>
-		
+
 		<Groups>
 			<!-- View / {EditorBarViewMenuGroup} -->
 			<Group guid="guidEditorBarPackageCmdSet" id="EditorBarViewMenuGroup" priority="0x0950">
 				<Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_VIEW" />
 			</Group>
-			
+
 			<!-- View / Editor Bar / {EditorBarViewSubMenuGroup} -->
 			<Group guid="guidEditorBarPackageCmdSet" id="EditorBarViewSubMenuGroup" priority="0x0950">
 				<Parent guid="guidEditorBarPackageCmdSet" id="EditorBarViewSubMenu" />
 			</Group>
-			
+
 			<!--  Text Editor Toolbar / {EditorBarTextEditorToolbarGroup} -->
 			<Group guid="guidEditorBarPackageCmdSet" id="EditorBarTextEditorToolbarGroup" priority="0x100">
 				<Parent guid="guidStdEditor" id="IDM_VS_TOOL_TEXTEDITOR" />
@@ -45,7 +43,24 @@
 				<!-- placed using command placements -->
 				<Icon guid="guidImages" id="bmpToggleEditorBar" />
 				<Strings>
-					<ButtonText>Toggle Editor Bar</ButtonText>
+					<ButtonText>Toggle &amp;Editor Bar</ButtonText>
+					<CommandName>Toggle Editor Bar</CommandName>
+					<CanonicalName>EditorBar.ToggleEditorBar</CanonicalName>
+					<LocCanonicalName>EditorBar.ToggleEditorBar</LocCanonicalName>
+				</Strings>
+			</Button>
+
+			<!-- Editor Bar Options -->
+			<Button guid="guidEditorBarPackageCmdSet" id="EditorBarOptionsCommand" priority="0x0600" type="Button">
+				<Parent guid="guidEditorBarPackageCmdSet" id="EditorBarViewSubMenuGroup"/>
+				<Icon guid="ImageCatalogGuid" id="Settings" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>TextChanges</CommandFlag>
+				<Strings>
+					<ButtonText>&amp;Options...</ButtonText>
+					<CommandName>Editor Bar Options...</CommandName>
+					<CanonicalName>EditorBar.Options</CanonicalName>
+					<LocCanonicalName>EditorBar.Options</LocCanonicalName>
 				</Strings>
 			</Button>
 		</Buttons>
@@ -54,9 +69,9 @@
 			<Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpToggleEditorBar"/>
 		</Bitmaps>
 	</Commands>
-	
-	
-	
+
+
+
 	<CommandPlacements>
 		<!-- ToggleEditorBarCommand -->
 		<CommandPlacement guid="guidEditorBarPackageCmdSet" id="ToggleEditorBarCommand" priority="0x0300">
@@ -67,10 +82,10 @@
 		</CommandPlacement>
 	</CommandPlacements>
 
-	
-	
+
+
 	<Symbols>
-		
+
 		<GuidSymbol name="guidEditorBarPackage" value="{ef5d9a25-5e0d-4428-8762-56d4dc816eeb}" />
 
 		<GuidSymbol name="guidEditorBarPackageCmdSet" value="{264c2d6c-e85c-4cbb-a800-0c412f8d91f1}">
@@ -79,11 +94,13 @@
 			<IDSymbol name="EditorBarViewSubMenuGroup" value="0x1231" />
 			<IDSymbol name="EditorBarTextEditorToolbarGroup" value="0x1140" />
 			<IDSymbol name="ToggleEditorBarCommand" value="0x0100" />
+			<IDSymbol name="EditorBarOptionsCommand" value="0x0101" />
 		</GuidSymbol>
 
 		<GuidSymbol name="guidImages" value="{8ec912c7-6f7f-457d-bbe8-318409383d92}" >
 			<IDSymbol name="bmpToggleEditorBar" value="1" />
 		</GuidSymbol>
+
 	</Symbols>
-	
+
 </CommandTable>
