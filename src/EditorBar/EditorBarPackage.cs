@@ -30,6 +30,7 @@ namespace JPSoftworks.EditorBar;
 /// &gt; in .vsixmanifest file.
 /// </para>
 /// </remarks>
+[InstalledProductRegistration(Vsix.Name, Vsix.Description, Vsix.Version)]
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 [Guid(PackageGuidString)]
 [ProvideOptionPage(typeof(GeneralOptionPage), "Editor Bar", "General", 0, 0, true)]
