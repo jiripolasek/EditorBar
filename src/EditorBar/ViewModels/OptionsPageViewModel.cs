@@ -48,6 +48,7 @@ public class OptionsPageViewModel : ViewModel
         new EnumViewModel<FileAction>(FileAction.None, "Do nothing"),
         new EnumViewModel<FileAction>(FileAction.OpenContainingFolder, "Open Containing Folder"),
         new EnumViewModel<FileAction>(FileAction.OpenInExternalEditor, "Open in External Editor"),
+        new EnumViewModel<FileAction>(FileAction.OpenInDefaultEditor, "Open in Default Editor"),
         new EnumViewModel<FileAction>(FileAction.CopyRelativePath,"Copy Relative path"),
         new EnumViewModel<FileAction>(FileAction.CopyAbsolutePath, "Copy Full path")
     ];

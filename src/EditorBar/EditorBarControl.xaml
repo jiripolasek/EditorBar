@@ -46,6 +46,12 @@
                         </Style>
                     </Border.Style>
                     <StackPanel Orientation="Horizontal">
+                        <Button x:Name="OpenDefaultEditorButton"
+                                Click="OpenDefaultEditorClicked" 
+                                ToolTip="Open in Default Editor"
+                                Style="{DynamicResource NoBorderButtonStyle}">
+                            <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.OpenFileDialog}" />
+                        </Button>
                         <Button x:Name="OpenExternalEditorButton"
                                 Click="OpenExternalEditorClicked" 
                                 ToolTip="Open in External Editor"
@@ -99,9 +105,10 @@
                                 <MenuItem Header="_Copy Full Path" Click="CopyPathClicked" />
                                 <MenuItem Header="Copy _Relative Path" Click="CopyRelativePathClicked" />
                                 <Separator />
-                                <MenuItem Header="Open Containing _Folder" Click="OpenFolderClicked" />
-                                <Separator />
                                 <MenuItem x:Name="OpenExternalEditorMenuItem" Header="Open in External _Editor" Click="OpenExternalEditorClicked" />
+                                <MenuItem Header="Open in Default _Editor" Click="OpenDefaultEditorClicked" />
+                                <Separator />
+                                <MenuItem Header="Open Containing _Folder" Click="OpenFolderClicked" />
                             </ContextMenu>
                         </Border.ContextMenu>
                         <Label Style="{DynamicResource LabelWithoutAccelerator}"
