@@ -31,9 +31,9 @@
 
             <GroupBox Header="Editor Bar">
                 <StackPanel>
-                    <CheckBox Content="_Enabled" IsChecked="{Binding ViewModel.IsEnabled}" />
-                    <TextBlock Margin="20,4,0,0" Style="{StaticResource HintTextBlockStyle}">
-                        You can toggle Editor Bar using a menu command <Run FontWeight="SemiBold">View / Editor Bar</Run> or assign a keyboard shortcut to toggle Editor Bar on and off using <Hyperlink Click="CustomizeKeyboardHyperlink_OnClick">Environment -> Keyboard</Hyperlink> options.
+                    <CheckBox Content="Show _Editor Bar" IsChecked="{Binding ViewModel.IsEnabled}" />
+                    <TextBlock Margin="22,4,0,0" Style="{StaticResource HintTextBlockStyle}">
+                        You can toggle Editor Bar using a menu command <Run FontWeight="SemiBold">View / Editor Bar</Run> or assign a keyboard shortcut to toggle Editor Bar on and off using <Hyperlink Click="CustomizeKeyboardHyperlink_OnClick">Environment / Keyboard</Hyperlink> options.
                     </TextBlock>
                 </StackPanel>
             </GroupBox>
