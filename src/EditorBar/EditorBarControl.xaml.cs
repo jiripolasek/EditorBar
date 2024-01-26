@@ -299,6 +299,9 @@ public partial class EditorBarControl : IDisposable
             case FileAction.OpenInExternalEditor:
                 Launcher.OpenInExternalEditor(this.FilePath);
                 break;
+            case FileAction.OpenInDefaultEditor:
+                Launcher.OpenInDefaultEditor(this.FilePath);
+                break;
             case FileAction.CopyRelativePath:
                 Launcher.CopyRelativePath(this.RelativePath);
                 break;
@@ -313,6 +316,11 @@ public partial class EditorBarControl : IDisposable
     private void OpenExternalEditorClicked(object sender, RoutedEventArgs e)
     {
         Launcher.OpenInExternalEditor(this.FilePath);
+    }
+
+    private void OpenDefaultEditorClicked(object sender, RoutedEventArgs e)
+    {
+        Launcher.OpenInDefaultEditor(this.FilePath);
     }
 
     private void CopyPathClicked(object sender, RoutedEventArgs e)

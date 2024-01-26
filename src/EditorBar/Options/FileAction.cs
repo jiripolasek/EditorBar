@@ -22,5 +22,8 @@ public enum FileAction
     CopyRelativePath,
 
     [Description("Copy full path to Clipboard")]
-    CopyAbsolutePath
+    CopyAbsolutePath,
+
+    [Description("Open default editor")]
+    OpenInDefaultEditor
 }

@@ -52,6 +52,25 @@ internal static class Launcher
         }
     }
 
+    internal static void OpenInDefaultEditor(string? filePath)
+    {
+        if (StringHelper.IsNullOrWhiteSpace(filePath))
+        {
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            VS.StatusBar.ShowMessageAsync($"Opened {filePath} in default editor").FireAndForget();
+        }
+        catch (Exception ex)
+        {
+            ex.Log();
+            VS.StatusBar.ShowMessageAsync($"Failed to open {filePath} in default editor").FireAndForget();
+        }
+    }
+
     internal static void OpenContaingFolder(string? filePath)
     {
         if (StringHelper.IsNullOrWhiteSpace(filePath))
