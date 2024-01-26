@@ -11,7 +11,7 @@ namespace JPSoftworks.EditorBar
         public const string Name = "Editor Bar";
         public const string Description = @"Editor bar - bar for the text editor, highlighting parent project of the opened document.";
         public const string Language = "en-US";
-        public const string Version = "1.0.3";
+        public const string Version = "1.0.4";
         public const string Author = "Jiří Polášek";
         public const string Tags = "editor bar path";
     }
