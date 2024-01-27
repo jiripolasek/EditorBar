@@ -6,6 +6,7 @@
 
 using System.Runtime.InteropServices;
 using System.Threading;
+using Community.VisualStudio.Toolkit;
 using JPSoftworks.EditorBar.Commands;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.Shell;
@@ -36,6 +37,7 @@ namespace JPSoftworks.EditorBar;
 [ProvideOptionPage(typeof(GeneralOptionPage), "Editor Bar", "General", 0, 0, true)]
 [ProvideProfile(typeof(GeneralOptionPage), "Editor Bar", "General", 0, 0, true)]
 [ProvideMenuResource("Menus.ctmenu", 1)]
+[ProvideService(typeof(EditorBarFileActionMenuBridge), IsAsyncQueryable = true)]
 public sealed class EditorBarPackage : AsyncPackage
 {
     /// <summary>
@@ -49,13 +51,12 @@ public sealed class EditorBarPackage : AsyncPackage
     protected override async Task InitializeAsync(CancellationToken cancellationToken,
         IProgress<ServiceProgressData> progress)
     {
-        await base.InitializeAsync(cancellationToken, progress)!;
+        this.AddService(typeof(EditorBarFileActionMenuBridge), (_, _, _) => Task.FromResult<object>(new EditorBarFileActionMenuBridge()), promote: true);
 
         // When initialized asynchronously, the current thread may be a background thread at this point.
         // Do any initialization that requires the UI thread after switching to the UI thread.
         await this.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
 
-        await ToggleEditorBarCommand.InitializeAsync(this);
-        await EditorBarOptionsCommand.InitializeAsync(this);
+        await this.RegisterCommandsAsync();
     }
 }

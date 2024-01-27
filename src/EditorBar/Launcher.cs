@@ -110,10 +110,11 @@ internal static class Launcher
         }
     }
 
-    internal static void CopyRelativePath(string? relativePath)
+    internal static void CopyRelativePathFromFullPath(string? filePath)
     {
         try
         {
+            var relativePath = GetRelativePathToSolution(filePath);
             if (!StringHelper.IsNullOrWhiteSpace(relativePath))
             {
                 Clipboard.SetText(relativePath, TextDataFormat.UnicodeText);
@@ -125,6 +126,32 @@ internal static class Launcher
             ex.Log();
         }
     }
+
+    private static string? GetRelativePathToSolution(string? path)
+    {
+        if (path == null)
+        {
+            return null;
+        }
+
+        var currentSolution = VS.Solutions.GetCurrentSolution();
+        var slnPath = currentSolution?.FullPath;
+        if (string.IsNullOrWhiteSpace(slnPath!))
+        {
+            return path;
+        }
+
+        var slnDir = Path.GetDirectoryName(slnPath!);
+        return slnDir == null ? path : GetRelativePath(path, slnDir);
+
+        static string GetRelativePath(string filePath, string slnDir)
+        {
+            return !filePath.StartsWith(slnDir, StringComparison.OrdinalIgnoreCase)
+                ? filePath
+                : filePath.Substring(slnDir.Length);
+        }
+    }
+
 
     private static string Quote(string fileName)
     {

@@ -99,18 +99,7 @@
                     </Border>
 
                     <!-- Document Path -->
-                    <Border Style="{DynamicResource DocumentPathElement}" Background="Transparent">
-                        <Border.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="_Copy Full Path" Click="CopyPathClicked" />
-                                <MenuItem Header="Copy _Relative Path" Click="CopyRelativePathClicked" />
-                                <Separator />
-                                <MenuItem x:Name="OpenExternalEditorMenuItem" Header="Open in External _Editor" Click="OpenExternalEditorClicked" />
-                                <MenuItem Header="Open in Default _Editor" Click="OpenDefaultEditorClicked" />
-                                <Separator />
-                                <MenuItem Header="Open Containing _Folder" Click="OpenFolderClicked" />
-                            </ContextMenu>
-                        </Border.ContextMenu>
+                    <Border Style="{DynamicResource DocumentPathElement}" Background="Transparent" MouseRightButtonUp="UIElement_OnMouseRightButtonUp">
                         <Label Style="{DynamicResource LabelWithoutAccelerator}"
                                Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}"
                                MouseDoubleClick="PathLabel_OnMouseDoubleClick"

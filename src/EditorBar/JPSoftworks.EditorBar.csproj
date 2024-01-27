@@ -70,7 +70,14 @@
   <ItemGroup>
     <Compile Include="BaseEditorBarFactory.cs" />
     <Compile Include="BottomEditorBarFactory.cs" />
+    <Compile Include="Commands\CopyFullPathToClipboardCommand.cs" />
+    <Compile Include="Commands\CopyRelativePathToClipboardCommand.cs" />
+    <Compile Include="Commands\EditorBarFileActionMenuBridge.cs" />
+    <Compile Include="Commands\EditorBarFileActionMenuBridgeCommand.cs" />
     <Compile Include="Commands\EditorBarOptionsCommand.cs" />
+    <Compile Include="Commands\OpenContainingFolderCommand.cs" />
+    <Compile Include="Commands\OpenInDefaultEditorCommand.cs" />
+    <Compile Include="Commands\OpenInExternalEditorCommand.cs" />
     <Compile Include="Commands\ToggleEditorBarCommand.cs" />
     <Compile Include="Controls\ColorButton.xaml.cs">
       <DependentUpon>ColorButton.xaml</DependentUpon>

@@ -9,11 +9,13 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Community.VisualStudio.Toolkit;
+using JPSoftworks.EditorBar.Commands;
 using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Threading;
 
 namespace JPSoftworks.EditorBar;
 
@@ -47,12 +49,14 @@ public partial class EditorBarControl : IDisposable
         nameof(ShowSolutionRoot), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(default(bool)));
 
     private readonly IWpfTextView? _textView;
+    private readonly JoinableTaskFactory _joinableTaskFactory;
 
-    public EditorBarControl(IWpfTextView textView)
+    public EditorBarControl(IWpfTextView textView, JoinableTaskFactory joinableTaskFactory)
     {
         this.InitializeComponent();
 
         this._textView = textView;
+        this._joinableTaskFactory = joinableTaskFactory;
         this.Loaded += (_, _) =>
         {
             this.OnSomethingAboutDocumentNameChanged();
@@ -192,7 +196,7 @@ public partial class EditorBarControl : IDisposable
         this.ShowSolutionRoot = GeneralOptionsModel.Instance.ShowSolutionRoot;
 
         this.OpenExternalEditorButton!.Visibility = StringHelper.IsNullOrWhiteSpace(GeneralOptionsModel.Instance.ExternalEditorCommand) ? Visibility.Collapsed : Visibility.Visible;
-        this.OpenExternalEditorMenuItem!.IsEnabled = !StringHelper.IsNullOrWhiteSpace(GeneralOptionsModel.Instance.ExternalEditorCommand);
+        //this.OpenExternalEditorMenuItem!.IsEnabled = !StringHelper.IsNullOrWhiteSpace(GeneralOptionsModel.Instance.ExternalEditorCommand);
 
         this.ReloadStyle();
     }
@@ -303,7 +307,7 @@ public partial class EditorBarControl : IDisposable
                 Launcher.OpenInDefaultEditor(this.FilePath);
                 break;
             case FileAction.CopyRelativePath:
-                Launcher.CopyRelativePath(this.RelativePath);
+                Launcher.CopyRelativePathFromFullPath(this.FilePath);
                 break;
             case FileAction.CopyAbsolutePath:
                 Launcher.CopyAbsolutePath(this.FilePath);
@@ -321,16 +325,6 @@ public partial class EditorBarControl : IDisposable
     private void OpenDefaultEditorClicked(object sender, RoutedEventArgs e)
     {
         Launcher.OpenInDefaultEditor(this.FilePath);
-    }
-
-    private void CopyPathClicked(object sender, RoutedEventArgs e)
-    {
-        Launcher.CopyAbsolutePath(this.FilePath);
-    }
-
-    private void CopyRelativePathClicked(object sender, RoutedEventArgs e)
-    {
-        Launcher.CopyRelativePath(this.RelativePath);
     }
 
     private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -380,5 +374,28 @@ public partial class EditorBarControl : IDisposable
     private void OnSolutionEventsOnOnAfterOpenSolution(Solution? _)
     {
         this.OnSomethingAboutDocumentNameChanged();
+    }
+    
+    private void UIElement_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        var doc = this.GetCurrentDocument();
+        if (doc is null)
+            return;
+
+#pragma warning disable VSTHRD102
+        this._joinableTaskFactory.Run(async () =>
+#pragma warning restore VSTHRD102
+        {
+            try
+            {
+                var bridge = await VS.GetRequiredServiceAsync<EditorBarFileActionMenuBridge, EditorBarFileActionMenuBridge>();
+                Point point = this.PointToScreen(e.GetPosition(this));
+                await bridge.ShowAsync(doc, (int)point.X, (int)point.Y);
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync();
+            }
+        });
     }
 }
