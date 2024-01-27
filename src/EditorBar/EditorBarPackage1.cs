@@ -32,6 +32,15 @@ namespace JPSoftworks.EditorBar
         public const int EditorBarTextEditorToolbarGroup = 0x1140;
         public const int ToggleEditorBarCommand = 0x0100;
         public const int EditorBarOptionsCommand = 0x0101;
+        public const int EditorBarFileActionMenu = 0x2000;
+        public const int EditorBarFileActionMenuCopyPathGroup = 0x2001;
+        public const int EditorBarFileActionMenuOpenFileGroup = 0x2002;
+        public const int EditorBarFileActionMenuOpenFolderGroup = 0x2003;
+        public const int EditorBarFileAction_OpenContainingFolderCommand = 0x2010;
+        public const int EditorBarFileAction_OpenFileInDefaultEditorCommand = 0x2011;
+        public const int EditorBarFileAction_OpenFileInExternalEditorCommand = 0x2012;
+        public const int EditorBarFileAction_CopyFullPathCommand = 0x2013;
+        public const int EditorBarFileAction_CopyRelativePathCommand = 0x2014;
         public const int bmpToggleEditorBar = 0x0001;
     }
 }

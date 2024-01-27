@@ -18,6 +18,13 @@
 					<ButtonText>&amp;Editor Bar</ButtonText>
 				</Strings>
 			</Menu>
+			
+			<!-- Editor bar context menu for current file -->
+			<Menu guid="guidEditorBarPackageCmdSet" id="EditorBarFileActionMenu" type="Context">
+				<Strings>
+					<ButtonText>Editor Bar Context Menu</ButtonText>
+				</Strings>
+			</Menu>
 		</Menus>
 
 		<Groups>
@@ -34,6 +41,19 @@
 			<!--  Text Editor Toolbar / {EditorBarTextEditorToolbarGroup} -->
 			<Group guid="guidEditorBarPackageCmdSet" id="EditorBarTextEditorToolbarGroup" priority="0x100">
 				<Parent guid="guidStdEditor" id="IDM_VS_TOOL_TEXTEDITOR" />
+			</Group>
+			
+			<!-- Editor bar context menu -->
+			<Group guid="guidEditorBarPackageCmdSet" id="EditorBarFileActionMenuCopyPathGroup" priority="0x100">
+				<Parent guid="guidEditorBarPackageCmdSet" id="EditorBarFileActionMenu" />
+			</Group>
+			
+			<Group guid="guidEditorBarPackageCmdSet" id="EditorBarFileActionMenuOpenFileGroup" priority="0x200">
+				<Parent guid="guidEditorBarPackageCmdSet" id="EditorBarFileActionMenu" />
+			</Group>
+			
+			<Group guid="guidEditorBarPackageCmdSet" id="EditorBarFileActionMenuOpenFolderGroup" priority="0x300">
+				<Parent guid="guidEditorBarPackageCmdSet" id="EditorBarFileActionMenu" />
 			</Group>
 		</Groups>
 
@@ -61,6 +81,75 @@
 					<CommandName>Editor Bar Options...</CommandName>
 					<CanonicalName>EditorBar.Options</CanonicalName>
 					<LocCanonicalName>EditorBar.Options</LocCanonicalName>
+				</Strings>
+			</Button>
+			
+			<!-- Editor bar context menu -->
+			<Button guid="guidEditorBarPackageCmdSet" id="EditorBarFileAction_OpenContainingFolderCommand" priority="0x0100" type="Button">
+				<Parent guid="guidEditorBarPackageCmdSet" id="EditorBarFileActionMenuOpenFolderGroup" />
+				<Icon guid="ImageCatalogGuid" id="OpenFolder" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Open Containing &amp;Folder</ButtonText>
+					<CommandName>Open Containing Folder</CommandName>
+					<CanonicalName>EditorBar.OpenContainingFolder</CanonicalName>
+					<LocCanonicalName>EditorBar.OpenContainingFolder</LocCanonicalName>
+				</Strings>
+			</Button>
+			
+			<Button guid="guidEditorBarPackageCmdSet" id="EditorBarFileAction_OpenFileInDefaultEditorCommand" priority="0x0100" type="Button">
+				<Parent guid="guidEditorBarPackageCmdSet" id="EditorBarFileActionMenuOpenFileGroup" />
+				<Icon guid="ImageCatalogGuid" id="3923" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Open in &amp;Default Editor</ButtonText>
+					<CommandName>Open in Default Editor</CommandName>
+					<CanonicalName>EditorBar.OpenInDefaultEditor</CanonicalName>
+					<LocCanonicalName>EditorBar.OpenInDefaultEditor</LocCanonicalName>
+				</Strings>
+			</Button>
+			<Button guid="guidEditorBarPackageCmdSet" id="EditorBarFileAction_OpenFileInExternalEditorCommand" priority="0x0200" type="Button">
+				<Parent guid="guidEditorBarPackageCmdSet" id="EditorBarFileActionMenuOpenFileGroup" />
+				<Icon guid="ImageCatalogGuid" id="OpenFileDialog" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Open in &amp;External Editor</ButtonText>
+					<CommandName>Open in External Editor</CommandName>
+					<CanonicalName>EditorBar.OpenInExternalEditor</CanonicalName>
+					<LocCanonicalName>EditorBar.OpenInExternalEditor</LocCanonicalName>
+				</Strings>
+			</Button>
+			
+			<Button guid="guidEditorBarPackageCmdSet" id="EditorBarFileAction_CopyFullPathCommand" priority="0x0100" type="Button">
+				<Parent guid="guidEditorBarPackageCmdSet" id="EditorBarFileActionMenuCopyPathGroup" />
+				<Icon guid="ImageCatalogGuid" id="Copy" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>&amp;Copy Full Path</ButtonText>
+					<CommandName>Copy Full Path</CommandName>
+					<CanonicalName>EditorBar.CopyFullPath</CanonicalName>
+					<LocCanonicalName>EditorBar.CopyFullPath</LocCanonicalName>
+				</Strings>
+			</Button>
+			<Button guid="guidEditorBarPackageCmdSet" id="EditorBarFileAction_CopyRelativePathCommand" priority="0x0200" type="Button">
+				<Parent guid="guidEditorBarPackageCmdSet" id="EditorBarFileActionMenuCopyPathGroup" />
+				<Icon guid="ImageCatalogGuid" id="Copy" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Copy &amp;Relative Path</ButtonText>
+					<CommandName>Copy Relative Path</CommandName>
+					<CanonicalName>EditorBar.CopyRelativePath</CanonicalName>
+					<LocCanonicalName>EditorBar.CopyRelativePath</LocCanonicalName>
 				</Strings>
 			</Button>
 		</Buttons>
@@ -95,6 +184,20 @@
 			<IDSymbol name="EditorBarTextEditorToolbarGroup" value="0x1140" />
 			<IDSymbol name="ToggleEditorBarCommand" value="0x0100" />
 			<IDSymbol name="EditorBarOptionsCommand" value="0x0101" />
+			
+			
+			
+			<IDSymbol name="EditorBarFileActionMenu" value="0x2000" />
+			
+			<IDSymbol name="EditorBarFileActionMenuCopyPathGroup" value="0x2001" />
+			<IDSymbol name="EditorBarFileActionMenuOpenFileGroup" value="0x2002" />
+			<IDSymbol name="EditorBarFileActionMenuOpenFolderGroup" value="0x2003" />
+			
+			<IDSymbol name="EditorBarFileAction_OpenContainingFolderCommand" value="0x2010" />
+			<IDSymbol name="EditorBarFileAction_OpenFileInDefaultEditorCommand" value="0x2011" />
+			<IDSymbol name="EditorBarFileAction_OpenFileInExternalEditorCommand" value="0x2012" />
+			<IDSymbol name="EditorBarFileAction_CopyFullPathCommand" value="0x2013" />
+			<IDSymbol name="EditorBarFileAction_CopyRelativePathCommand" value="0x2014" />
 		</GuidSymbol>
 
 		<GuidSymbol name="guidImages" value="{8ec912c7-6f7f-457d-bbe8-318409383d92}" >

@@ -4,8 +4,10 @@
 //
 // ------------------------------------------------------------
 
+using System.ComponentModel.Composition;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Threading;
 
 namespace JPSoftworks.EditorBar;
 
@@ -15,6 +17,9 @@ namespace JPSoftworks.EditorBar;
 /// <seealso cref="Microsoft.VisualStudio.Text.Editor.IWpfTextViewMarginProvider" />
 abstract class BaseEditorBarFactory(BarPosition targetBarPosition) : IWpfTextViewMarginProvider
 {
+    [Import]
+    internal JoinableTaskContext JoinableTaskContext = null!;
+
     private IWpfTextView? _textView;
     private BarPosition TargetBarPosition { get; } = targetBarPosition;
 
@@ -22,6 +27,6 @@ abstract class BaseEditorBarFactory(BarPosition targetBarPosition) : IWpfTextVie
     public IWpfTextViewMargin? CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)
     {
         this._textView = wpfTextViewHost.TextView;
-        return this._textView != null ? new EditorBarMargin(this._textView, this.TargetBarPosition) : null;
+        return this._textView != null ? new EditorBarMargin(this._textView, JoinableTaskContext.Factory, this.TargetBarPosition) : null;
     }
 }

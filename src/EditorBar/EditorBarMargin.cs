@@ -7,6 +7,7 @@
 using System.Windows;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Threading;
 
 namespace JPSoftworks.EditorBar;
 
@@ -23,11 +24,12 @@ public class EditorBarMargin : IWpfTextViewMargin
     /// Initializes a new instance of the <see cref="EditorBarMargin" /> class.
     /// </summary>
     /// <param name="textView">The text view.</param>
+    /// <param name="joinableTaskFactory">A factory for starting asynchronous tasks that can mitigate deadlocks.</param>
     /// <param name="position">The position.</param>
-    public EditorBarMargin(IWpfTextView textView, BarPosition position)
+    public EditorBarMargin(IWpfTextView textView, JoinableTaskFactory joinableTaskFactory, BarPosition position)
     {
         this._position = position;
-        this._editorBarControl = new EditorBarControl(textView);
+        this._editorBarControl = new EditorBarControl(textView, joinableTaskFactory);
 
         GeneralOptionsModel.Saved += this.GeneralPageOnSaved;
         this.GeneralPageOnSaved(GeneralOptionsModel.Instance);
