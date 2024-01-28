@@ -90,10 +90,10 @@
       <DependentUpon>EditorBarControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="EditorBarMargin.cs" />
-    <Compile Include="EditorBarPackage1.cs">
+    <Compile Include="VSCommandTable.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>EditorBarPackage.vsct</DependentUpon>
+      <DependentUpon>VSCommandTable.vsct</DependentUpon>
     </Compile>
     <Compile Include="Fx\ViewModel.cs" />
     <Compile Include="GlobalUsings.cs" />
@@ -195,10 +195,10 @@
       <Link>Resources\LICENSE.txt</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <VSCTCompile Include="EditorBarPackage.vsct">
+    <VSCTCompile Include="VSCommandTable.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <Generator>VsctGenerator</Generator>
-      <LastGenOutput>EditorBarPackage1.cs</LastGenOutput>
+      <LastGenOutput>VSCommandTable.cs</LastGenOutput>
     </VSCTCompile>
     <Content Include="Resources\CommandIcons.png" />
     <Content Include="Resources\Icon.png">
