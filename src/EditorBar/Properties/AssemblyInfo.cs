@@ -14,9 +14,9 @@ using JPSoftworks.EditorBar;
 [assembly: AssemblyTitle(Vsix.Name)]
 [assembly: AssemblyDescription(Vsix.Description)]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Jiří Polášek")]
+[assembly: AssemblyCompany(Vsix.Author)]
 [assembly: AssemblyProduct(Vsix.Name)]
-[assembly: AssemblyCopyright("(c) 2024 Jiří Polášek")]
+[assembly: AssemblyCopyright("(c) 2024 " + Vsix.Author)]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
