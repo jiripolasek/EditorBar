@@ -7,6 +7,8 @@
              xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
              xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
              xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+             xmlns:puiUtilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
+             xmlns:puiImaging="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
              mc:Ignorable="d"
              Style="{DynamicResource EditorBarControlStyle}"
              d:DesignHeight="450" d:DesignWidth="800"
@@ -14,10 +16,12 @@
              Name="RootControl">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <puiUtilities:BrushToColorConverter x:Key="BrushToColorConverter" />
     </UserControl.Resources>
 
     <Grid>
-        <Border x:Name="EditorBarBorder" Style="{DynamicResource EditorBarBorderStyle}">
+        <Border x:Name="EditorBarBorder" Style="{DynamicResource EditorBarBorderStyle}"
+                puiImaging:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}">
             <DockPanel>
 
                 <!-- control button on the right -->
