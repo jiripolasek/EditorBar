@@ -50,6 +50,12 @@
                         </Style>
                     </Border.Style>
                     <StackPanel Orientation="Horizontal">
+                        <Button Click="DebugButtonClicked" 
+                                ToolTip="Debug"
+                                Style="{DynamicResource NoBorderButtonStyle}"
+                                Visibility="{Binding IsDevelopmentModeEnabled, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter} }">
+                            <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" />
+                        </Button>
                         <Button x:Name="OpenDefaultEditorButton"
                                 Click="OpenDefaultEditorClicked" 
                                 ToolTip="Open in Default Editor"

@@ -24,6 +24,12 @@ public class OptionsPageViewModel : ViewModel
     private string? _externalEditorPath;
     private string? _externalEditorArguments;
     private bool _showRelativePath;
+    private bool _displayInAuxiliaryDocuments;
+    private bool _displayInNonEditableDocuments;
+    private bool _displayInDiffViews;
+    private bool _isDebugModeEnabled;
+    private bool _displayInBlame;
+    private bool _displayInTemp;
 
     public ObservableCollection<EnumViewModel<BarPosition>> BarPositions { get; } =
     [
@@ -87,6 +93,36 @@ public class OptionsPageViewModel : ViewModel
         set => this.SetField(ref this._displayStyle, value);
     }
 
+    public bool DisplayInAuxiliaryDocuments
+    {
+        get => this._displayInAuxiliaryDocuments;
+        set => this.SetField(ref this._displayInAuxiliaryDocuments, value);
+    }
+
+    public bool DisplayInNonEditableDocuments
+    {
+        get => this._displayInNonEditableDocuments;
+        set => this.SetField(ref this._displayInNonEditableDocuments, value);
+    }
+
+    public bool DisplayInDiffViews
+    {
+        get => this._displayInDiffViews;
+        set => this.SetField(ref this._displayInDiffViews, value);
+    }
+
+    public bool DisplayInBlame
+    {
+        get => this._displayInBlame;
+        set => this.SetField(ref this._displayInBlame, value);
+    }
+
+    public bool DisplayInTemp
+    {
+        get => this._displayInTemp;
+        set => this.SetField(ref this._displayInTemp, value);
+    }
+
     public FileAction DoubleClickAction
     {
         get => this._doubleClickAction;
@@ -123,6 +159,12 @@ public class OptionsPageViewModel : ViewModel
         set => this.SetField(ref this._externalEditorArguments, value);
     }
 
+    public bool IsDebugModeEnabled
+    {
+        get => this._isDebugModeEnabled;
+        set => this.SetField(ref this._isDebugModeEnabled, value);
+    }
+
     public void Load(GeneralOptionsModel model)
     {
         try
@@ -131,6 +173,12 @@ public class OptionsPageViewModel : ViewModel
             this.BarPosition = model.BarPosition;
             this.DisplayStyle = model.DisplayStyle;
             this.ShowRelativePath = model.ShowPathRelativeToSolutionRoot;
+
+            this.DisplayInAuxiliaryDocuments = model.DisplayInAuxiliaryDocuments;
+            this.DisplayInNonEditableDocuments = model.DisplayInNonEditableDocuments;
+            this.DisplayInDiffViews = model.DisplayInDiffViews;
+            this.DisplayInBlame = model.DisplayInBlame;
+            this.DisplayInTemp = model.DisplayInTempFiles;
 
             this.DoubleClickAction = model.FileAction;
             this.DoubleClickCtrlAction = model.AlternateFileAction;
@@ -149,6 +197,8 @@ public class OptionsPageViewModel : ViewModel
 
             this.ExternalEditorPath = model.ExternalEditorCommand ?? "";
             this.ExternalEditorArguments = model.ExternalEditorCommandArguments ?? "";
+
+            this.IsDebugModeEnabled = model.DebugMode;
         }
         catch (Exception ex)
         {
@@ -164,6 +214,12 @@ public class OptionsPageViewModel : ViewModel
             model.BarPosition = this.BarPosition;
             model.DisplayStyle = this.DisplayStyle;
             model.ShowPathRelativeToSolutionRoot = this.ShowRelativePath;
+
+            model.DisplayInAuxiliaryDocuments = this.DisplayInAuxiliaryDocuments;
+            model.DisplayInNonEditableDocuments = this.DisplayInNonEditableDocuments;
+            model.DisplayInDiffViews = this.DisplayInDiffViews;
+            model.DisplayInBlame = this.DisplayInBlame;
+            model.DisplayInTempFiles = this.DisplayInTemp;
 
             model.FileAction = this.DoubleClickAction;
             model.AlternateFileAction = this.DoubleClickCtrlAction;
@@ -181,6 +237,8 @@ public class OptionsPageViewModel : ViewModel
 
             model.ExternalEditorCommand = (this.ExternalEditorPath ?? "").Trim();
             model.ExternalEditorCommandArguments = (this.ExternalEditorArguments ?? "").Trim();
+
+            model.DebugMode = this.IsDebugModeEnabled;
 
             model.Save();
         }
