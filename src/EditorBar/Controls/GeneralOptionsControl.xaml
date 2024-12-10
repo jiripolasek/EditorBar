@@ -70,6 +70,16 @@
                 </StackPanel>
             </GroupBox>
 
+            <GroupBox Header="Where to display">
+                <StackPanel Grid.IsSharedSizeScope="True">
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInAuxiliaryDocuments}" Content="Display in auxiliary documents" />
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInDiffViews}" Content="Display in comparison view" />
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInNonEditableDocuments}" Content="Display in non-editable documents" />
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInBlame}" Content="Display in annotation / blame" />
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInTemp}" Content="Display in temp files" />
+                </StackPanel>
+            </GroupBox>
+
             <GroupBox Header="Quick Actions">
 
                 <Grid>
@@ -116,6 +126,13 @@
                     </TextBlock>
                 </Grid>
             </GroupBox>
+
+            <GroupBox Header="Development">
+                <StackPanel Grid.IsSharedSizeScope="True">
+                    <CheckBox IsChecked="{Binding ViewModel.IsDebugModeEnabled}" Content="Enabled development mode" />
+                </StackPanel>
+            </GroupBox>
+
         </StackPanel>
     </ScrollViewer>
 </UserControl>

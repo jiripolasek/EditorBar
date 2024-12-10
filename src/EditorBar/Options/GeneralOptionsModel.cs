@@ -242,6 +242,42 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
     public string? ExternalEditorCommandArguments { get; set; } = Launcher.FileNamePlaceholderConstant;
 
     // -------------------------------------------
+    // Activation rules category
+    // -------------------------------------------
+
+    [Category(GeneralCategoryName)]
+    [DisplayName("Display in diff views")]
+    [Description("Determines if the Editor Bar is visible in diff views.")]
+    [DefaultValue(false)]
+    public bool DisplayInDiffViews { get; set; }
+
+    [Category(GeneralCategoryName)]
+    [DisplayName("Display in auxiliary documents")]
+    [Description("Determines if the Editor Bar is visible in auxiliary documents.")]
+    [DefaultValue(false)]
+    public bool DisplayInAuxiliaryDocuments { get; set; }
+
+    [Category(GeneralCategoryName)]
+    [DisplayName("Display in read-only documents")]
+    [Description("Determines if the Editor Bar is visible in read-only documents.")]
+    [DefaultValue(false)]
+    public bool DisplayInNonEditableDocuments { get; set; }
+
+    // display in blam
+    [Category(GeneralCategoryName)]
+    [DisplayName("Display in Blame")]
+    [Description("Determines if the Editor Bar is visible in annotations / blame view.")]
+    [DefaultValue(false)]
+    public bool DisplayInBlame { get; set; }
+
+    // display in temp files
+    [Category(GeneralCategoryName)]
+    [DisplayName("Display in temp files")]
+    [Description("Determines if the Editor Bar is visible in temp files.")]
+    [DefaultValue(false)]
+    public bool DisplayInTempFiles { get; set; }
+
+    // -------------------------------------------
     // Additional Actions category
     // -------------------------------------------
 
@@ -258,4 +294,15 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
     [DefaultValue(typeof(FileAction), nameof(FileAction.OpenInExternalEditor))]
     [TypeConverter(typeof(EnumToDescriptionConverter))]
     public FileAction AlternateFileAction { get; set; } = FileAction.OpenInExternalEditor;
+
+
+
+    // -------------------------------------------
+    // Debug category
+    // -------------------------------------------
+    [Category("Debug")]
+    [DisplayName("Debug mode")]
+    [Description("Enable debug mode.")]
+    [DefaultValue(false)]
+    public bool DebugMode { get; set; }
 }

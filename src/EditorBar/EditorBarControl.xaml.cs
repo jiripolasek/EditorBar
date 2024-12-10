@@ -5,6 +5,7 @@
 // ------------------------------------------------------------
 
 using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -13,6 +14,7 @@ using JPSoftworks.EditorBar.Commands;
 using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Threading;
@@ -48,13 +50,21 @@ public partial class EditorBarControl : IDisposable
     public static readonly DependencyProperty ShowSolutionRootProperty = DependencyProperty.Register(
         nameof(ShowSolutionRoot), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(default(bool)));
 
+    public static readonly DependencyProperty IsDevelopmentModeEnabledProperty = DependencyProperty.Register(
+        nameof(IsDevelopmentModeEnabled), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(default(bool)));
+
+    public bool IsDevelopmentModeEnabled
+    {
+        get { return (bool)GetValue(IsDevelopmentModeEnabledProperty); }
+        set { SetValue(IsDevelopmentModeEnabledProperty, value); }
+    }
+
     private readonly IWpfTextView? _textView;
     private readonly JoinableTaskFactory _joinableTaskFactory;
 
     public EditorBarControl(IWpfTextView textView, JoinableTaskFactory joinableTaskFactory)
     {
         this.InitializeComponent();
-
         this._textView = textView;
         this._joinableTaskFactory = joinableTaskFactory;
         this.Loaded += (_, _) =>
@@ -197,6 +207,8 @@ public partial class EditorBarControl : IDisposable
 
         this.OpenExternalEditorButton!.Visibility = StringHelper.IsNullOrWhiteSpace(GeneralOptionsModel.Instance.ExternalEditorCommand) ? Visibility.Collapsed : Visibility.Visible;
         //this.OpenExternalEditorMenuItem!.IsEnabled = !StringHelper.IsNullOrWhiteSpace(GeneralOptionsModel.Instance.ExternalEditorCommand);
+
+        this.IsDevelopmentModeEnabled = GeneralOptionsModel.Instance.DebugMode;
 
         this.ReloadStyle();
     }
@@ -375,7 +387,7 @@ public partial class EditorBarControl : IDisposable
     {
         this.OnSomethingAboutDocumentNameChanged();
     }
-    
+
     private void UIElement_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
         var doc = this.GetCurrentDocument();
@@ -397,5 +409,26 @@ public partial class EditorBarControl : IDisposable
                 await ex.LogAsync();
             }
         });
+    }
+
+    private void DebugButtonClicked(object sender, RoutedEventArgs e)
+    {
+        var sb = new StringBuilder();
+
+        var roles = this._textView?.Roles;
+        if (roles != null)
+        {
+            sb.AppendLine("Roles:");
+            foreach (var role in roles.OrderBy(t => t))
+            {
+                sb.AppendFormat(" - {0}", role).AppendLine();
+            }
+        }
+
+        // show message box:
+        VS.MessageBox.Show(sb.ToString(),
+            "",
+            OLEMSGICON.OLEMSGICON_INFO,
+            OLEMSGBUTTON.OLEMSGBUTTON_OK);
     }
 }

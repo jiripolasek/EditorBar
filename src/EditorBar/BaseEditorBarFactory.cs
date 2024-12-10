@@ -6,6 +6,7 @@
 
 using System.ComponentModel.Composition;
 using JPSoftworks.EditorBar.Options;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Threading;
 
@@ -20,13 +21,22 @@ abstract class BaseEditorBarFactory(BarPosition targetBarPosition) : IWpfTextVie
     [Import]
     internal JoinableTaskContext JoinableTaskContext = null!;
 
+    [Import]
+    internal SVsServiceProvider ServiceProvider = null!;
+
     private IWpfTextView? _textView;
-    private BarPosition TargetBarPosition { get; } = targetBarPosition;
 
     /// <inheritdoc />
     public IWpfTextViewMargin? CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)
     {
         this._textView = wpfTextViewHost.TextView;
-        return this._textView != null ? new EditorBarMargin(this._textView, JoinableTaskContext.Factory, this.TargetBarPosition) : null;
+        if (this._textView == null)
+            return null;
+
+        return new EditorBarMargin(
+            this._textView,
+            this.JoinableTaskContext.Factory,
+            this.ServiceProvider,
+            targetBarPosition);
     }
 }
