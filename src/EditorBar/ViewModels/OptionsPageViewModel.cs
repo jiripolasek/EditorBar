@@ -30,6 +30,7 @@ public class OptionsPageViewModel : ViewModel
     private bool _isDebugModeEnabled;
     private bool _displayInBlame;
     private bool _displayInTemp;
+    private VisualStyle _visualStyle;
 
     public ObservableCollection<EnumViewModel<BarPosition>> BarPositions { get; } =
     [
@@ -41,6 +42,13 @@ public class OptionsPageViewModel : ViewModel
     [
         new EnumViewModel<DisplayStyle>(DisplayStyle.Normal, "Normal"),
         new EnumViewModel<DisplayStyle>(DisplayStyle.Compact, "Compact")
+    ];
+
+    public ObservableCollection<EnumViewModel<VisualStyle>> VisualStyles { get; } =
+    [
+        new EnumViewModel<VisualStyle>(VisualStyle.FullRowCommandBar, "Command Bar"),
+        new EnumViewModel<VisualStyle>(VisualStyle.FullRowTransparent, "Transparent"),
+        new EnumViewModel<VisualStyle>(VisualStyle.FullRowToolWindow, "Tool Window")
     ];
 
     public ObservableCollection<EnumViewModel<bool>> PathStyles { get; } =
@@ -91,6 +99,12 @@ public class OptionsPageViewModel : ViewModel
     {
         get => this._displayStyle;
         set => this.SetField(ref this._displayStyle, value);
+    }
+
+    public VisualStyle VisualStyle
+    {
+        get => this._visualStyle;
+        set => this.SetField(ref this._visualStyle, value);
     }
 
     public bool DisplayInAuxiliaryDocuments
@@ -172,6 +186,7 @@ public class OptionsPageViewModel : ViewModel
             this.IsEnabled = model.Enabled;
             this.BarPosition = model.BarPosition;
             this.DisplayStyle = model.DisplayStyle;
+            this.VisualStyle = model.VisualStyle;
             this.ShowRelativePath = model.ShowPathRelativeToSolutionRoot;
 
             this.DisplayInAuxiliaryDocuments = model.DisplayInAuxiliaryDocuments;
@@ -213,6 +228,7 @@ public class OptionsPageViewModel : ViewModel
             model.Enabled = this.IsEnabled;
             model.BarPosition = this.BarPosition;
             model.DisplayStyle = this.DisplayStyle;
+            model.VisualStyle = this.VisualStyle;
             model.ShowPathRelativeToSolutionRoot = this.ShowRelativePath;
 
             model.DisplayInAuxiliaryDocuments = this.DisplayInAuxiliaryDocuments;

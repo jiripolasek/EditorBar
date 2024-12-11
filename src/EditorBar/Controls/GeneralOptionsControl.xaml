@@ -49,6 +49,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <Label Grid.Column="0" Grid.Row="0" Content="_Position:" Target="{x:Reference BarPositionComboBox}" />
@@ -57,8 +58,11 @@
                     <Label Grid.Column="0" Grid.Row="1" Content="Display _mode:" Target="{x:Reference DisplayModeComboBox}" />
                     <ComboBox x:Name="DisplayModeComboBox" Grid.Column="1" Grid.Row="1" ItemsSource="{Binding ViewModel.DisplayStyles}" SelectedValue="{Binding ViewModel.DisplayStyle, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
 
-                    <Label Grid.Column="0" Grid.Row="2" Content="Pat_h display:" Target="{x:Reference PathStyleComboBox}" />
-                    <ComboBox x:Name="PathStyleComboBox" Grid.Column="1" Grid.Row="2" ItemsSource="{Binding ViewModel.PathStyles}" SelectedValue="{Binding ViewModel.ShowRelativePath, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
+                    <Label Grid.Column="0" Grid.Row="2" Content="_Visual style:" Target="{x:Reference VisualStyleComboBox}" />
+                    <ComboBox x:Name="VisualStyleComboBox" Grid.Column="1" Grid.Row="2" ItemsSource="{Binding ViewModel.VisualStyles}" SelectedValue="{Binding ViewModel.VisualStyle, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
+
+                    <Label Grid.Column="0" Grid.Row="3" Content="Pat_h display:" Target="{x:Reference PathStyleComboBox}" />
+                    <ComboBox x:Name="PathStyleComboBox" Grid.Column="1" Grid.Row="3" ItemsSource="{Binding ViewModel.PathStyles}" SelectedValue="{Binding ViewModel.ShowRelativePath, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
                 </Grid>
             </GroupBox>
 
