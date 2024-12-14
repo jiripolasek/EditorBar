@@ -161,7 +161,7 @@ public class OptionsPageViewModel : ViewModel
 
     public EditorSegmentOptionsViewModel ProjectNameSegment { get; } = new();
 
-    public EditorSegmentOptionsViewModel ParentFolderSegment { get; set; } = new();
+    public EditorSegmentOptionsViewModel ParentFolderSegment { get; } = new();
 
     public string? ExternalEditorPath
     {
