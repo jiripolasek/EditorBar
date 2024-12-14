@@ -288,14 +288,9 @@ public partial class EditorBarControl : IDisposable
         this.ParentFolderElementCornerRadius = new CornerRadius(0, 4, 4, 0);
         this.ProjectElementCornerRadius = new CornerRadius(0, 4, 4, 0);
 
-        this.OpenExternalEditorButton!.Visibility =
-            StringHelper.IsNullOrWhiteSpace(GeneralOptionsModel.Instance.ExternalEditorCommand)
-                ? Visibility.Collapsed
-                : Visibility.Visible;
-        //this.OpenExternalEditorMenuItem!.IsEnabled = !StringHelper.IsNullOrWhiteSpace(GeneralOptionsModel.Instance.ExternalEditorCommand);
+        this.OpenExternalEditorButton!.Visibility = StringHelper.IsNullOrWhiteSpace(options.ExternalEditorCommand) ? Visibility.Collapsed : Visibility.Visible;
 
         this.IsDevelopmentModeEnabled = options.DebugMode;
-
 
         this.ReloadStyle();
         // allow to change background color of the editor bar
