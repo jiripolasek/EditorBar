@@ -184,9 +184,7 @@ public partial class EditorBarControl : IDisposable
         this.ProjectNameLabel!.Content = project?.Name ?? "(no project)";
         if (project != null)
         {
-            var parents =
-                await VisualStudioHelper.GetSolutionFolderPathAsync(
-                    await VisualStudioHelper.ConvertToSolutionItemAsync(project));
+            var parents = await VisualStudioHelper.GetSolutionFolderPathAsync(await VisualStudioHelper.ConvertToSolutionItemAsync(project));
             this.SolutionFoldersList!.ItemsSource = parents;
         }
         else
@@ -272,8 +270,7 @@ public partial class EditorBarControl : IDisposable
     private void ReloadStyle()
     {
         // remove old style (remove only styles from this extension), we have also VS theme loaded on the control (toolkit:Themes.UseVsTheme="True"
-        var currentStyleResourceDictionaries =
-            this.Resources.MergedDictionaries.Where(IsEditorBarStyleXamlComponent).ToList();
+        var currentStyleResourceDictionaries = this.Resources.MergedDictionaries.Where(IsEditorBarStyleXamlComponent).ToList();
 
         foreach (var c in currentStyleResourceDictionaries)
         {
@@ -286,13 +283,11 @@ public partial class EditorBarControl : IDisposable
         this.Resources.MergedDictionaries.Add(newResourceDict);
         return;
 
-        static bool IsEditorBarStyleXamlComponent(ResourceDictionary resourceDictionary)
-        {
-            return resourceDictionary.Source != null
-                   && resourceDictionary.Source.IsAbsoluteUri
-                   && resourceDictionary.Source.AbsolutePath.Contains("/EditorBar;")
-                   && resourceDictionary.Source.AbsolutePath.Contains("Style.xaml");
-        }
+        static bool IsEditorBarStyleXamlComponent(ResourceDictionary resourceDictionary) =>
+            resourceDictionary.Source != null
+            && resourceDictionary.Source.IsAbsoluteUri
+            && resourceDictionary.Source.AbsolutePath.Contains("/EditorBar;")
+            && resourceDictionary.Source.AbsolutePath.Contains("Style.xaml");
     }
 
     private void UpdateFilePathLabel(ITextDocument document, bool forced = false)
@@ -305,9 +300,7 @@ public partial class EditorBarControl : IDisposable
         this.FilePath = document.FilePath;
         this.RelativePath = GetRelativePathToSolution(this.FilePath);
 
-        var pathLabelText = GeneralOptionsModel.Instance.ShowPathRelativeToSolutionRoot
-            ? this.RelativePath
-            : this.FilePath;
+        var pathLabelText = GeneralOptionsModel.Instance.ShowPathRelativeToSolutionRoot ? this.RelativePath : this.FilePath;
         this.PathLabel!.Content = pathLabelText ?? "(unnamed document)";
     }
 
@@ -466,9 +459,8 @@ public partial class EditorBarControl : IDisposable
         {
             try
             {
-                var bridge =
-                    await VS.GetRequiredServiceAsync<EditorBarFileActionMenuBridge, EditorBarFileActionMenuBridge>();
-                var point = this.PointToScreen(e.GetPosition(this));
+                var bridge = await VS.GetRequiredServiceAsync<EditorBarFileActionMenuBridge, EditorBarFileActionMenuBridge>();
+                Point point = this.PointToScreen(e.GetPosition(this));
                 await bridge.ShowAsync(doc, (int)point.X, (int)point.Y);
             }
             catch (Exception ex)
