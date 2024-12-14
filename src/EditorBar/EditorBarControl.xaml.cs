@@ -204,20 +204,14 @@ public partial class EditorBarControl : IDisposable
 
     private void ReapplySettings()
     {
-        this.SolutionElementBackground =
-            new SolidColorBrush(GeneralOptionsModel.Instance.SolutionBackground.ToMediaColor());
-        this.SolutionElementForeground =
-            new SolidColorBrush(GeneralOptionsModel.Instance.SolutionForeground.ToMediaColor());
+        this.SolutionElementBackground = new SolidColorBrush(GeneralOptionsModel.Instance.SolutionBackground.ToMediaColor());
+        this.SolutionElementForeground = new SolidColorBrush(GeneralOptionsModel.Instance.SolutionForeground.ToMediaColor());
 
-        this.ProjectElementBackground =
-            new SolidColorBrush(GeneralOptionsModel.Instance.ProjectBackground.ToMediaColor());
-        this.ProjectElementForeground =
-            new SolidColorBrush(GeneralOptionsModel.Instance.ProjectForeground.ToMediaColor());
+        this.ProjectElementBackground = new SolidColorBrush(GeneralOptionsModel.Instance.ProjectBackground.ToMediaColor());
+        this.ProjectElementForeground = new SolidColorBrush(GeneralOptionsModel.Instance.ProjectForeground.ToMediaColor());
 
-        this.SolutionFolderElementBackground =
-            new SolidColorBrush(GeneralOptionsModel.Instance.SolutionFolderBackground.ToMediaColor());
-        this.SolutionFolderElementForeground =
-            new SolidColorBrush(GeneralOptionsModel.Instance.SolutionFolderForeground.ToMediaColor());
+        this.SolutionFolderElementBackground = new SolidColorBrush(GeneralOptionsModel.Instance.SolutionFolderBackground.ToMediaColor());
+        this.SolutionFolderElementForeground = new SolidColorBrush(GeneralOptionsModel.Instance.SolutionFolderForeground.ToMediaColor());
 
         this.ShowSolutionFolders = GeneralOptionsModel.Instance.ShowSolutionFolders;
         this.ShowSolutionRoot = GeneralOptionsModel.Instance.ShowSolutionRoot;
