@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:controls="clr-namespace:JPSoftworks.EditorBar.Controls"
              xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging" xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance Type=controls:GeneralOptionsControl, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -75,13 +76,15 @@
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="Where to display">
+            <GroupBox Header="Visibility">
                 <StackPanel Grid.IsSharedSizeScope="True">
-                    <CheckBox IsChecked="{Binding ViewModel.DisplayInAuxiliaryDocuments}" Content="Display in auxiliary documents" />
-                    <CheckBox IsChecked="{Binding ViewModel.DisplayInDiffViews}" Content="Display in comparison view" />
-                    <CheckBox IsChecked="{Binding ViewModel.DisplayInNonEditableDocuments}" Content="Display in non-editable documents" />
-                    <CheckBox IsChecked="{Binding ViewModel.DisplayInBlame}" Content="Display in annotation / blame" />
-                    <CheckBox IsChecked="{Binding ViewModel.DisplayInTemp}" Content="Display in temp files" />
+                    <Label>Display Editor Bar in these documents and views:</Label>
+                    <CheckBox IsChecked="True" IsEnabled="False" Content="Primary document views" />
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInAuxiliaryDocuments}" Content="Auxiliary document views" />
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInDiffViews}" Content="Comparison view" />
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInNonEditableDocuments}" Content="Non-editable documents" />
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInBlame}" Content="Annotation / blame" />
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInTemp}" Content="Temporary files" />
                 </StackPanel>
             </GroupBox>
 
