@@ -29,8 +29,7 @@ internal static class VisualStudioHelper
     /// Thrown back at the awaiting caller if <paramref name="cancellationToken" /> is canceled,
     /// even if the caller is already on the main thread.
     /// </exception>
-    internal static async Task<SolutionItem?> ConvertToSolutionItemAsync(Project dteProject,
-        CancellationToken cancellationToken = default)
+    internal static async Task<Community.VisualStudio.Toolkit.Project?> ConvertToSolutionItemAsync(Project dteProject, CancellationToken cancellationToken = default)
     {
         if (dteProject == null)
         {

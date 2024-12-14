@@ -161,6 +161,8 @@ public class OptionsPageViewModel : ViewModel
 
     public EditorSegmentOptionsViewModel ProjectNameSegment { get; } = new();
 
+    public EditorSegmentOptionsViewModel ParentFolderSegment { get; } = new();
+
     public string? ExternalEditorPath
     {
         get => this._externalEditorPath;
@@ -206,9 +208,13 @@ public class OptionsPageViewModel : ViewModel
             this.SolutionFolderSegment.ForegroundColor = model.SolutionFolderForeground.ToMediaColor();
             this.SolutionFolderSegment.BackgroundColor = model.SolutionFolderBackground.ToMediaColor();
 
-            this.ProjectNameSegment.IsVisible = true;
+            this.ProjectNameSegment.IsVisible = model.ShowProject;
             this.ProjectNameSegment.ForegroundColor = model.ProjectForeground.ToMediaColor();
             this.ProjectNameSegment.BackgroundColor = model.ProjectBackground.ToMediaColor();
+
+            this.ParentFolderSegment.IsVisible = model.ShowParentFolder;
+            this.ParentFolderSegment.ForegroundColor = model.ParentFolderForeground.ToMediaColor();
+            this.ParentFolderSegment.BackgroundColor = model.ParentFolderBackground.ToMediaColor();
 
             this.ExternalEditorPath = model.ExternalEditorCommand ?? "";
             this.ExternalEditorArguments = model.ExternalEditorCommandArguments ?? "";
@@ -248,8 +254,13 @@ public class OptionsPageViewModel : ViewModel
             model.SolutionFolderForeground = this.SolutionFolderSegment.ForegroundColor.ToDrawingColor();
             model.SolutionFolderBackground = this.SolutionFolderSegment.BackgroundColor.ToDrawingColor();
 
+            model.ShowProject = this.ProjectNameSegment.IsVisible;
             model.ProjectForeground = this.ProjectNameSegment.ForegroundColor.ToDrawingColor();
             model.ProjectBackground = this.ProjectNameSegment.BackgroundColor.ToDrawingColor();
+
+            model.ShowParentFolder = this.ParentFolderSegment.IsVisible;
+            model.ParentFolderForeground = this.ParentFolderSegment.ForegroundColor.ToDrawingColor();
+            model.ParentFolderBackground = this.ParentFolderSegment.BackgroundColor.ToDrawingColor();
 
             model.ExternalEditorCommand = (this.ExternalEditorPath ?? "").Trim();
             model.ExternalEditorCommandArguments = (this.ExternalEditorArguments ?? "").Trim();
