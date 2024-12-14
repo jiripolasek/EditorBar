@@ -76,11 +76,11 @@
 
             <GroupBox Header="Where to display">
                 <StackPanel Grid.IsSharedSizeScope="True">
-                    <CheckBox IsChecked="{Binding ViewModel.DisplayInAuxiliaryDocuments}" Content="Auxiliary documents" />
-                    <CheckBox IsChecked="{Binding ViewModel.DisplayInDiffViews}" Content="Comparison view" />
-                    <CheckBox IsChecked="{Binding ViewModel.DisplayInNonEditableDocuments}" Content="Non-editable documents" />
-                    <CheckBox IsChecked="{Binding ViewModel.DisplayInBlame}" Content="Annotation / blame" />
-                    <CheckBox IsChecked="{Binding ViewModel.DisplayInTemp}" Content="Temporary files" />
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInAuxiliaryDocuments}" Content="Display in auxiliary documents" />
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInDiffViews}" Content="Display in comparison view" />
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInNonEditableDocuments}" Content="Display in non-editable documents" />
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInBlame}" Content="Display in annotation / blame" />
+                    <CheckBox IsChecked="{Binding ViewModel.DisplayInTemp}" Content="Display in temp files" />
                 </StackPanel>
             </GroupBox>
 
