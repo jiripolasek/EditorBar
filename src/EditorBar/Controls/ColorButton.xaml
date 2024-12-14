@@ -6,22 +6,221 @@
              xmlns:local="clr-namespace:JPSoftworks.EditorBar.Controls"
              xmlns:presentation="clr-namespace:JPSoftworks.EditorBar.Presentation"
              xmlns:platformUi="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
              mc:Ignorable="d" 
              x:Name="Root"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <presentation:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+
+
+        <Style x:Key="ColorSwatchButtonStyle" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <ContentPresenter />
+                            <Border x:Name="Border" BorderThickness="2" BorderBrush="Transparent"></Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="Black" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Margin" Value="0" />
+        </Style>
+
+        <x:Array x:Key="BasicColors" Type="{x:Type Color}">
+
+            <Color>#FF0000</Color>
+            <Color>#ee0099</Color>
+            <Color>#FF00FF</Color>
+            <Color>#9900FF</Color>
+            <Color>#0000FF</Color>
+            <Color>#0099FF</Color>
+            <Color>#00eeee</Color>
+            <Color>#00ee99</Color>
+            <Color>#00FF00</Color>
+            <Color>#CCFF00</Color>
+            <Color>#FFFF00</Color>
+            <Color>#FFcc00</Color>
+            <Color>#FF9900</Color>
+
+            <Color>#000000</Color>
+            <Color>#333333</Color>
+            <Color>#666666</Color>
+            <Color>#999999</Color>
+            <Color>#cccccc</Color>
+            <Color>#FFFFFF</Color>
+        </x:Array>
+
         <x:Array x:Key="Colors" Type="{x:Type Color}">
-            <Color>Gold</Color>
-            <Color>DeepSkyBlue</Color>
-            <Color>Purple</Color>
-            <Color>Maroon</Color>
-            <Color>YellowGreen</Color>
-            <Color>Black</Color>
-            <Color>Gray</Color>
-            <Color>Silver</Color>
-            <Color>WhiteSmoke</Color>
-            <Color>White</Color>
+            <Color>#FACDD4</Color>
+            <Color>#F7C7D5</Color>
+            <Color>#E5BDD7</Color>
+            <Color>#DFBEDB</Color>
+            <Color>#CBC4E3</Color>
+            <Color>#C0DAF1</Color>
+            <Color>#BAE0F7</Color>
+            <Color>#B5E3F2</Color>
+            <Color>#B3DFDE</Color>
+            <Color>#BCE2D3</Color>
+            <Color>#D5EAC9</Color>
+            <Color>#E0EBC9</Color>
+            <Color>#F4F6C5</Color>
+            <Color>#FEF2B8</Color>
+            <Color>#FEECBC</Color>
+            <Color>#FBD7B7</Color>
+            <Color>#DCCDCA</Color>
+            <Color>#E2D9D7</Color>
+            <Color>#DFE4E7</Color>
+
+            <Color>#F3ABAE</Color>
+            <Color>#F6A5B4</Color>
+            <Color>#D9A1C8</Color>
+            <Color>#CBA2CC</Color>
+            <Color>#B5AED8</Color>
+            <Color>#A7C8E9</Color>
+            <Color>#9FD2F1</Color>
+            <Color>#97D9E9</Color>
+            <Color>#90D1CD</Color>
+            <Color>#9ED3C3</Color>
+            <Color>#C2E1B5</Color>
+            <Color>#D2E6B1</Color>
+            <Color>#F1F2AC</Color>
+            <Color>#FEE89D</Color>
+            <Color>#FCE096</Color>
+            <Color>#FCC39A</Color>
+            <Color>#CDB4B0</Color>
+            <Color>#D2C7C6</Color>
+            <Color>#CFD7DA</Color>
+
+            <Color>#E66F71</Color>
+            <Color>#EB6A7E</Color>
+            <Color>#C66EA8</Color>
+            <Color>#A56AAC</Color>
+            <Color>#847BBC</Color>
+            <Color>#71A4DB</Color>
+            <Color>#65B5E8</Color>
+            <Color>#53C5E0</Color>
+            <Color>#46B7B1</Color>
+            <Color>#59BC9F</Color>
+            <Color>#98D27E</Color>
+            <Color>#B7D68A</Color>
+            <Color>#EBEF91</Color>
+            <Color>#FFDA56</Color>
+            <Color>#FFC94F</Color>
+            <Color>#FAA362</Color>
+            <Color>#B0867B</Color>
+            <Color>#B3A49D</Color>
+            <Color>#AAB8BB</Color>
+
+            <Color>#F0514E</Color>
+            <Color>#ED4964</Color>
+            <Color>#AC4C94</Color>
+            <Color>#9451A0</Color>
+            <Color>#6863A6</Color>
+            <Color>#5794CB</Color>
+            <Color>#51A3DB</Color>
+            <Color>#36BDDA</Color>
+            <Color>#27AA9A</Color>
+            <Color>#3EAE86</Color>
+            <Color>#8AC567</Color>
+            <Color>#9FCE5C</Color>
+            <Color>#E3E752</Color>
+            <Color>#FDD32C</Color>
+            <Color>#F4B826</Color>
+            <Color>#F78737</Color>
+            <Color>#996E61</Color>
+            <Color>#97847E</Color>
+            <Color>#8D9DA4</Color>
+
+            <Color>#F0443A</Color>
+            <Color>#EE344B</Color>
+            <Color>#A1358A</Color>
+            <Color>#86419C</Color>
+            <Color>#544FA3</Color>
+            <Color>#4380BF</Color>
+            <Color>#4192D1</Color>
+            <Color>#27B3D7</Color>
+            <Color>#189A90</Color>
+            <Color>#29A173</Color>
+            <Color>#75BC4C</Color>
+            <Color>#92C64A</Color>
+            <Color>#E1DF3A</Color>
+            <Color>#FECA1C</Color>
+            <Color>#FFB617</Color>
+            <Color>#F37C2F</Color>
+            <Color>#895746</Color>
+            <Color>#846D62</Color>
+            <Color>#7F9298</Color>
+
+            <Color>#DC3030</Color>
+            <Color>#D8344D</Color>
+            <Color>#8E3088</Color>
+            <Color>#763696</Color>
+            <Color>#47439A</Color>
+            <Color>#3372B9</Color>
+            <Color>#2E7EC3</Color>
+            <Color>#1A96B8</Color>
+            <Color>#0F8275</Color>
+            <Color>#1B8A5F</Color>
+            <Color>#5FA243</Color>
+            <Color>#79AA3D</Color>
+            <Color>#D3C52E</Color>
+            <Color>#FBAD1B</Color>
+            <Color>#F49B19</Color>
+            <Color>#F06821</Color>
+            <Color>#774739</Color>
+            <Color>#655348</Color>
+            <Color>#55656D</Color>
+
+            <Color>#C7292A</Color>
+            <Color>#C0233E</Color>
+            <Color>#792885</Color>
+            <Color>#6F3999</Color>
+            <Color>#3A3792</Color>
+            <Color>#255EAB</Color>
+            <Color>#1C6AB5</Color>
+            <Color>#0A7FA0</Color>
+            <Color>#096A59</Color>
+            <Color>#186F4F</Color>
+            <Color>#49853D</Color>
+            <Color>#608C3D</Color>
+            <Color>#C6A230</Color>
+            <Color>#F79319</Color>
+            <Color>#F3891C</Color>
+            <Color>#E35921</Color>
+            <Color>#63372F</Color>
+            <Color>#4B3832</Color>
+            <Color>#364349</Color>
+
+            <Color>#B92025</Color>
+            <Color>#A41E37</Color>
+            <Color>#5C2C80</Color>
+            <Color>#482D8A</Color>
+            <Color>#322F86</Color>
+            <Color>#1D4695</Color>
+            <Color>#15499D</Color>
+            <Color>#0B5C79</Color>
+            <Color>#0E4B43</Color>
+            <Color>#0D563B</Color>
+            <Color>#2D6A31</Color>
+            <Color>#3E6934</Color>
+            <Color>#AF7C28</Color>
+            <Color>#F4711F</Color>
+            <Color>#EA6A21</Color>
+            <Color>#D0492B</Color>
+            <Color>#4F2927</Color>
+            <Color>#34221E</Color>
+            <Color>#2E373B</Color>
         </x:Array>
     </UserControl.Resources>
     <Grid>
@@ -42,8 +241,9 @@
             <platformUi:SystemDropShadowChrome Color="#71000000" MinWidth="{Binding ActualWidth, ElementName=Root}" Margin="0,0,5,5">
                 <Border Background="{x:Static SystemColors.ControlBrush}" BorderBrush="{x:Static SystemColors.ControlDarkBrush}" BorderThickness="1">
                     <StackPanel>
+                        <!-- ad colors -->
                         <Border Margin="4">
-                            <ItemsControl ItemsSource="{StaticResource Colors}" MaxWidth="140">
+                            <ItemsControl ItemsSource="{StaticResource Colors}" MaxWidth="380">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel IsItemsHost="True" />
@@ -51,17 +251,46 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type Color}">
-                                        <Button Margin="2" Tag="{Binding}" Click="SetColor_Click">
-                                            <Border Background="{Binding Converter={StaticResource ColorToBrushConverter}}" Width="20" Height="20" />
+                                        <Button Tag="{Binding}" Click="SetColor_Click" Style="{StaticResource ColorSwatchButtonStyle}" Width="20" Height="20">
+                                            <Border Background="{Binding Converter={StaticResource ColorToBrushConverter}}" />
                                         </Button>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </Border>
+                        <!-- basic colors -->
+
+                        <Border Margin="4">
+                            <ItemsControl ItemsSource="{StaticResource BasicColors}" MaxWidth="380">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel IsItemsHost="True" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type Color}">
+                                        <Button Tag="{Binding}" Click="SetColor_Click" Style="{StaticResource ColorSwatchButtonStyle}" Width="20" Height="20">
+                                            <Border Background="{Binding Converter={StaticResource ColorToBrushConverter}}" />
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                        <!-- extra -->
                         <Border Margin="4">
                             <StackPanel>
-                                <Button Background="Transparent" BorderBrush="Transparent" Margin="4" Content="Transparent" Click="SetColor_Click" Tag="{x:Static Colors.Transparent}" />
-                                <Button Background="Transparent" BorderBrush="Transparent" Margin="4" Content="More Colors..." Click="ButtonBase_OnClick" />
+                                <Button Background="Transparent" BorderBrush="Transparent" Click="SetColor_Click" Tag="{x:Static Colors.Transparent}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.TransparentBackground}" />
+                                        <Label>Transparent</Label>
+                                    </StackPanel>
+                                </Button>
+                                <Button Background="Transparent" BorderBrush="Transparent" Click="ButtonBase_OnClick">
+                                    <StackPanel Orientation="Horizontal">
+                                        <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.ColorPalette}" />
+                                        <Label>More Colors...</Label>
+                                    </StackPanel>
+                                </Button>
                             </StackPanel>
                         </Border>
                     </StackPanel>
