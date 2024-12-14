@@ -83,7 +83,7 @@
                 <DockPanel Margin="1,0" VerticalAlignment="Center">
 
                     <!-- Root: \ -->
-                    <Border DockPanel.Dock="Left" Style="{DynamicResource BreadcrumbElementFirst}" Background="{Binding SolutionElementBackground, ElementName=RootControl}" Visibility="{Binding ShowSolutionRoot, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Border DockPanel.Dock="Left" Name="RootElement" Style="{DynamicResource BreadcrumbElementFirst}" Background="{Binding SolutionElementBackground, ElementName=RootControl}" Visibility="{Binding ShowSolutionRoot, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <Label Style="{DynamicResource LabelWithoutAccelerator}" Foreground="{Binding SolutionElementForeground, ElementName=RootControl}">\</Label>
                     </Border>
 
@@ -104,8 +104,13 @@
                     </ItemsControl>
 
                     <!-- Project -->
-                    <Border DockPanel.Dock="Left" Style="{DynamicResource BreadcrumbElementProject}" Background="{Binding ProjectElementBackground, ElementName=RootControl}">
+                    <Border DockPanel.Dock="Left" Style="{DynamicResource BreadcrumbElementProject}" Background="{Binding ProjectElementBackground, ElementName=RootControl}" Visibility="{Binding ShowProjectElement, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <Label Style="{DynamicResource LabelWithoutAccelerator}" Name="ProjectNameLabel" Foreground="{Binding ProjectElementForeground, ElementName=RootControl}">(project name placeholder)</Label>
+                    </Border>
+
+                    <!-- Parent folder -->
+                    <Border DockPanel.Dock="Left" Style="{DynamicResource BreadcrumbElementProject}" Background="{Binding ParentFolderElementBackground, ElementName=RootControl}" Visibility="{Binding ShowParentFolderElement, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Label Style="{DynamicResource LabelWithoutAccelerator}" Name="ParentFolderLabel" Foreground="{Binding ParentFolderElementForeground, ElementName=RootControl}">(parent folder placeholder)</Label>
                     </Border>
 
                     <!-- Document Path -->

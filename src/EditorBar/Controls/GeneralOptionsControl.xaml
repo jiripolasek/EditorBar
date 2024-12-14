@@ -66,7 +66,8 @@
                 <StackPanel Grid.IsSharedSizeScope="True">
                     <controls:ColorSelector LabelContent="_Solution root" IsChecked="{Binding ViewModel.SolutionRootSegment.IsVisible}" ForegroundColor="{Binding ViewModel.SolutionRootSegment.ForegroundColor}" BackgroundColor="{Binding ViewModel.SolutionRootSegment.BackgroundColor}" />
                     <controls:ColorSelector LabelContent="Solution _folders" IsChecked="{Binding ViewModel.SolutionFolderSegment.IsVisible}" ForegroundColor="{Binding ViewModel.SolutionFolderSegment.ForegroundColor}" BackgroundColor="{Binding ViewModel.SolutionFolderSegment.BackgroundColor}" />
-                    <controls:ColorSelector LabelContent="P_roject" IsCheckable="False" ForegroundColor="{Binding ViewModel.ProjectNameSegment.ForegroundColor}" BackgroundColor="{Binding ViewModel.ProjectNameSegment.BackgroundColor}" />
+                    <controls:ColorSelector LabelContent="P_roject" IsChecked="{Binding ViewModel.ProjectNameSegment.IsVisible}" ForegroundColor="{Binding ViewModel.ProjectNameSegment.ForegroundColor}" BackgroundColor="{Binding ViewModel.ProjectNameSegment.BackgroundColor}" />
+                    <controls:ColorSelector LabelContent="_Parent folder" IsChecked="{Binding ViewModel.ParentFolderSegment.IsVisible}" ForegroundColor="{Binding ViewModel.ParentFolderSegment.ForegroundColor}" BackgroundColor="{Binding ViewModel.ParentFolderSegment.BackgroundColor}" />
                 </StackPanel>
             </GroupBox>
 

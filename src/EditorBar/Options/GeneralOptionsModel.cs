@@ -54,10 +54,22 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
     public bool ShowSolutionFolders { get; set; } = true;
 
     [Category(AppearanceCategoryName)]
+    [DisplayName("Show parent folder")]
+    [Description("Show immediate parent folder element in the Editor Bar.")]
+    [DefaultValue(true)]
+    public bool ShowParentFolder { get; set; } = true;
+
+    [Category(AppearanceCategoryName)]
     [DisplayName("Show solution root")]
     [Description("Show solution root element in the Editor Bar.")]
     [DefaultValue(true)]
     public bool ShowSolutionRoot { get; set; } = true;
+
+    [Category(AppearanceCategoryName)]
+    [DisplayName("Show project")]
+    [Description("Show project that current documents belongs to in the Editor Bar.")]
+    [DefaultValue(true)]
+    public bool ShowProject { get; set; } = true;
 
     [Category(AppearanceCategoryName)]
     [DisplayName("Display mode")]
@@ -221,6 +233,52 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
     public void ResetSerializeSolutionFolderForeground()
     {
         this.SolutionFolderForeground = SolutionFolderForegroundDefaultColor;
+    }
+
+    #endregion
+
+    
+    #region Parent Folder Background
+
+    private static readonly Color ParentFolderBackgroundDefault = Color.YellowGreen;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Parent folder background color")]
+    [Description("Background color of Parent folder element.")]
+    public Color ParentFolderBackground { get; set; } = ParentFolderBackgroundDefault;
+
+    public bool ShouldSerializeParentFolderBackground()
+    {
+        return !EqualColor(this.ParentFolderBackground, ParentFolderBackgroundDefault);
+    }
+
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public void ResetSerializeParentFolderBackground()
+    {
+        this.ParentFolderBackground = ParentFolderBackgroundDefault;
+    }
+
+    #endregion
+
+
+    #region Parent Folder Foreground
+
+    private static readonly Color ParentFolderForegroundDefaultColor = SystemColors.ControlText;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Parent folder text color")]
+    [Description("Foreground color of Parent folder element.")]
+    public Color ParentFolderForeground { get; set; } = ParentFolderForegroundDefaultColor;
+
+    public bool ShouldSerializeParentFolderForeground()
+    {
+        return !EqualColor(this.ParentFolderForeground, ParentFolderForegroundDefaultColor);
+    }
+
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public void ResetSerializeParentFolderForeground()
+    {
+        this.ParentFolderForeground = ParentFolderForegroundDefaultColor;
     }
 
     #endregion
