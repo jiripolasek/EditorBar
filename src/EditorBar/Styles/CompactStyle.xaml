@@ -17,17 +17,16 @@
     <Style x:Key="BreadcrumbElement" TargetType="Border">
         <Setter Property="Margin" Value="0,0,1,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="CornerRadius" Value="2" />
     </Style>
 
     <Style x:Key="BreadcrumbElementFirst" TargetType="Border" BasedOn="{StaticResource BreadcrumbElement}">
-        <Setter Property="CornerRadius" Value="2,0,0,2" />
     </Style>
 
     <Style x:Key="BreadcrumbElementFolder" TargetType="Border" BasedOn="{StaticResource BreadcrumbElement}">
     </Style>
 
     <Style x:Key="BreadcrumbElementLast" TargetType="Border" BasedOn="{StaticResource BreadcrumbElement}">
-        <Setter Property="CornerRadius" Value="0,2,2,0" />
     </Style>
 
     <Style x:Key="BreadcrumbElementProject" TargetType="Border" BasedOn="{StaticResource BreadcrumbElementLast}">
