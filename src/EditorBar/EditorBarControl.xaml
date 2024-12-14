@@ -84,12 +84,12 @@
                 <DockPanel Margin="1,0" VerticalAlignment="Center">
 
                     <!-- Root: \ -->
-                    <Border DockPanel.Dock="Left" Name="RootElement" Style="{DynamicResource BreadcrumbElementFirst}" Background="{Binding SolutionElementBackground, ElementName=RootControl}" Visibility="{Binding ShowSolutionRoot, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Border DockPanel.Dock="Left" Name="RootElement" Style="{DynamicResource BreadcrumbElementFirst}" Background="{Binding SolutionElementBackground, ElementName=RootControl}" Visibility="{Binding ShowSolutionRoot, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}" ToolTip="Solution root">
                         <Label Style="{DynamicResource LabelWithoutAccelerator}" Foreground="{Binding SolutionElementForeground, ElementName=RootControl}">\</Label>
                     </Border>
 
                     <!-- Solution Folders -->
-                    <ItemsControl DockPanel.Dock="Left" Name="SolutionFoldersList" Visibility="{Binding ShowSolutionFolders, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ItemsControl DockPanel.Dock="Left" Name="SolutionFoldersList" Visibility="{Binding ShowSolutionFolders, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}" ToolTip="Solution folders">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Horizontal" />
@@ -105,17 +105,17 @@
                     </ItemsControl>
 
                     <!-- Project -->
-                    <Border DockPanel.Dock="Left" Style="{DynamicResource BreadcrumbElementProject}" Background="{Binding ProjectElementBackground, ElementName=RootControl}" Visibility="{Binding ShowProjectElement, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Border DockPanel.Dock="Left" Style="{DynamicResource BreadcrumbElementProject}" Background="{Binding ProjectElementBackground, ElementName=RootControl}" Visibility="{Binding ShowProjectElement, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}" ToolTip="Project">
                         <Label Style="{DynamicResource LabelWithoutAccelerator}" Name="ProjectNameLabel" Foreground="{Binding ProjectElementForeground, ElementName=RootControl}">(project name placeholder)</Label>
                     </Border>
 
                     <!-- Parent folder -->
-                    <Border DockPanel.Dock="Left" Style="{DynamicResource BreadcrumbElementProject}" Background="{Binding ParentFolderElementBackground, ElementName=RootControl}" Visibility="{Binding ShowParentFolderElement, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Border DockPanel.Dock="Left" Style="{DynamicResource BreadcrumbElementProject}" Background="{Binding ParentFolderElementBackground, ElementName=RootControl}" Visibility="{Binding ShowParentFolderElement, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}" ToolTip="Parent folder">
                         <Label Style="{DynamicResource LabelWithoutAccelerator}" Name="ParentFolderLabel" Foreground="{Binding ParentFolderElementForeground, ElementName=RootControl}">(parent folder placeholder)</Label>
                     </Border>
 
                     <!-- Document Path -->
-                    <Border Style="{DynamicResource DocumentPathElement}" Background="Transparent" MouseRightButtonUp="UIElement_OnMouseRightButtonUp">
+                    <Border Style="{DynamicResource DocumentPathElement}" Background="Transparent" MouseRightButtonUp="UIElement_OnMouseRightButtonUp" ToolTip="Document path">
                         <Label Style="{DynamicResource LabelWithoutAccelerator}"
                                Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}"
                                MouseDoubleClick="PathLabel_OnMouseDoubleClick"
