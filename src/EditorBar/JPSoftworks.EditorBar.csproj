@@ -85,6 +85,7 @@
     <Compile Include="Controls\ColorSelector.xaml.cs">
       <DependentUpon>ColorSelector.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Options\VisualStyle.cs" />
     <Compile Include="Presentation\ColorToBrushConverter.cs" />
     <Compile Include="EditorBarControl.xaml.cs">
       <DependentUpon>EditorBarControl.xaml</DependentUpon>

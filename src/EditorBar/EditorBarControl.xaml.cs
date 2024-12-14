@@ -13,6 +13,7 @@ using Community.VisualStudio.Toolkit;
 using JPSoftworks.EditorBar.Commands;
 using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Options;
+using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
@@ -44,26 +45,25 @@ public partial class EditorBarControl : IDisposable
     public static readonly DependencyProperty SolutionFolderElementForegroundProperty =
         DependencyProperty.Register(nameof(SolutionFolderElementForeground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.Black));
 
-    public static readonly DependencyProperty ShowSolutionFoldersProperty = DependencyProperty.Register(
-        nameof(ShowSolutionFolders), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(default(bool)));
+    public static readonly DependencyProperty ShowSolutionFoldersProperty =
+        DependencyProperty.Register(nameof(ShowSolutionFolders), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(default(bool)));
 
-    public static readonly DependencyProperty ShowSolutionRootProperty = DependencyProperty.Register(
-        nameof(ShowSolutionRoot), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(default(bool)));
+    public static readonly DependencyProperty ShowSolutionRootProperty =
+        DependencyProperty.Register(nameof(ShowSolutionRoot), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(default(bool)));
 
-    public static readonly DependencyProperty IsDevelopmentModeEnabledProperty = DependencyProperty.Register(
-        nameof(IsDevelopmentModeEnabled), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(default(bool)));
-
-    public bool IsDevelopmentModeEnabled
-    {
-        get { return (bool)GetValue(IsDevelopmentModeEnabledProperty); }
-        set { SetValue(IsDevelopmentModeEnabledProperty, value); }
-    }
+    public static readonly DependencyProperty IsDevelopmentModeEnabledProperty =
+        DependencyProperty.Register(nameof(IsDevelopmentModeEnabled), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(default(bool)));
 
     private readonly IWpfTextView? _textView;
     private readonly JoinableTaskFactory _joinableTaskFactory;
 
     public EditorBarControl(IWpfTextView textView, JoinableTaskFactory joinableTaskFactory)
     {
+        if (textView == null)
+            throw new ArgumentNullException(nameof(textView));
+        if (joinableTaskFactory == null)
+            throw new ArgumentNullException(nameof(joinableTaskFactory));
+
         this.InitializeComponent();
         this._textView = textView;
         this._joinableTaskFactory = joinableTaskFactory;
@@ -82,7 +82,9 @@ public partial class EditorBarControl : IDisposable
         VS.Events.DocumentEvents.Saved += this.OnDocumentEventsOnSaved;
         VS.Events.SolutionEvents.OnAfterRenameProject += this.OnSolutionEventsOnOnAfterRenameProject;
         VS.Events.SolutionEvents.OnAfterOpenSolution += this.OnSolutionEventsOnOnAfterOpenSolution;
+        VS.Events.ShellEvents.EnvironmentColorChanged += this.ShellEventsOnEnvironmentColorChanged;
     }
+
 
     public Brush SolutionElementBackground
     {
@@ -132,6 +134,12 @@ public partial class EditorBarControl : IDisposable
         set => this.SetValue(ShowSolutionRootProperty, value);
     }
 
+    public bool IsDevelopmentModeEnabled
+    {
+        get => (bool)this.GetValue(IsDevelopmentModeEnabledProperty);
+        set => this.SetValue(IsDevelopmentModeEnabledProperty, value);
+    }
+
     private string? FilePath { get; set; }
 
     private string? RelativePath { get; set; }
@@ -146,6 +154,7 @@ public partial class EditorBarControl : IDisposable
         VS.Events.DocumentEvents.Saved -= this.OnDocumentEventsOnSaved;
         VS.Events.SolutionEvents.OnAfterRenameProject -= this.OnSolutionEventsOnOnAfterRenameProject;
         VS.Events.SolutionEvents.OnAfterOpenSolution -= this.OnSolutionEventsOnOnAfterOpenSolution;
+        VS.Events.ShellEvents.EnvironmentColorChanged -= this.ShellEventsOnEnvironmentColorChanged;
     }
 
     private void OnSomethingAboutDocumentNameChanged()
@@ -205,12 +214,57 @@ public partial class EditorBarControl : IDisposable
         this.ShowSolutionFolders = GeneralOptionsModel.Instance.ShowSolutionFolders;
         this.ShowSolutionRoot = GeneralOptionsModel.Instance.ShowSolutionRoot;
 
-        this.OpenExternalEditorButton!.Visibility = StringHelper.IsNullOrWhiteSpace(GeneralOptionsModel.Instance.ExternalEditorCommand) ? Visibility.Collapsed : Visibility.Visible;
+        this.OpenExternalEditorButton!.Visibility =
+            StringHelper.IsNullOrWhiteSpace(GeneralOptionsModel.Instance.ExternalEditorCommand)
+                ? Visibility.Collapsed
+                : Visibility.Visible;
         //this.OpenExternalEditorMenuItem!.IsEnabled = !StringHelper.IsNullOrWhiteSpace(GeneralOptionsModel.Instance.ExternalEditorCommand);
 
         this.IsDevelopmentModeEnabled = GeneralOptionsModel.Instance.DebugMode;
 
+
         this.ReloadStyle();
+        // allow to change background color of the editor bar
+        // in case of the top panel, we can follow the color of the editor so it integrates seemlesly;
+        // bottom panel is below the scrollbar, so it doesn't make sense to follow the editor color
+        if (GeneralOptionsModel.Instance.BarPosition == BarPosition.Top)
+        {
+            switch (GeneralOptionsModel.Instance.VisualStyle)
+            {
+                case VisualStyle.FullRowCommandBar:
+                    this.Background = (Brush)this.FindResource(VsBrushes.CommandBarGradientKey!)!;
+                    this.BorderBrush = (Brush)this.FindResource(SearchControlColors.PopupBorderBrushKey!)!;
+                    this.BorderThickness = new Thickness(0, 0, 0, 1);
+                    break;
+                case VisualStyle.FullRowTransparent:
+                    // copy background from the editor so the theme ImageThemingUtilities.ImageBackgroundColor will work
+                    this.Background = this._textView?.Background ?? Brushes.Transparent;
+                    this.BorderBrush = (Brush)this.FindResource(SearchControlColors.PopupBorderBrushKey!)!;
+                    this.BorderThickness = new Thickness(0, 0, 0, 1);
+                    break;
+                case VisualStyle.FullRowToolWindow:
+                    this.Background = (Brush)this.FindResource(VsBrushes.ToolWindowBackgroundKey!)!;
+                    this.BorderBrush = (Brush)this.FindResource(SearchControlColors.PopupBorderBrushKey!)!;
+                    this.BorderThickness = new Thickness(0, 0, 0, 1);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            // floating island
+            //this.Background = Brushes.Transparent;
+            //this.BorderThickness = new Thickness(0);
+
+            //EditorBarBorder.CornerRadius = new CornerRadius(4);
+            //EditorBarBorder.Background = (Brush)this.FindResource(EnvironmentColors.ToolWindowBackgroundBrushKey!)!;
+            //EditorBarBorder.Margin = new Thickness(4);
+        }
+        else
+        {
+            this.Background = (Brush)this.FindResource(VsBrushes.CommandBarGradientKey!)!;
+            this.BorderBrush = Brushes.Transparent;
+            this.BorderThickness = new Thickness(0);
+        }
     }
 
     private void ReloadStyle()
@@ -388,15 +442,20 @@ public partial class EditorBarControl : IDisposable
         this.OnSomethingAboutDocumentNameChanged();
     }
 
+    private void ShellEventsOnEnvironmentColorChanged()
+    {
+        this.ReapplySettings();
+    }
+
     private void UIElement_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
         var doc = this.GetCurrentDocument();
         if (doc is null)
+        {
             return;
+        }
 
-#pragma warning disable VSTHRD102
-        this._joinableTaskFactory.Run(async () =>
-#pragma warning restore VSTHRD102
+        this._joinableTaskFactory.RunAsync(async () =>
         {
             try
             {
@@ -408,7 +467,7 @@ public partial class EditorBarControl : IDisposable
             {
                 await ex.LogAsync();
             }
-        });
+        }).FireAndForget();
     }
 
     private void DebugButtonClicked(object sender, RoutedEventArgs e)

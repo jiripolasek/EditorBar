@@ -9,7 +9,7 @@
 
     <Style x:Key="EditorBarBorderStyle" TargetType="Border">
         <Setter Property="BorderBrush" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarBorderKey}}" />
-        <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarGradientKey}}" />
+        <!--<Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarGradientKey}}" />-->
         <Setter Property="Margin" Value="2" />
         <Setter Property="Padding" Value="2" />
         <Setter Property="CornerRadius" Value="4" />

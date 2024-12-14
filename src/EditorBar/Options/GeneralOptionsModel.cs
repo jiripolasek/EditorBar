@@ -65,6 +65,12 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
     [DefaultValue(DisplayStyle.Normal)]
     public DisplayStyle DisplayStyle { get; set; } = DisplayStyle.Normal;
 
+    [Category(AppearanceCategoryName)]
+    [DisplayName("Visual Style")]
+    [Description("Choose the theme of the Editor Bar.")]
+    [DefaultValue(VisualStyle.FullRowCommandBar)]
+    public VisualStyle VisualStyle { get; set; } = VisualStyle.FullRowCommandBar;
+
     // -------------------------------------------
     // General category
     // -------------------------------------------
