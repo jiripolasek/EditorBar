@@ -9,11 +9,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows;
 using Community.VisualStudio.Toolkit;
-using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.Shell;
 
-namespace JPSoftworks.EditorBar;
+namespace JPSoftworks.EditorBar.Helpers;
 
 [SuppressMessage("ReSharper", "CatchAllClause")]
 internal static class Launcher

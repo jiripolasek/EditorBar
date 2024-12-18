@@ -23,7 +23,6 @@ public class OptionsPageViewModel : ViewModel
     private FileAction _doubleClickCtrlAction;
     private string? _externalEditorPath;
     private string? _externalEditorArguments;
-    private bool _showRelativePath;
     private bool _displayInAuxiliaryDocuments;
     private bool _displayInNonEditableDocuments;
     private bool _displayInDiffViews;
@@ -31,40 +30,43 @@ public class OptionsPageViewModel : ViewModel
     private bool _displayInBlame;
     private bool _displayInTemp;
     private VisualStyle _visualStyle;
+    private FileLabel _pathStyle;
 
     public ObservableCollection<EnumViewModel<BarPosition>> BarPositions { get; } =
     [
-        new EnumViewModel<BarPosition>(BarPosition.Top, "Top"),
-        new EnumViewModel<BarPosition>(BarPosition.Bottom, "Bottom")
+        new(BarPosition.Top, "Top"),
+        new(BarPosition.Bottom, "Bottom")
     ];
 
     public ObservableCollection<EnumViewModel<DisplayStyle>> DisplayStyles { get; } =
     [
-        new EnumViewModel<DisplayStyle>(DisplayStyle.Normal, "Normal"),
-        new EnumViewModel<DisplayStyle>(DisplayStyle.Compact, "Compact")
+        new(DisplayStyle.Normal, "Normal"),
+        new(DisplayStyle.Compact, "Compact")
     ];
 
     public ObservableCollection<EnumViewModel<VisualStyle>> VisualStyles { get; } =
     [
-        new EnumViewModel<VisualStyle>(VisualStyle.FullRowCommandBar, "Command Bar"),
-        new EnumViewModel<VisualStyle>(VisualStyle.FullRowTransparent, "Transparent"),
-        new EnumViewModel<VisualStyle>(VisualStyle.FullRowToolWindow, "Tool Window")
+        new(VisualStyle.FullRowCommandBar, "Command Bar"),
+        new(VisualStyle.FullRowTransparent, "Transparent"),
+        new(VisualStyle.FullRowToolWindow, "Tool Window")
     ];
 
-    public ObservableCollection<EnumViewModel<bool>> PathStyles { get; } =
+    public ObservableCollection<EnumViewModel<FileLabel>> PathStyles { get; } =
     [
-        new EnumViewModel<bool>(true, "Relative Path"),
-        new EnumViewModel<bool>(false, "Full Path")
+        new(FileLabel.RelativePathInProject, "Relative Path (in project)"),
+        new(FileLabel.RelativePathInSolution, "Relative Path (in solution)"),
+        new(FileLabel.AbsolutePath, "Absolute Path"),
+        new(FileLabel.FileName, "File Name Only"),
     ];
 
     public ObservableCollection<EnumViewModel<FileAction>> DoubleClickActions { get; } =
     [
-        new EnumViewModel<FileAction>(FileAction.None, "Do nothing"),
-        new EnumViewModel<FileAction>(FileAction.OpenContainingFolder, "Open Containing Folder"),
-        new EnumViewModel<FileAction>(FileAction.OpenInExternalEditor, "Open in External Editor"),
-        new EnumViewModel<FileAction>(FileAction.OpenInDefaultEditor, "Open in Default Editor"),
-        new EnumViewModel<FileAction>(FileAction.CopyRelativePath,"Copy Relative path"),
-        new EnumViewModel<FileAction>(FileAction.CopyAbsolutePath, "Copy Full path")
+        new(FileAction.None, "Do nothing"),
+        new(FileAction.OpenContainingFolder, "Open Containing Folder"),
+        new(FileAction.OpenInExternalEditor, "Open in External Editor"),
+        new(FileAction.OpenInDefaultEditor, "Open in Default Editor"),
+        new(FileAction.CopyRelativePath,"Copy Relative path"),
+        new(FileAction.CopyAbsolutePath, "Copy Full path")
     ];
 
     public ICommand BrowseForExternalEditorCommand { get; }
@@ -105,6 +107,12 @@ public class OptionsPageViewModel : ViewModel
     {
         get => this._visualStyle;
         set => this.SetField(ref this._visualStyle, value);
+    }
+
+    public FileLabel PathStyle
+    {
+        get => this._pathStyle;
+        set => this.SetField(ref this._pathStyle, value);
     }
 
     public bool DisplayInAuxiliaryDocuments
@@ -149,17 +157,15 @@ public class OptionsPageViewModel : ViewModel
         set => this.SetField(ref this._doubleClickCtrlAction, value);
     }
 
-    public bool ShowRelativePath
-    {
-        get => this._showRelativePath;
-        set => this.SetField(ref this._showRelativePath, value);
-    }
-
     public EditorSegmentOptionsViewModel SolutionRootSegment { get; } = new();
+
+    public EditorSegmentOptionsViewModel NonSolutionRootSegment { get; } = new();
 
     public EditorSegmentOptionsViewModel SolutionFolderSegment { get; } = new();
 
     public EditorSegmentOptionsViewModel ProjectNameSegment { get; } = new();
+
+    public EditorSegmentOptionsViewModel ProjectFolderSegments { get; } = new();
 
     public EditorSegmentOptionsViewModel ParentFolderSegment { get; } = new();
 
@@ -189,7 +195,7 @@ public class OptionsPageViewModel : ViewModel
             this.BarPosition = model.BarPosition;
             this.DisplayStyle = model.DisplayStyle;
             this.VisualStyle = model.VisualStyle;
-            this.ShowRelativePath = model.ShowPathRelativeToSolutionRoot;
+            this.PathStyle = model.FileLabelStyle;
 
             this.DisplayInAuxiliaryDocuments = model.DisplayInAuxiliaryDocuments;
             this.DisplayInNonEditableDocuments = model.DisplayInNonEditableDocuments;
@@ -203,6 +209,8 @@ public class OptionsPageViewModel : ViewModel
             this.SolutionRootSegment.IsVisible = model.ShowSolutionRoot;
             this.SolutionRootSegment.ForegroundColor = model.SolutionForeground.ToMediaColor();
             this.SolutionRootSegment.BackgroundColor = model.SolutionBackground.ToMediaColor();
+            this.NonSolutionRootSegment.ForegroundColor = model.NonSolutionRootForeground.ToMediaColor();
+            this.NonSolutionRootSegment.BackgroundColor = model.NonSolutionRootBackground.ToMediaColor();
 
             this.SolutionFolderSegment.IsVisible = model.ShowSolutionFolders;
             this.SolutionFolderSegment.ForegroundColor = model.SolutionFolderForeground.ToMediaColor();
@@ -211,6 +219,10 @@ public class OptionsPageViewModel : ViewModel
             this.ProjectNameSegment.IsVisible = model.ShowProject;
             this.ProjectNameSegment.ForegroundColor = model.ProjectForeground.ToMediaColor();
             this.ProjectNameSegment.BackgroundColor = model.ProjectBackground.ToMediaColor();
+
+            this.ProjectFolderSegments.IsVisible = model.ShowProjectFolders;
+            this.ProjectFolderSegments.ForegroundColor = model.ProjectFoldersForeground.ToMediaColor();
+            this.ProjectFolderSegments.BackgroundColor = model.ProjectFoldersBackground.ToMediaColor();
 
             this.ParentFolderSegment.IsVisible = model.ShowParentFolder;
             this.ParentFolderSegment.ForegroundColor = model.ParentFolderForeground.ToMediaColor();
@@ -235,7 +247,7 @@ public class OptionsPageViewModel : ViewModel
             model.BarPosition = this.BarPosition;
             model.DisplayStyle = this.DisplayStyle;
             model.VisualStyle = this.VisualStyle;
-            model.ShowPathRelativeToSolutionRoot = this.ShowRelativePath;
+            model.FileLabelStyle = this.PathStyle;
 
             model.DisplayInAuxiliaryDocuments = this.DisplayInAuxiliaryDocuments;
             model.DisplayInNonEditableDocuments = this.DisplayInNonEditableDocuments;
@@ -249,6 +261,8 @@ public class OptionsPageViewModel : ViewModel
             model.ShowSolutionRoot = this.SolutionRootSegment.IsVisible;
             model.SolutionForeground = this.SolutionRootSegment.ForegroundColor.ToDrawingColor();
             model.SolutionBackground = this.SolutionRootSegment.BackgroundColor.ToDrawingColor();
+            model.NonSolutionRootForeground = this.NonSolutionRootSegment.ForegroundColor.ToDrawingColor();
+            model.NonSolutionRootBackground = this.NonSolutionRootSegment.BackgroundColor.ToDrawingColor();
 
             model.ShowSolutionFolders = this.SolutionFolderSegment.IsVisible;
             model.SolutionFolderForeground = this.SolutionFolderSegment.ForegroundColor.ToDrawingColor();
@@ -257,6 +271,10 @@ public class OptionsPageViewModel : ViewModel
             model.ShowProject = this.ProjectNameSegment.IsVisible;
             model.ProjectForeground = this.ProjectNameSegment.ForegroundColor.ToDrawingColor();
             model.ProjectBackground = this.ProjectNameSegment.BackgroundColor.ToDrawingColor();
+
+            model.ShowProjectFolders = this.ProjectFolderSegments.IsVisible;
+            model.ProjectFoldersForeground = this.ProjectFolderSegments.ForegroundColor.ToDrawingColor();
+            model.ProjectFoldersBackground = this.ProjectFolderSegments.BackgroundColor.ToDrawingColor();
 
             model.ShowParentFolder = this.ParentFolderSegment.IsVisible;
             model.ParentFolderForeground = this.ParentFolderSegment.ForegroundColor.ToDrawingColor();

@@ -7,11 +7,13 @@
 using System.Threading;
 using Community.VisualStudio.Toolkit;
 using EnvDTE;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Project = EnvDTE.Project;
 
-namespace JPSoftworks.EditorBar;
+namespace JPSoftworks.EditorBar.Helpers;
 
 /// <summary>
 /// Helper methods for operations on Visual Studio objects.
@@ -37,13 +39,34 @@ internal static class VisualStudioHelper
         }
 
         await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
-
-        var allProjects = await VS.Solutions.GetAllProjectsAsync(ProjectStateFilter.All).ConfigureAwait(false);
-        return allProjects.FirstOrDefault(t =>
+        var allProjects = await GetAllProjectsAsync(ProjectStateFilter.All).ConfigureAwait(false);
+        return allProjects.FirstOrDefault(project =>
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            return t.FullPath == dteProject.FullName;
+            return project.FullPath == dteProject.FullName;
         });
+    }
+
+
+    private static async Task<IEnumerable<Community.VisualStudio.Toolkit.Project>> GetAllProjectsAsync(ProjectStateFilter filter = ProjectStateFilter.Loaded)
+    {
+        await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync();
+
+        IVsSolution solution = await VS.Services.GetSolutionAsync();
+        IEnumerable<IVsHierarchy> hierarchies = solution.GetAllProjectHierarchies(filter);
+
+        List<Community.VisualStudio.Toolkit.Project> list = new();
+
+        foreach (IVsHierarchy hierarchy in hierarchies)
+        {
+            var si = await SolutionItem.FromHierarchyAsync(hierarchy, VSConstants.VSITEMID_ROOT);
+            if (si is Community.VisualStudio.Toolkit.Project proj)
+            {
+                list.Add(proj);
+            }
+        }
+
+        return list;
     }
 
     /// <summary>
@@ -99,25 +122,24 @@ internal static class VisualStudioHelper
     /// <summary>
     /// Gets the solution folder path asynchronous.
     /// </summary>
-    /// <param name="project">The project.</param>
+    /// <param name="solutionItem">The project.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns></returns>
     /// <exception cref="OperationCanceledException">
     /// Thrown back at the awaiting caller if <paramref name="cancellationToken" /> is canceled,
     /// even if the caller is already on the main thread.
     /// </exception>
-    internal static async Task<List<string>> GetSolutionFolderPathAsync(SolutionItem? project,
-        CancellationToken cancellationToken = default)
+    internal static async Task<List<string>> GetSolutionFolderPathAsync(SolutionItem? solutionItem, CancellationToken cancellationToken = default)
     {
         var folderPath = new List<string>();
-        if (project == null)
+        if (solutionItem == null)
         {
             return folderPath;
         }
 
         await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
 
-        var parent = project.FindParent(SolutionItemType.SolutionFolder);
+        var parent = solutionItem.FindParent(SolutionItemType.SolutionFolder);
         while (parent != null)
         {
             cancellationToken.ThrowIfCancellationRequested();

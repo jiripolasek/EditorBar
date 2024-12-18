@@ -27,11 +27,11 @@ internal class EnumToDescriptionConverter(Type type) : EnumConverter(type)
         if (value == null)
             throw new ArgumentException("Value is not valid enum member.", nameof(value));
 
-        var fieldName = Enum.GetName(_enumType, value);
+        var fieldName = Enum.GetName(this._enumType, value);
         if (fieldName == null)
             throw new ArgumentException("Value is not valid enum member.", nameof(value));
 
-        var fi = _enumType.GetField(fieldName);
+        var fi = this._enumType.GetField(fieldName);
         if (fi == null)
             throw new ArgumentException("Value is not valid enum member.", nameof(value));
 
@@ -55,15 +55,15 @@ internal class EnumToDescriptionConverter(Type type) : EnumConverter(type)
         if (value is not string stringValue)
             throw new ArgumentException("Unsupported type of value.", nameof(value));
 
-        foreach (var fi in _enumType.GetFields())
+        foreach (var fi in this._enumType.GetFields())
         {
             var descriptionAttribute = fi.GetCustomAttribute<DescriptionAttribute>();
             if (descriptionAttribute != null && stringValue == descriptionAttribute.Description)
             {
-                return Enum.Parse(_enumType, fi.Name);
+                return Enum.Parse(this._enumType, fi.Name);
             }
         }
 
-        return Enum.Parse(_enumType, stringValue);
+        return Enum.Parse(this._enumType, stringValue);
     }
 }

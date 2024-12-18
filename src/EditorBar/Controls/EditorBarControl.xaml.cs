@@ -12,7 +12,9 @@ using System.Windows.Media;
 using Community.VisualStudio.Toolkit;
 using JPSoftworks.EditorBar.Commands;
 using JPSoftworks.EditorBar.Helpers;
+using JPSoftworks.EditorBar.Models;
 using JPSoftworks.EditorBar.Options;
+using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -20,61 +22,35 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Threading;
 
-namespace JPSoftworks.EditorBar;
+namespace JPSoftworks.EditorBar.Controls;
 
 /// <summary>
 /// Interaction logic for EditorBarControl.xaml
 /// </summary>
 public partial class EditorBarControl : IDisposable
 {
-    public static readonly DependencyProperty SolutionElementBackgroundProperty =
-        DependencyProperty.Register(nameof(SolutionElementBackground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.Purple));
+    public static readonly DependencyProperty IsDevelopmentModeEnabledProperty = DependencyProperty.Register(nameof(IsDevelopmentModeEnabled), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(false));
+    public static readonly DependencyProperty FilePathProperty = DependencyProperty.Register(nameof(FilePath), typeof(string), typeof(EditorBarControl), new PropertyMetadata(null!));
 
-    public static readonly DependencyProperty SolutionElementForegroundProperty =
-        DependencyProperty.Register(nameof(SolutionElementForeground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.Black));
-
-    public static readonly DependencyProperty ProjectElementBackgroundProperty =
-        DependencyProperty.Register(nameof(ProjectElementBackground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.LightSkyBlue));
-
-    public static readonly DependencyProperty ProjectElementForegroundProperty =
-        DependencyProperty.Register(nameof(ProjectElementForeground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.Black));
-
-    public static readonly DependencyProperty SolutionFolderElementBackgroundProperty =
-        DependencyProperty.Register(nameof(SolutionFolderElementBackground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.Gold));
-
-    public static readonly DependencyProperty SolutionFolderElementForegroundProperty =
-        DependencyProperty.Register(nameof(SolutionFolderElementForeground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.Black));
-
-    public static readonly DependencyProperty ParentFolderElementBackgroundProperty =
-        DependencyProperty.Register(nameof(ParentFolderElementBackground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.YellowGreen));
-
-    public static readonly DependencyProperty ParentFolderElementForegroundProperty =
-        DependencyProperty.Register(nameof(ParentFolderElementForeground), typeof(Brush), typeof(EditorBarControl), new PropertyMetadata(Brushes.Black));
-
-    public static readonly DependencyProperty ShowParentFolderElementProperty =
-        DependencyProperty.Register(nameof(ShowParentFolderElement), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(false));
-
-    public static readonly DependencyProperty ShowSolutionFoldersProperty =
-        DependencyProperty.Register(nameof(ShowSolutionFolders), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(false));
-
-    public static readonly DependencyProperty ShowProjectElementProperty =
-        DependencyProperty.Register(nameof(ShowProjectElement), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(false));
-
-    public static readonly DependencyProperty ShowSolutionRootProperty =
-        DependencyProperty.Register(nameof(ShowSolutionRoot), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(false));
-
-    public static readonly DependencyProperty IsDevelopmentModeEnabledProperty =
-        DependencyProperty.Register(nameof(IsDevelopmentModeEnabled), typeof(bool), typeof(EditorBarControl), new PropertyMetadata(false));
-
-    public static readonly DependencyProperty ParentFolderElementCornerRadiusProperty = DependencyProperty.Register(
-        nameof(ParentFolderElementCornerRadius), typeof(CornerRadius), typeof(EditorBarControl), new PropertyMetadata(default(CornerRadius)));
-
-    public static readonly DependencyProperty ProjectElementCornerRadiusProperty = DependencyProperty.Register(
-        nameof(ProjectElementCornerRadius), typeof(CornerRadius), typeof(EditorBarControl), new PropertyMetadata(default(CornerRadius)));
+    private static readonly char[] DirectorySeparators = [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar];
+    private const string MiscProjectKindGuid = "{66A26720-8FB5-11D2-AA7E-00C04F688DDE}";
 
     private readonly IWpfTextView? _textView;
     private readonly JoinableTaskFactory _joinableTaskFactory;
-    private bool _showParentFolderElementEnabled;
+
+    private List<string>? _solutionFolders;
+    private string[] _inProjectPathElements = [];
+    private SolidColorBrush _projectFoldersBackground = Brushes.White;
+    private SolidColorBrush _projectFoldersForeground = Brushes.Black;
+    private string? _semiRoot;
+
+    public bool IsDevelopmentModeEnabled
+    {
+        get => (bool)this.GetValue(IsDevelopmentModeEnabledProperty);
+        set => this.SetValue(IsDevelopmentModeEnabledProperty, value);
+    }
+
+    public BulkObservableCollection<BreadcrumbModel> Breadcrumbs { get; } = [];
 
     public EditorBarControl(IWpfTextView textView, JoinableTaskFactory joinableTaskFactory)
     {
@@ -86,6 +62,7 @@ public partial class EditorBarControl : IDisposable
         this.InitializeComponent();
         this._textView = textView;
         this._joinableTaskFactory = joinableTaskFactory;
+
         this.IsVisibleChanged += this.OnIsVisibleChanged;
 
         GeneralOptionsModel.Saved += this.OnGeneralPageOnSaved;
@@ -99,100 +76,6 @@ public partial class EditorBarControl : IDisposable
         VS.Events.ShellEvents.EnvironmentColorChanged += this.ShellEventsOnEnvironmentColorChanged;
     }
 
-    public Brush SolutionElementBackground
-    {
-        get => (Brush)this.GetValue(SolutionElementBackgroundProperty)!;
-        set => this.SetValue(SolutionElementBackgroundProperty, value);
-    }
-
-    public Brush SolutionElementForeground
-    {
-        get => (Brush)this.GetValue(SolutionElementForegroundProperty)!;
-        set => this.SetValue(SolutionElementForegroundProperty, value);
-    }
-
-    public Brush ProjectElementBackground
-    {
-        get => (Brush)this.GetValue(ProjectElementBackgroundProperty)!;
-        set => this.SetValue(ProjectElementBackgroundProperty, value);
-    }
-
-    public Brush ProjectElementForeground
-    {
-        get => (Brush)this.GetValue(ProjectElementForegroundProperty)!;
-        set => this.SetValue(ProjectElementForegroundProperty, value);
-    }
-
-    public Brush SolutionFolderElementBackground
-    {
-        get => (Brush)this.GetValue(SolutionFolderElementBackgroundProperty)!;
-        set => this.SetValue(SolutionFolderElementBackgroundProperty, value);
-    }
-
-    public Brush SolutionFolderElementForeground
-    {
-        get => (Brush)this.GetValue(SolutionFolderElementForegroundProperty)!;
-        set => this.SetValue(SolutionFolderElementForegroundProperty, value);
-    }
-
-    public bool ShowSolutionFolders
-    {
-        get => (bool)this.GetValue(ShowSolutionFoldersProperty);
-        set => this.SetValue(ShowSolutionFoldersProperty, value);
-    }
-
-    public bool ShowSolutionRoot
-    {
-        get => (bool)this.GetValue(ShowSolutionRootProperty);
-        set => this.SetValue(ShowSolutionRootProperty, value);
-    }
-
-    public bool ShowProjectElement
-    {
-        get { return (bool)this.GetValue(ShowProjectElementProperty); }
-        set { this.SetValue(ShowProjectElementProperty, value); }
-    }
-
-    public bool ShowParentFolderElement
-    {
-        get => (bool)this.GetValue(ShowParentFolderElementProperty);
-        set => this.SetValue(ShowParentFolderElementProperty, value);
-    }
-
-    public Brush ParentFolderElementBackground
-    {
-        get => (Brush)this.GetValue(ParentFolderElementBackgroundProperty)!;
-        set => this.SetValue(ParentFolderElementBackgroundProperty, value);
-    }
-
-    public Brush ParentFolderElementForeground
-    {
-        get => (Brush)this.GetValue(ParentFolderElementForegroundProperty)!;
-        set => this.SetValue(ParentFolderElementForegroundProperty, value);
-    }
-
-    public CornerRadius ParentFolderElementCornerRadius
-    {
-        get => (CornerRadius)this.GetValue(ParentFolderElementCornerRadiusProperty);
-        set => this.SetValue(ParentFolderElementCornerRadiusProperty, value);
-    }
-
-    public CornerRadius ProjectElementCornerRadius
-    {
-        get => (CornerRadius)this.GetValue(ProjectElementCornerRadiusProperty);
-        set => this.SetValue(ProjectElementCornerRadiusProperty, value);
-    }
-
-    public bool IsDevelopmentModeEnabled
-    {
-        get => (bool)this.GetValue(IsDevelopmentModeEnabledProperty);
-        set => this.SetValue(IsDevelopmentModeEnabledProperty, value);
-    }
-
-    private string? FilePath { get; set; }
-
-    private string? RelativePath { get; set; }
-
     public void Dispose()
     {
         GeneralOptionsModel.Saved -= this.OnGeneralPageOnSaved;
@@ -204,11 +87,6 @@ public partial class EditorBarControl : IDisposable
         VS.Events.SolutionEvents.OnAfterRenameProject -= this.OnSolutionEventsOnOnAfterRenameProject;
         VS.Events.SolutionEvents.OnAfterOpenSolution -= this.OnSolutionEventsOnOnAfterOpenSolution;
         VS.Events.ShellEvents.EnvironmentColorChanged -= this.ShellEventsOnEnvironmentColorChanged;
-    }
-
-    private void OnSomethingAboutDocumentNameChanged()
-    {
-        this.UpdateAsync(true).FireAndForget();
     }
 
     private async Task UpdateAsync(bool forced = false)
@@ -229,64 +107,189 @@ public partial class EditorBarControl : IDisposable
         document.FileActionOccurred -= this.HandleDocumentOnFileAction;
         document.FileActionOccurred += this.HandleDocumentOnFileAction;
 
-        var project = await FindParentProjectAsync(document);
-        await this.UpdateProjectElementAsync(project);
-        this.UpdateFilePathLabel(document, project, forced);
+        IProjectWrapper? projectWrapper = null;
+
+        var physicalDocument = await PhysicalFile.FromFileAsync(document.FilePath!);
+        var project = physicalDocument?.ContainingProject;
+        if (project != null)
+        {
+            projectWrapper = new ProjectWrapper(project);
+        }
+        else
+        {
+            // find in other projects (e.g. misc files) that are not convered by Tookit Project and thus not by PhysicalDocument.ContainingProject
+            projectWrapper ??= await FindParentProjectAsync(document);
+
+            // handle solution root folder (for the files that are in solution folder, but not part of the solution or project itself)
+            // - add as a file system root instead of solution root to mark that the file is not directly part of solution
+            if (projectWrapper == null)
+            {
+                // if the file is in the solution folder, but not part of the solution or project itself
+                var solution = await VS.Solutions.GetCurrentSolutionAsync();
+                if (solution != null)
+                {
+                    var solutionPath = Path.GetDirectoryName(solution.FullPath!);
+                    if (solutionPath != null && document.FilePath!.StartsWith(solutionPath))
+                    {
+                        projectWrapper = new FileSystemWrapper("\\", solutionPath);
+                    }
+                }
+            }
+
+            // handle known fake roots (like temp, app data, etc.)
+            if (projectWrapper == null)
+            {
+                var documentPath = document.FilePath!;
+                foreach (var knownFakeRoot in KnownFakeRoots.FakeRoots)
+                {
+                    if (documentPath.StartsWith(knownFakeRoot.Path, StringComparison.OrdinalIgnoreCase))
+                    {
+                        projectWrapper = new FileSystemWrapper(knownFakeRoot.DisplayName, knownFakeRoot.Path);
+                        break;
+                    }
+                }
+            }
+        }
+
+
+        // fallback for all other external paths
+        // distinguis between local and network files from the path and change the display name accordingly (This PC, Network, ...)
+
+        if (projectWrapper == null)
+        {
+            var displayName = document.FilePath!.StartsWith(@"\\") ? "Network" : "This PC"; // network path
+            projectWrapper = new FileSystemWrapper(displayName, null);
+        }
+
+
+        this._solutionFolders = projectWrapper switch
+        {
+            MiscFilesWrapper => await this.GetSolutionFoldersAsync(physicalDocument),
+            ProjectWrapper p => await this.GetSolutionFoldersAsync(p.Project),
+            _ => []
+        };
+
+        this.UpdateFilePathLabel(document, projectWrapper, forced);
+
+        var options = GeneralOptionsModel.Instance;
+
+        var breadcrumbs = this.RebuildBreadcrumbs(options, projectWrapper);
+        this.SetBreadcrumbs(breadcrumbs);
     }
 
-    private static async Task<Project?> FindParentProjectAsync(ITextDocument document)
+    private List<BreadcrumbModel> RebuildBreadcrumbs(GeneralOptionsModel options, IProjectWrapper projectWrapper)
     {
+        // Rebuild breadcrumbs
+        var breadcrumbs = new List<BreadcrumbModel>();
+
+        // 1) Root
+        if (options.ShowSolutionRoot)
+        {
+            var crumb = projectWrapper switch
+            {
+                SolutionProject s => new BreadcrumbModel("\\", options.SolutionBackground, options.SolutionForeground) { AssociatedFile = s.DirectoryPath },
+                FileSystemWrapper f => new BreadcrumbModel(f.DisplayName, options.NonSolutionRootBackground, options.NonSolutionRootForeground) { AssociatedDirectory = f.DirectoryPath },
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            breadcrumbs.Add(crumb);
+        }
+
+        // 2) Solution folders
+        if (options.ShowSolutionFolders && this._solutionFolders != null && this._solutionFolders.Any())
+        {
+            breadcrumbs.AddRange(this._solutionFolders.Select(folder => new BreadcrumbModel(folder, options.SolutionFolderBackground, options.SolutionFolderForeground)));
+        }
+
+        // 3) Project
+        if (options.ShowProject)
+        {
+            var crumb = projectWrapper switch
+            {
+                SolutionProject p => new BreadcrumbModel(p.DisplayName, options.ProjectBackground, options.ProjectForeground) { AssociatedDirectory = p.DirectoryPath },
+                _ => null
+            };
+
+            if (crumb != null)
+            {
+                breadcrumbs.Add(crumb);
+            }
+        }
+
+        // 4) project folders + parent folder
+        if (options.ShowProjectFolders && this._inProjectPathElements.Length > 0)
+        {
+            // show in-project path part, if there's more that two elements; skip the last element, if that is the parent folder that is displayed separately
+            var endIndex = options.ShowParentFolder ? this._inProjectPathElements.Length - 1 : this._inProjectPathElements.Length;
+            for (var i = 0; i < endIndex; i++)
+            {
+                breadcrumbs.Add(new BreadcrumbModel(this._inProjectPathElements[i], this._projectFoldersBackground, this._projectFoldersForeground));
+            }
+        }
+
+        // 5) immediate parent folder (if enabled explictly, to be displayed as a breadcrumb with a different color or without 
+        if (options.ShowParentFolder && this._inProjectPathElements.Length > 0)
+        {
+            breadcrumbs.Add(new BreadcrumbModel(this._inProjectPathElements.Last(), options.ParentFolderBackground, options.ParentFolderForeground));
+        }
+
+        // find what is the first element and mark it, so it is rendered without the left border
+        var first = breadcrumbs.FirstOrDefault();
+        if (first != null)
+        {
+            first.IsMiddle = false;
+        }
+
+        return breadcrumbs;
+    }
+
+    private void SetBreadcrumbs(List<BreadcrumbModel> breadcrumbs)
+    {
+        this.Breadcrumbs.BeginBulkOperation();
+        this.Breadcrumbs.Clear();
+        this.Breadcrumbs.AddRange(breadcrumbs);
+        this.Breadcrumbs.EndBulkOperation();
+    }
+
+    private static async Task<IProjectWrapper?> FindParentProjectAsync(ITextDocument document)
+    {
+        await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync();
+
         var dteProject = await VisualStudioHelper.GetProjectFromDocumentAsync(document);
 
         if (dteProject != null)
         {
-            return await VisualStudioHelper.ConvertToSolutionItemAsync(dteProject);
+            // is misc:
+            if (dteProject.Kind == MiscProjectKindGuid)
+            {
+                var currentSolution = await VS.Solutions.GetCurrentSolutionAsync();
+                return new MiscFilesWrapper(currentSolution?.FullPath);
+            }
+
+            var project2 = await VisualStudioHelper.ConvertToSolutionItemAsync(dteProject);
+            if (project2 != null)
+            {
+                return new ProjectWrapper(project2);
+            }
         }
 
+        // handle case when the document is a project file itself
         var allProjects = await VS.Solutions.GetAllProjectsAsync(ProjectStateFilter.All);
-        return allProjects.FirstOrDefault(t => t.FullPath == document.FilePath);
+        var project = allProjects.FirstOrDefault(t => t.FullPath == document.FilePath);
+        return project == null ? null : new ProjectWrapper(project);
     }
 
-    private async Task UpdateProjectElementAsync(Project? project)
+    private async Task<List<string>> GetSolutionFoldersAsync(SolutionItem? solutionItem)
     {
         await this._joinableTaskFactory.SwitchToMainThreadAsync();
-
-        if (project != null)
-        {
-            var parents = await VisualStudioHelper.GetSolutionFolderPathAsync(project);
-            this.ProjectNameLabel!.Content = project.Name;
-            this.SolutionFoldersList!.ItemsSource = parents;
-        }
-        else
-        {
-            this.ProjectNameLabel!.Content = "(no project)";
-            this.SolutionFoldersList!.ItemsSource = Array.Empty<string>();
-        }
+        return solutionItem == null ? [] : await VisualStudioHelper.GetSolutionFolderPathAsync(solutionItem);
     }
 
     private void ReapplySettings()
     {
         var options = GeneralOptionsModel.Instance;
 
-        this.SolutionElementBackground = new SolidColorBrush(options.SolutionBackground.ToMediaColor());
-        this.SolutionElementForeground = new SolidColorBrush(options.SolutionForeground.ToMediaColor());
-
-        this.ProjectElementBackground = new SolidColorBrush(options.ProjectBackground.ToMediaColor());
-        this.ProjectElementForeground = new SolidColorBrush(options.ProjectForeground.ToMediaColor());
-
-        this.SolutionFolderElementBackground = new SolidColorBrush(options.SolutionFolderBackground.ToMediaColor());
-        this.SolutionFolderElementForeground = new SolidColorBrush(options.SolutionFolderForeground.ToMediaColor());
-
-        this.ParentFolderElementBackground = new SolidColorBrush(options.ParentFolderBackground.ToMediaColor());
-        this.ParentFolderElementForeground = new SolidColorBrush(options.ParentFolderForeground.ToMediaColor());
-
-        this.ShowSolutionFolders = options.ShowSolutionFolders;
-        this.ShowSolutionRoot = options.ShowSolutionRoot;
-        this.ShowProjectElement = options.ShowProject;
-        this._showParentFolderElementEnabled = options.ShowParentFolder;
-
-        this.ParentFolderElementCornerRadius = new CornerRadius(0, 4, 4, 0);
-        this.ProjectElementCornerRadius = new CornerRadius(0, 4, 4, 0);
+        this._projectFoldersBackground = new SolidColorBrush(options.ProjectFoldersBackground.ToMediaColor());
+        this._projectFoldersForeground = new SolidColorBrush(options.ProjectFoldersForeground.ToMediaColor());
 
         this.OpenExternalEditorButton!.Visibility = StringHelper.IsNullOrWhiteSpace(options.ExternalEditorCommand) ? Visibility.Collapsed : Visibility.Visible;
 
@@ -340,28 +343,21 @@ public partial class EditorBarControl : IDisposable
     {
         // remove old style (remove only styles from this extension), we have also VS theme loaded on the control (toolkit:Themes.UseVsTheme="True"
         var currentStyleResourceDictionaries = this.Resources.MergedDictionaries.Where(IsEditorBarStyleXamlComponent).ToList();
-
-        foreach (var c in currentStyleResourceDictionaries)
-        {
-            this.Resources.MergedDictionaries.Remove(c);
-        }
+        currentStyleResourceDictionaries.ForEach(resourceDictionary => this.Resources.MergedDictionaries.Remove(resourceDictionary));
 
         // add new style
-        var newStyleUri = new Uri($"pack://application:,,,/EditorBar;component/Styles/{GeneralOptionsModel.Instance.DisplayStyle}Style.xaml");
-        var newResourceDict = new ResourceDictionary { Source = newStyleUri };
-        this.Resources.MergedDictionaries.Add(newResourceDict);
+        this.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri($"pack://application:,,,/EditorBar;component/Themes/EditorBar.{GeneralOptionsModel.Instance.DisplayStyle}.xaml") });
         return;
 
         static bool IsEditorBarStyleXamlComponent(ResourceDictionary resourceDictionary) =>
             resourceDictionary.Source != null
             && resourceDictionary.Source.IsAbsoluteUri
-            && resourceDictionary.Source.AbsolutePath.Contains("/EditorBar;")
-            && resourceDictionary.Source.AbsolutePath.Contains("Style.xaml");
+            && resourceDictionary.Source.AbsolutePath.Contains("/EditorBar;component/Themes/EditorBar.");
     }
 
 
 
-    private void UpdateFilePathLabel(ITextDocument document, Project? project, bool forced)
+    private void UpdateFilePathLabel(ITextDocument document, IProjectWrapper projectWrapper, bool forced)
     {
         ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -371,63 +367,42 @@ public partial class EditorBarControl : IDisposable
         }
 
         this.FilePath = document.FilePath;
-        this.RelativePath = GetRelativePathToSolution(this.FilePath);
-
-        var pathLabelText = GeneralOptionsModel.Instance.ShowPathRelativeToSolutionRoot
-            ? this.RelativePath
-            : this.FilePath;
-        this.PathLabel!.Content = pathLabelText ?? "(unnamed document)";
+        var pathLabelText = this.FormatFileNameLabel(document.FilePath ?? "", projectWrapper);
+        this.PathLabel!.Content = pathLabelText ?? "(Untitled document)";
 
         // get immediate parent folder name
         // if the file is in a project, the use path relative to the project and hide the parent folder if it's the same as the project name
         // if project element is not visible, simply display the parent folder name; if it is visible, then display the parent folder name only if it's different from the project name
-        var parentFolderName = "";
 
-        if (!this.ShowProjectElement)
+        string? semiRoot = projectWrapper.DirectoryPath;
+
+        string[] inProjectPathElements;
+
+        if (semiRoot != null)
         {
-            parentFolderName = Path.GetFileName(Path.GetDirectoryName(this.FilePath!) ?? "");
+            var relativePath = GetRelativePath(Path.GetDirectoryName(this.FilePath!)!, semiRoot);
+            inProjectPathElements = relativePath.Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Split(DirectorySeparators, StringSplitOptions.RemoveEmptyEntries);
         }
         else
         {
-            if (project != null && !string.IsNullOrWhiteSpace(project.FullPath!))
-            {
-                var projectPath = project.FullPath ?? "";
-                var projectDir = Path.GetDirectoryName(projectPath);
-                if (projectDir != null)
-                {
-                    var relativePath = GetRelativePath(this.FilePath!, projectDir);
-                    parentFolderName = Path.GetFileName(Path.GetDirectoryName(relativePath) ?? "");
-                }
-            }
-            else
-            {
-                var solution = VS.Solutions.GetCurrentSolution();
-                if (solution != null)
-                {
-                    var solutionDir = Path.GetDirectoryName(solution.FullPath ?? "");
-                    if (solutionDir != null)
-                    {
-                        var relativePath = GetRelativePath(this.FilePath!, solutionDir);
-                        parentFolderName = Path.GetFileName(Path.GetDirectoryName(relativePath) ?? "");
-                    }
-                }
-                else
-                {
-                    parentFolderName = Path.GetFileName(Path.GetDirectoryName(this.FilePath!) ?? "");
-                }
-            }
+            var absolutePath = Path.GetDirectoryName(this.FilePath!) ?? "";
+            inProjectPathElements = absolutePath.Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Split(DirectorySeparators, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        if (this._showParentFolderElementEnabled && !string.IsNullOrWhiteSpace(parentFolderName))
+        this._semiRoot = semiRoot;
+        this._inProjectPathElements = inProjectPathElements;
+    }
+
+    private string? FormatFileNameLabel(string fullFileName, IProjectWrapper projectWrapper)
+    {
+        return GeneralOptionsModel.Instance.FileLabelStyle switch
         {
-            this.ShowParentFolderElement = true;
-            this.ParentFolderLabel!.Content = parentFolderName;
-        }
-        else
-        {
-            this.ShowParentFolderElement = false;
-            this.ParentFolderLabel!.Content = "";
-        }
+            FileLabel.AbsolutePath => fullFileName,
+            FileLabel.RelativePathInProject => GetRelativePathToProject(this.FilePath ?? "", projectWrapper),
+            FileLabel.RelativePathInSolution => GetRelativePathToSolution(this.FilePath),
+            FileLabel.FileName => Path.GetFileName(fullFileName),
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 
     private static string? GetRelativePathToSolution(string? path)
@@ -448,11 +423,21 @@ public partial class EditorBarControl : IDisposable
         return slnDir == null ? path : GetRelativePath(path, slnDir);
     }
 
-    private static string GetRelativePath(string filePath, string slnDir)
+    private static string? GetRelativePathToProject(string? path, IProjectWrapper? project)
     {
-        return !filePath.StartsWith(slnDir, StringComparison.OrdinalIgnoreCase)
+        if (path == null)
+        {
+            return null;
+        }
+
+        return project == null ? path : GetRelativePath(path, project.DirectoryPath ?? "");
+    }
+
+    private static string GetRelativePath(string filePath, string parentDir)
+    {
+        return !filePath.StartsWith(parentDir, StringComparison.OrdinalIgnoreCase)
             ? filePath
-            : filePath.Substring(slnDir.Length);
+            : filePath.Substring(parentDir.Length);
     }
 
 
@@ -476,6 +461,12 @@ public partial class EditorBarControl : IDisposable
     private void OpenOptionsButtonClicked(object sender, RoutedEventArgs e)
     {
         VS.Settings.OpenAsync<GeneralOptionPage>().FireAndForget();
+    }
+
+    public string? FilePath
+    {
+        get => (string?)this.GetValue(FilePathProperty);
+        set => this.SetValue(FilePathProperty, value!);
     }
 
     private void PathLabel_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -525,6 +516,11 @@ public partial class EditorBarControl : IDisposable
         {
             this.OnSettingsChanged();
         }
+    }
+
+    private void OnSomethingAboutDocumentNameChanged()
+    {
+        this.UpdateAsync(true).FireAndForget();
     }
 
     private void OnSettingsChanged()

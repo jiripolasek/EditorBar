@@ -16,10 +16,10 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Threading;
 
-namespace JPSoftworks.EditorBar;
+namespace JPSoftworks.EditorBar.MefComponents;
 
 /// <summary>
-/// Represents margin for <see cref="IWpfTextView" />. It is used to display <see cref="EditorBarControl" /> in the
+/// Represents margin for <see cref="IWpfTextView" />. It is used to display <see cref="Controls.EditorBarControl" /> in the
 /// editor.
 /// </summary>
 public class EditorBarMargin : IWpfTextViewMargin
@@ -33,7 +33,7 @@ public class EditorBarMargin : IWpfTextViewMargin
         DifferenceViewerRoles.InlineViewTextViewRole
     ];
 
-    private readonly EditorBarControl _editorBarControl;
+    private readonly Controls.EditorBarControl _editorBarControl;
     private readonly IWpfTextView _textView;
     private readonly BarPosition _position;
     private readonly IServiceProvider _serviceProvider;
@@ -52,7 +52,7 @@ public class EditorBarMargin : IWpfTextViewMargin
         this._textView = textView;
         this._position = position;
         this._joinableTaskFactory = joinableTaskFactory;
-        this._editorBarControl = new EditorBarControl(textView, joinableTaskFactory);
+        this._editorBarControl = new Controls.EditorBarControl(textView, joinableTaskFactory);
         this._serviceProvider = serviceProvider;
 
         GeneralOptionsModel.Saved += this.GeneralPageOnSaved;

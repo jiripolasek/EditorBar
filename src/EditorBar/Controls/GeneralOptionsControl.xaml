@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:controls="clr-namespace:JPSoftworks.EditorBar.Controls"
              xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
-             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging" xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance Type=controls:GeneralOptionsControl, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -40,7 +39,6 @@
             </GroupBox>
 
             <GroupBox Header="Appearance">
-
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" MinWidth="160" />
@@ -53,25 +51,27 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <Label Grid.Column="0" Grid.Row="0" Content="_Position:" Target="{x:Reference BarPositionComboBox}" />
+                    <Label Grid.Column="0" Grid.Row="0" Content="_Position" Target="{x:Reference BarPositionComboBox}" />
                     <ComboBox x:Name="BarPositionComboBox" Grid.Column="1" Grid.Row="0" ItemsSource="{Binding ViewModel.BarPositions}" SelectedValue="{Binding ViewModel.BarPosition, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
 
-                    <Label Grid.Column="0" Grid.Row="1" Content="Display _mode:" Target="{x:Reference DisplayModeComboBox}" />
+                    <Label Grid.Column="0" Grid.Row="1" Content="Display _mode" Target="{x:Reference DisplayModeComboBox}" />
                     <ComboBox x:Name="DisplayModeComboBox" Grid.Column="1" Grid.Row="1" ItemsSource="{Binding ViewModel.DisplayStyles}" SelectedValue="{Binding ViewModel.DisplayStyle, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
 
-                    <Label Grid.Column="0" Grid.Row="2" Content="_Visual style:" Target="{x:Reference VisualStyleComboBox}" />
+                    <Label Grid.Column="0" Grid.Row="2" Content="_Background" Target="{x:Reference VisualStyleComboBox}" />
                     <ComboBox x:Name="VisualStyleComboBox" Grid.Column="1" Grid.Row="2" ItemsSource="{Binding ViewModel.VisualStyles}" SelectedValue="{Binding ViewModel.VisualStyle, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
 
-                    <Label Grid.Column="0" Grid.Row="3" Content="Pat_h display:" Target="{x:Reference PathStyleComboBox}" />
-                    <ComboBox x:Name="PathStyleComboBox" Grid.Column="1" Grid.Row="3" ItemsSource="{Binding ViewModel.PathStyles}" SelectedValue="{Binding ViewModel.ShowRelativePath, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
+                    <Label Grid.Column="0" Grid.Row="3" Content="Pat_h display" Target="{x:Reference PathStyleComboBox}" />
+                    <ComboBox x:Name="PathStyleComboBox" Grid.Column="1" Grid.Row="3" ItemsSource="{Binding ViewModel.PathStyles}" SelectedValue="{Binding ViewModel.PathStyle, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
                 </Grid>
             </GroupBox>
 
-            <GroupBox Header="Bar Elements">
+            <GroupBox Header="Breadcrumbs">
                 <StackPanel Grid.IsSharedSizeScope="True">
                     <controls:ColorSelector LabelContent="_Solution root" IsChecked="{Binding ViewModel.SolutionRootSegment.IsVisible}" ForegroundColor="{Binding ViewModel.SolutionRootSegment.ForegroundColor}" BackgroundColor="{Binding ViewModel.SolutionRootSegment.BackgroundColor}" />
+                    <controls:ColorSelector LabelContent="No_n-solution root" IsCheckable="False" IsChecked="{Binding ViewModel.SolutionRootSegment.IsVisible}" ForegroundColor="{Binding ViewModel.NonSolutionRootSegment.ForegroundColor}" BackgroundColor="{Binding ViewModel.NonSolutionRootSegment.BackgroundColor}" />
                     <controls:ColorSelector LabelContent="Solution _folders" IsChecked="{Binding ViewModel.SolutionFolderSegment.IsVisible}" ForegroundColor="{Binding ViewModel.SolutionFolderSegment.ForegroundColor}" BackgroundColor="{Binding ViewModel.SolutionFolderSegment.BackgroundColor}" />
                     <controls:ColorSelector LabelContent="P_roject" IsChecked="{Binding ViewModel.ProjectNameSegment.IsVisible}" ForegroundColor="{Binding ViewModel.ProjectNameSegment.ForegroundColor}" BackgroundColor="{Binding ViewModel.ProjectNameSegment.BackgroundColor}" />
+                    <controls:ColorSelector LabelContent="Pr_oject folders" IsChecked="{Binding ViewModel.ProjectFolderSegments.IsVisible}" ForegroundColor="{Binding ViewModel.ProjectFolderSegments.ForegroundColor}" BackgroundColor="{Binding ViewModel.ProjectFolderSegments.BackgroundColor}" />
                     <controls:ColorSelector LabelContent="_Parent folder" IsChecked="{Binding ViewModel.ParentFolderSegment.IsVisible}" ForegroundColor="{Binding ViewModel.ParentFolderSegment.ForegroundColor}" BackgroundColor="{Binding ViewModel.ParentFolderSegment.BackgroundColor}" />
                 </StackPanel>
             </GroupBox>
@@ -89,7 +89,6 @@
             </GroupBox>
 
             <GroupBox Header="Quick Actions">
-
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" MinWidth="160" />

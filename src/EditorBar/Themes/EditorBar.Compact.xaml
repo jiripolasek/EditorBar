@@ -6,36 +6,19 @@
         <Setter Property="MinHeight" Value="22" />
     </Style>
 
+    <Style x:Key="BreadcrumbsPart" TargetType="Control">
+        <Setter Property="Height" Value="22" />
+    </Style>
+
     <Style x:Key="EditorBarBorderStyle" TargetType="Border">
         <Setter Property="BorderBrush" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarBorderKey}}" />
-        <!--<Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarGradientKey}}" />-->
-        <Setter Property="CornerRadius" Value="2" />
         <Setter Property="TextElement.FontFamily" Value="{DynamicResource {x:Static shell:VsFonts.EnvironmentFontFamilyKey}}" />
         <Setter Property="TextElement.FontSize" Value="{DynamicResource {x:Static shell:VsFonts.EnvironmentFontSizeKey}}" />
     </Style>
 
-    <Style x:Key="BreadcrumbElement" TargetType="Border">
-        <Setter Property="Margin" Value="0,0,1,0" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="CornerRadius" Value="2" />
-    </Style>
-
-    <Style x:Key="BreadcrumbElementFirst" TargetType="Border" BasedOn="{StaticResource BreadcrumbElement}">
-    </Style>
-
-    <Style x:Key="BreadcrumbElementFolder" TargetType="Border" BasedOn="{StaticResource BreadcrumbElement}">
-    </Style>
-
-    <Style x:Key="BreadcrumbElementLast" TargetType="Border" BasedOn="{StaticResource BreadcrumbElement}">
-    </Style>
-
-    <Style x:Key="BreadcrumbElementProject" TargetType="Border" BasedOn="{StaticResource BreadcrumbElementLast}">
-    </Style>
-
     <Style x:Key="DocumentPathElement" TargetType="Border">
-        <Setter Property="TextElement.Foreground"
-                Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
-        <Setter Property="Margin" Value="1" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
+        <Setter Property="Margin" Value="8,0" />
         <Setter Property="Background" Value="Transparent" />
     </Style>
 
@@ -46,7 +29,7 @@
     </Style>
 
     <Style x:Key="LabelWithoutAccelerator" BasedOn="{StaticResource {x:Type Label}}" TargetType="Label">
-        <Setter Property="Padding" Value="4,2" />
+        <Setter Property="Padding" Value="2,0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Label">

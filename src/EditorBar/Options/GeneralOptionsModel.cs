@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using Community.VisualStudio.Toolkit;
+using JPSoftworks.EditorBar.Helpers;
 
 namespace JPSoftworks.EditorBar.Options;
 
@@ -21,8 +22,7 @@ namespace JPSoftworks.EditorBar.Options;
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Setters are used implicitly by PropertyGrid.")]
 public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
 {
-    // keep legacy name to  keep settings for existing users intact
-    protected override string CollectionName => "JPSoftworks.EditorBar.Options.GeneralPage";
+    private const int CurrentConfigVersion = 2;
 
     private const string AppearanceCategoryName = "Appearance";
     private const string GeneralCategoryName = "General";
@@ -30,9 +30,16 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
     private const string AdditionalActionCategoryName = "Actions";
     private const string ExternalEditorCategoryName = "External Editor";
 
+    // keep legacy name to  keep settings for existing users intact
+    protected override string CollectionName => "JPSoftworks.EditorBar.Options.GeneralPage";
+
     // -------------------------------------------  
     // Appearance category
     // -------------------------------------------
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Browsable(false)]
+    public int Version { get; set; }
 
     [Category(AppearanceCategoryName)]
     [DisplayName("Bar position")]
@@ -48,10 +55,22 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
     public bool ShowPathRelativeToSolutionRoot { get; set; } = true;
 
     [Category(AppearanceCategoryName)]
+    [DisplayName("File name display style")]
+    [Description("Show path relative to the solution root.")]
+    [DefaultValue(FileLabel.RelativePathInSolution)]
+    public FileLabel FileLabelStyle { get; set; } = FileLabel.RelativePathInSolution;
+
+    [Category(AppearanceCategoryName)]
     [DisplayName("Show solution folders")]
     [Description("Show solution folder block elements in the Editor Bar.")]
     [DefaultValue(true)]
     public bool ShowSolutionFolders { get; set; } = true;
+
+    [Category(AppearanceCategoryName)]
+    [DisplayName("Show project folders")]
+    [Description("Show project folders in the Editor Bar.")]
+    [DefaultValue(true)]
+    public bool ShowProjectFolders { get; set; } = true;
 
     [Category(AppearanceCategoryName)]
     [DisplayName("Show parent folder")]
@@ -152,6 +171,52 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
     #endregion
 
 
+    #region NonSolutionRoot Background
+
+    private static readonly Color NonSolutionRootBackgroundDefault = Color.Silver;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("NonSolutionRoot root background color")]
+    [Description("Background color of NonSolutionRoot element.")]
+    public Color NonSolutionRootBackground { get; set; } = NonSolutionRootBackgroundDefault;
+
+    public bool ShouldSerializeNonSolutionRootBackground()
+    {
+        return !EqualColor(this.NonSolutionRootBackground, NonSolutionRootBackgroundDefault);
+    }
+
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public void ResetSerializeNonSolutionRootBackground()
+    {
+        this.NonSolutionRootBackground = NonSolutionRootBackgroundDefault;
+    }
+
+    #endregion
+
+
+    #region NonSolutionRoot Foreground
+
+    private static readonly Color NonSolutionRootForegroundDefault = SystemColors.ControlText;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("NonSolutionRoot root text Color")]
+    [Description("Foreground color of NonSolutionRoot element.")]
+    public Color NonSolutionRootForeground { get; set; } = NonSolutionRootForegroundDefault;
+
+    public bool ShouldSerializeNonSolutionRootForeground()
+    {
+        return !EqualColor(this.NonSolutionRootForeground, NonSolutionRootForegroundDefault);
+    }
+
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public void ResetSerializeNonSolutionRootForeground()
+    {
+        this.NonSolutionRootForeground = NonSolutionRootForegroundDefault;
+    }
+
+    #endregion
+
+
     #region Project Background
 
     private static readonly Color ProjectBackgroundDefault = Color.LightSkyBlue;
@@ -243,7 +308,7 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
 
     #endregion
 
-    
+
     #region Parent Folder Background
 
     private static readonly Color ParentFolderBackgroundDefault = Color.YellowGreen;
@@ -285,6 +350,51 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
     public void ResetSerializeParentFolderForeground()
     {
         this.ParentFolderForeground = ParentFolderForegroundDefaultColor;
+    }
+
+    #endregion
+
+
+    #region Project Folders Background
+
+    private static readonly Color ProjectFoldersBackgroundDefault = Color.FromArgb(192, 218, 138);
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Project folder background color")]
+    [Description("Background color of Project folder element.")]
+    public Color ProjectFoldersBackground { get; set; } = ProjectFoldersBackgroundDefault;
+
+    public bool ShouldSerializeProjectFoldersBackground()
+    {
+        return !EqualColor(this.ProjectFoldersBackground, ProjectFoldersBackgroundDefault);
+    }
+
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public void ResetSerializeProjectFoldersBackground()
+    {
+        this.ProjectFoldersBackground = ProjectFoldersBackgroundDefault;
+    }
+
+    #endregion
+
+    #region Project Folders Foreground
+
+    private static readonly Color ProjectFoldersForegroundDefaultColor = SystemColors.ControlText;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Project folder text color")]
+    [Description("Foreground color of Project folder element.")]
+    public Color ProjectFoldersForeground { get; set; } = ProjectFoldersForegroundDefaultColor;
+
+    public bool ShouldSerializeProjectFoldersForeground()
+    {
+        return !EqualColor(this.ProjectFoldersForeground, ProjectFoldersForegroundDefaultColor);
+    }
+
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public void ResetSerializeProjectFoldersForeground()
+    {
+        this.ProjectFoldersForeground = ProjectFoldersForegroundDefaultColor;
     }
 
     #endregion
@@ -369,4 +479,19 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
     [Description("Enable debug mode.")]
     [DefaultValue(false)]
     public bool DebugMode { get; set; }
+
+    public async Task UpgradeAsync()
+    {
+        if (this.Version >= CurrentConfigVersion)
+            return;
+
+        // Sequential upgrade accross config versions
+        if (this.Version < 2)
+        {
+            this.FileLabelStyle = this.ShowPathRelativeToSolutionRoot ? FileLabel.RelativePathInSolution : FileLabel.AbsolutePath;
+        }
+
+        this.Version = CurrentConfigVersion;
+        await this.SaveAsync();
+    }
 }

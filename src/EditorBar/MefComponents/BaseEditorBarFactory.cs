@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Threading;
 
-namespace JPSoftworks.EditorBar;
+namespace JPSoftworks.EditorBar.MefComponents;
 
 /// <summary>
 /// Base for a factory for creating a margin that will hold the Editor bar.

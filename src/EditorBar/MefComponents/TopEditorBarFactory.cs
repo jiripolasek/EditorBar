@@ -9,7 +9,7 @@ using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 
-namespace JPSoftworks.EditorBar;
+namespace JPSoftworks.EditorBar.MefComponents;
 
 /// <summary>
 /// Specialized class of editor bar factory for creating a margin on the top of the editor.
@@ -18,7 +18,7 @@ namespace JPSoftworks.EditorBar;
 /// We have to have two separate classes since there can't be multiple <see cref="MarginContainerAttribute" /> on a
 /// class.
 /// </remarks>
-/// <seealso cref="JPSoftworks.EditorBar.BaseEditorBarFactory" />
+/// <seealso cref="BaseEditorBarFactory" />
 [Export(typeof(IWpfTextViewMarginProvider))]
 [Name("EditorBar-Top")]
 [MarginContainer(PredefinedMarginNames.Top)]
