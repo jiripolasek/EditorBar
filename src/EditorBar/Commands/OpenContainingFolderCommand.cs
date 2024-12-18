@@ -5,6 +5,7 @@
 // ------------------------------------------------------------
 
 using Community.VisualStudio.Toolkit;
+using JPSoftworks.EditorBar.Helpers;
 using Microsoft.VisualStudio.Text;
 
 namespace JPSoftworks.EditorBar.Commands;

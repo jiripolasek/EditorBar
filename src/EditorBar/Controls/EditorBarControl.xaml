@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="JPSoftworks.EditorBar.EditorBarControl"
+﻿<UserControl x:Class="JPSoftworks.EditorBar.Controls.EditorBarControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -9,6 +9,8 @@
              xmlns:puiUtilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
              xmlns:puiImaging="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
              xmlns:puiShell="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+             xmlns:controls="clr-namespace:JPSoftworks.EditorBar.Controls"
+             xmlns:models="clr-namespace:JPSoftworks.EditorBar.Models"
              mc:Ignorable="d"
              Style="{DynamicResource EditorBarControlStyle}"
              Background="{DynamicResource {x:Static puiShell:EnvironmentColors.CommandBarGradientBrushKey}}"
@@ -16,8 +18,15 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Name="RootControl">
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <puiUtilities:BrushToColorConverter x:Key="BrushToColorConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary>
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+                    <puiUtilities:BrushToColorConverter x:Key="BrushToColorConverter" />
+                </ResourceDictionary>
+                <ResourceDictionary Source="pack://application:,,,/EditorBar;component/Themes/Generic.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
@@ -57,8 +66,7 @@
                                 Visibility="{Binding IsDevelopmentModeEnabled, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter} }">
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" />
                         </Button>
-                        <Button x:Name="OpenDefaultEditorButton"
-                                Click="OpenDefaultEditorClicked" 
+                        <Button Click="OpenDefaultEditorClicked" 
                                 ToolTip="Open in Default Editor"
                                 Style="{DynamicResource NoBorderButtonStyle}">
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.OpenFileDialog}" />
@@ -81,45 +89,39 @@
                 </Border>
 
                 <!-- Path visualization -->
-                <DockPanel Margin="1,0" VerticalAlignment="Center">
+                <DockPanel Margin="1" VerticalAlignment="Center">
 
-                    <!-- Root: \ -->
-                    <Border DockPanel.Dock="Left" Name="RootElement" Style="{DynamicResource BreadcrumbElementFirst}" Background="{Binding SolutionElementBackground, ElementName=RootControl}" Visibility="{Binding ShowSolutionRoot, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <Label Style="{DynamicResource LabelWithoutAccelerator}" Foreground="{Binding SolutionElementForeground, ElementName=RootControl}">\</Label>
-                    </Border>
-
-                    <!-- Solution Folders -->
-                    <ItemsControl DockPanel.Dock="Left" Name="SolutionFoldersList" Visibility="{Binding ShowSolutionFolders, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
+                    <ItemsControl DockPanel.Dock="Left" ItemsSource="{Binding Breadcrumbs, ElementName=RootControl}" Style="{DynamicResource BreadcrumbsPart}">
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Style="{DynamicResource BreadcrumbElementFolder}" Background="{Binding SolutionFolderElementBackground, ElementName=RootControl}">
-                                    <Label Style="{DynamicResource LabelWithoutAccelerator}" Foreground="{Binding SolutionFolderElementForeground, ElementName=RootControl}" Content="{Binding}" />
-                                </Border>
+                            <DataTemplate DataType="{x:Type models:BreadcrumbModel}">
+                                <controls:ChevronButton Background="{Binding Background}" 
+                                                        Foreground="{Binding Foreground}"
+                                                        IsMiddle="{Binding IsMiddle}" 
+                                                        Content="{Binding Text}" 
+                                                        Command="{Binding Command}" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel IsItemsHost="True" Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
                     </ItemsControl>
 
-                    <!-- Project -->
-                    <Border DockPanel.Dock="Left" Style="{DynamicResource BreadcrumbElementProject}" Background="{Binding ProjectElementBackground, ElementName=RootControl}" Visibility="{Binding ShowProjectElement, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <Label Style="{DynamicResource LabelWithoutAccelerator}" Name="ProjectNameLabel" Foreground="{Binding ProjectElementForeground, ElementName=RootControl}">(project name placeholder)</Label>
-                    </Border>
-
-                    <!-- Parent folder -->
-                    <Border DockPanel.Dock="Left" Style="{DynamicResource BreadcrumbElementProject}" Background="{Binding ParentFolderElementBackground, ElementName=RootControl}" Visibility="{Binding ShowParentFolderElement, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <Label Style="{DynamicResource LabelWithoutAccelerator}" Name="ParentFolderLabel" Foreground="{Binding ParentFolderElementForeground, ElementName=RootControl}">(parent folder placeholder)</Label>
-                    </Border>
-
                     <!-- Document Path -->
-                    <Border Style="{DynamicResource DocumentPathElement}" Background="Transparent" MouseRightButtonUp="UIElement_OnMouseRightButtonUp">
+                    <Border Style="{DynamicResource DocumentPathElement}" Background="Transparent" MouseRightButtonUp="UIElement_OnMouseRightButtonUp" ToolTip="Document path">
                         <Label Style="{DynamicResource LabelWithoutAccelerator}"
                                Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}"
                                MouseDoubleClick="PathLabel_OnMouseDoubleClick"
+                               VerticalContentAlignment="Center"
                                Name="PathLabel">
+                            <Label.ToolTip>
+                                <TextBlock>
+                                    <Run Text="Document path" FontWeight="Bold"/>
+                                    <LineBreak/>
+                                    <Run Text="{Binding FilePath, ElementName=RootControl}"/>
+                                </TextBlock>
+                            </Label.ToolTip>
                             (document path placeholder)
                         </Label>
                     </Border>

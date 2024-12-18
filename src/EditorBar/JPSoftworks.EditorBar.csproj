@@ -68,8 +68,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="BaseEditorBarFactory.cs" />
-    <Compile Include="BottomEditorBarFactory.cs" />
+    <Compile Include="MefComponents\BaseEditorBarFactory.cs" />
+    <Compile Include="MefComponents\BottomEditorBarFactory.cs" />
+    <Compile Include="Models\BreadcrumbModel.cs" />
     <Compile Include="Commands\CopyFullPathToClipboardCommand.cs" />
     <Compile Include="Commands\CopyRelativePathToClipboardCommand.cs" />
     <Compile Include="Commands\EditorBarFileActionMenuBridge.cs" />
@@ -79,18 +80,27 @@
     <Compile Include="Commands\OpenInDefaultEditorCommand.cs" />
     <Compile Include="Commands\OpenInExternalEditorCommand.cs" />
     <Compile Include="Commands\ToggleEditorBarCommand.cs" />
+    <Compile Include="Controls\ChevronButton.cs" />
     <Compile Include="Controls\ColorButton.xaml.cs">
       <DependentUpon>ColorButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ColorSelector.xaml.cs">
       <DependentUpon>ColorSelector.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\FileSystemWrapper.cs" />
+    <Compile Include="Models\IProjectWrapper.cs" />
+    <Compile Include="Models\KnownFakeRoot.cs" />
+    <Compile Include="Models\KnownFakeRoots.cs" />
+    <Compile Include="Models\MiscFilesWrapper.cs" />
+    <Compile Include="Options\FileLabel.cs" />
     <Compile Include="Options\VisualStyle.cs" />
     <Compile Include="Presentation\ColorToBrushConverter.cs" />
-    <Compile Include="EditorBarControl.xaml.cs">
+    <Compile Include="Controls\EditorBarControl.xaml.cs">
       <DependentUpon>EditorBarControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="EditorBarMargin.cs" />
+    <Compile Include="MefComponents\EditorBarMargin.cs" />
+    <Compile Include="Models\ProjectWrapper.cs" />
+    <Compile Include="Models\SolutionProject.cs" />
     <Compile Include="VSCommandTable.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -101,7 +111,7 @@
     <Compile Include="Helpers\ColorExtensions.cs" />
     <Compile Include="Helpers\IsExternalInitPolyfil.cs" />
     <Compile Include="Helpers\NullabilityPolyfil.cs" />
-    <Compile Include="Launcher.cs" />
+    <Compile Include="Helpers\Launcher.cs" />
     <Compile Include="Options\FileAction.cs" />
     <Compile Include="Options\EnumToDescriptionConverter.cs" />
     <Compile Include="Options\BarPosition.cs" />
@@ -123,11 +133,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
-    <Compile Include="TopEditorBarFactory.cs" />
+    <Compile Include="MefComponents\TopEditorBarFactory.cs" />
     <Compile Include="ViewModels\EditorSegmentOptionsViewModel.cs" />
     <Compile Include="ViewModels\EnumViewModel.cs" />
     <Compile Include="ViewModels\OptionsPageViewModel.cs" />
-    <Compile Include="VisualStudioHelper.cs" />
+    <Compile Include="Helpers\VisualStudioHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
@@ -179,7 +189,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="EditorBarControl.xaml">
+    <Page Include="Controls\EditorBarControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -187,11 +197,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Styles\CompactStyle.xaml">
+    <Page Include="Themes\EditorBar.Compact.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Styles\NormalStyle.xaml">
+    <Page Include="Themes\EditorBar.Normal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

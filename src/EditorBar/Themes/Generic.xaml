@@ -1,0 +1,36 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:JPSoftworks.EditorBar.Controls">
+
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter2" />
+
+    <Style x:Key="DefaultChevronButton" TargetType="{x:Type controls:ChevronButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:ChevronButton">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,-4,0" Height="{TemplateBinding Height}">
+                        <Path Data="M0,0 5,0 5,30 0,30 5,15"
+                              Fill="{TemplateBinding Background}" 
+                              Stretch="Fill"
+                              x:Name="StartTriangle"
+                              Visibility="{TemplateBinding IsMiddle, Converter={StaticResource BooleanToVisibilityConverter2}}" VerticalAlignment="Stretch" />
+                        <Grid>
+                            <Rectangle Fill="{TemplateBinding Background}" x:Name="CenterRectangle" />
+                            <Border Padding="6,0">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                        </Grid>
+                        <Path Data="M0,0 5,15 0,30"
+                              Fill="{TemplateBinding Background}"
+                              Stretch="Fill"
+                              x:Name="EndTriangle"
+                              VerticalAlignment="Stretch"/>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type controls:ChevronButton}" BasedOn="{StaticResource DefaultChevronButton}" />
+</ResourceDictionary>
