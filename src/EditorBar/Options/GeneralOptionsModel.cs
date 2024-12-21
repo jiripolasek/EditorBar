@@ -30,8 +30,11 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     private const string AdditionalActionCategoryName = "Actions";
     private const string ExternalEditorCategoryName = "External Editor";
 
+    private const string RegistryCollectionName = "JPSoftworks.EditorBar.Options.GeneralPage";
+    internal const string PathToEnabledProperty = RegistryCollectionName + @"\" + nameof(Enabled);
+
     // keep legacy name to  keep settings for existing users intact
-    protected override string CollectionName => "JPSoftworks.EditorBar.Options.GeneralPage";
+    protected override string CollectionName => RegistryCollectionName;
 
     // -------------------------------------------  
     // Appearance category

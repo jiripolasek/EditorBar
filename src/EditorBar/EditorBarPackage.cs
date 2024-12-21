@@ -38,8 +38,17 @@ namespace JPSoftworks.EditorBar;
 [ProvideProfile(typeof(GeneralOptionPage), "Editor Bar", "General", 0, 0, true)]
 [ProvideMenuResource("Menus.ctmenu", 1)]
 [ProvideService(typeof(EditorBarFileActionMenuBridge), IsAsyncQueryable = true)]
+[ProvideAutoLoad(EditorBarPackage.EditorBarEnabledAutoload, PackageAutoLoadFlags.BackgroundLoad)]
+[ProvideUIContextRule(EditorBarPackage.EditorBarEnabledAutoload, // we've to load the package to provide Checked status for the ToggleEditorBarCommand
+    name: "Auto load when Editor Bar is Enabled",
+    expression: "editorBarEnabled",
+    termNames: ["editorBarEnabled"],
+    termValues: ["UserSettingsStoreQuery:" + GeneralOptionsModel.PathToEnabledProperty],
+    delay: 100)]
 public sealed class EditorBarPackage : AsyncPackage
 {
+    private const string EditorBarEnabledAutoload = "3c1dfe70-bb76-4e6d-b86c-a7c6ed149cf2";
+
     /// <summary>
     /// EditorBarPackage GUID string.
     /// </summary>

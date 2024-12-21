@@ -18,4 +18,16 @@ internal sealed class ToggleEditorBarCommand : BaseCommand<ToggleEditorBarComman
         GeneralOptionsModel.Instance.Enabled = !GeneralOptionsModel.Instance.Enabled;
         await GeneralOptionsModel.Instance.SaveAsync();
     }
+
+    protected override Task InitializeCompletedAsync()
+    {
+        this.Command.Checked = GeneralOptionsModel.Instance.Enabled;
+        return base.InitializeCompletedAsync();
+    }
+
+    protected override void BeforeQueryStatus(EventArgs e)
+    {
+        base.BeforeQueryStatus(e);
+        this.Command.Checked = GeneralOptionsModel.Instance.Enabled;
+    }
 }

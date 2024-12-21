@@ -15,6 +15,9 @@ namespace JPSoftworks.EditorBar
         public const string guidEditorBarPackageString = "ef5d9a25-5e0d-4428-8762-56d4dc816eeb";
         public static Guid guidEditorBarPackage = new Guid(guidEditorBarPackageString);
 
+        public const string guidUIContextGuidString = "3c1dfe70-bb76-4e6d-b86c-a7c6ed149cf2";
+        public static Guid guidUIContextGuid = new Guid(guidUIContextGuidString);
+
         public const string guidEditorBarPackageCmdSetString = "264c2d6c-e85c-4cbb-a800-0c412f8d91f1";
         public static Guid guidEditorBarPackageCmdSet = new Guid(guidEditorBarPackageCmdSetString);
 

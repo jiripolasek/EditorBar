@@ -62,6 +62,7 @@
 			<Button guid="guidEditorBarPackageCmdSet" id="ToggleEditorBarCommand" priority="0x0100" type="Button">
 				<!-- placed using command placements -->
 				<Icon guid="guidImages" id="bmpToggleEditorBar" />
+				<CommandFlag>TogglePatternAvailable</CommandFlag>
 				<Strings>
 					<ButtonText>Toggle &amp;Editor Bar</ButtonText>
 					<CommandName>Toggle Editor Bar</CommandName>
@@ -176,6 +177,8 @@
 	<Symbols>
 
 		<GuidSymbol name="guidEditorBarPackage" value="{ef5d9a25-5e0d-4428-8762-56d4dc816eeb}" />
+
+		<GuidSymbol name="guidUIContextGuid" value="{3c1dfe70-bb76-4e6d-b86c-a7c6ed149cf2}" />
 
 		<GuidSymbol name="guidEditorBarPackageCmdSet" value="{264c2d6c-e85c-4cbb-a800-0c412f8d91f1}">
 			<IDSymbol name="EditorBarViewMenuGroup" value="0x1120" />
