@@ -484,6 +484,9 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     public int Version { get; set; }
 
     [Browsable(false)]
+    public string? VsixVersion { get; set; }
+
+    [Browsable(false)]
     public int RatingRequests { get; set; }
 
     // -------------------------------------------
@@ -492,23 +495,38 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
 
     public async Task UpgradeAsync()
     {
-        if (this.Version >= CurrentConfigVersion)
-            return;
+        var changed = false;
 
-        // Sequential upgrade accross config versions
-        if (this.Version < 2)
+        // marked last used extension version; if changed, we can show What's new dialog, etc.
+        if (this.VsixVersion != Vsix.Version)
         {
-            // When upgrading from version 1 to 2, we need to change the default value of FileLabelStyle
-            // If the user had relative paths enabled, then we set the FileLabelStyle to FileName (not relative), because with this update
-            // we are also adding breadcrumbs for in-project folders and parent folder that supersedes the need for relative paths.
-            // User can disable these new features and revert to relative paths if they want manually.
-            //
-            // For absolute path, let's just keep the setting as it is. User might be anoyed by the long paths, which may force them to
-            // go to settings. This should be "fixed" later by adding What's new dialog.
-            this.FileLabelStyle = this.ShowPathRelativeToSolutionRoot ? FileLabel.FileName : FileLabel.AbsolutePath;
+            this.VsixVersion = Vsix.Version;
+            changed = true;
         }
 
-        this.Version = CurrentConfigVersion;
-        await this.SaveAsync();
+        // check last used config version and upgrade if necessary
+        if (this.Version < CurrentConfigVersion)
+        {
+            // Sequential upgrade accross config versions
+            if (this.Version < 2)
+            {
+                // When upgrading from version 1 to 2, we need to change the default value of FileLabelStyle
+                // If the user had relative paths enabled, then we set the FileLabelStyle to FileName (not relative), because with this update
+                // we are also adding breadcrumbs for in-project folders and parent folder that supersedes the need for relative paths.
+                // User can disable these new features and revert to relative paths if they want manually.
+                //
+                // For absolute path, let's just keep the setting as it is. User might be anoyed by the long paths, which may force them to
+                // go to settings. This should be "fixed" later by adding What's new dialog.
+                this.FileLabelStyle = this.ShowPathRelativeToSolutionRoot ? FileLabel.FileName : FileLabel.AbsolutePath;
+            }
+
+            this.Version = CurrentConfigVersion;
+            changed = true;
+        }
+
+        if (changed)
+        {
+            await this.SaveAsync();
+        }
     }
 }
