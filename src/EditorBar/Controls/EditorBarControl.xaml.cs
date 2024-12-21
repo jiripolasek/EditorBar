@@ -7,6 +7,8 @@
 using System.IO;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Community.VisualStudio.Toolkit;
@@ -369,6 +371,12 @@ public partial class EditorBarControl : IDisposable
         this.FilePath = document.FilePath;
         var pathLabelText = this.FormatFileNameLabel(document.FilePath ?? "", projectWrapper);
         this.PathLabel!.Content = pathLabelText ?? "(Untitled document)";
+
+        // create a tooltip so it contains the full and relative path (starting with bold name of the path):
+        var tooltip = new TextBlock();
+        tooltip.Inlines.Add(new Bold(new Run("Full path: ")));
+        tooltip.Inlines.Add(this.FilePath ?? "");
+        this.PathLabel.ToolTip = tooltip;
 
         // get immediate parent folder name
         // if the file is in a project, the use path relative to the project and hide the parent folder if it's the same as the project name

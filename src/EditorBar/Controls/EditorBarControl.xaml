@@ -115,13 +115,6 @@
                                MouseDoubleClick="PathLabel_OnMouseDoubleClick"
                                VerticalContentAlignment="Center"
                                Name="PathLabel">
-                            <Label.ToolTip>
-                                <TextBlock>
-                                    <Run Text="Document path" FontWeight="Bold"/>
-                                    <LineBreak/>
-                                    <Run Text="{Binding FilePath, ElementName=RootControl}"/>
-                                </TextBlock>
-                            </Label.ToolTip>
                             (document path placeholder)
                         </Label>
                     </Border>
