@@ -45,6 +45,11 @@ public sealed class EditorBarPackage : AsyncPackage
     /// </summary>
     private const string PackageGuidString = "ef5d9a25-5e0d-4428-8762-56d4dc816eeb";
 
+    /// <summary>
+    /// Defines number of time the extension is used before the rating prompt is shown (usage is incremented on successful usage, only once per session).
+    /// </summary>
+    internal const int UsagesBeforeRatingPrompt = 6;
+
 
     /// <inheritdoc />
     /// <exception cref="OperationCanceledException">Thrown back at the awaiting caller if <paramref name="cancellationToken" /> is canceled, even if the caller is already on the main thread.</exception>
@@ -58,14 +63,19 @@ public sealed class EditorBarPackage : AsyncPackage
         await this.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
 
         // upgrade settings from previous versions
-        await this.UpgradeSettingsAsync(cancellationToken);
+        var options = await GeneralOptionsModel.GetLiveInstanceAsync();
+
+        await this.UpgradeSettingsAsync(options, cancellationToken);
 
         await this.RegisterCommandsAsync();
+
+        var prompt = new RatingPrompt("JPSoftworks.EditorBar", Vsix.Name, options, UsagesBeforeRatingPrompt);
+        prompt.RegisterSuccessfulUsage();
     }
 
-    private async Task UpgradeSettingsAsync(CancellationToken cancellationToken)
+    private async Task UpgradeSettingsAsync(GeneralOptionsModel options, CancellationToken cancellationToken)
     {
         await this.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
-        await GeneralOptionsModel.Instance.UpgradeAsync();
+        await options.UpgradeAsync();
     }
 }

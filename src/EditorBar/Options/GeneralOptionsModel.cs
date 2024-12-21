@@ -20,7 +20,7 @@ namespace JPSoftworks.EditorBar.Options;
 /// <seealso cref="BaseOptionModel{GeneralPage}" />
 [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global", Justification = "Used implicitly.")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Setters are used implicitly by PropertyGrid.")]
-public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
+public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRatingConfig
 {
     private const int CurrentConfigVersion = 2;
 
@@ -36,10 +36,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
     // -------------------------------------------  
     // Appearance category
     // -------------------------------------------
-
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [Browsable(false)]
-    public int Version { get; set; }
 
     [Category(AppearanceCategoryName)]
     [DisplayName("Bar position")]
@@ -501,4 +497,15 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
         this.Version = CurrentConfigVersion;
         await this.SaveAsync();
     }
+
+    // -------------------------------------------
+    // Meta
+    // -------------------------------------------
+    
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Browsable(false)]
+    public int Version { get; set; }
+
+    [Browsable(false)]
+    public int RatingRequests { get; set; }
 }

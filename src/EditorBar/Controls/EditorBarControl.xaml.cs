@@ -523,6 +523,9 @@ public partial class EditorBarControl : IDisposable
         if ((bool)e.NewValue)
         {
             this.OnSettingsChanged();
+
+            var prompt = new RatingPrompt("JPSoftworks.EditorBar", Vsix.Name, GeneralOptionsModel.Instance, EditorBarPackage.UsagesBeforeRatingPrompt);
+            prompt.RegisterSuccessfulUsage();
         }
     }
 
