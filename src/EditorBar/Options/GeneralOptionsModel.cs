@@ -476,6 +476,21 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     [DefaultValue(false)]
     public bool DebugMode { get; set; }
 
+    // -------------------------------------------
+    // Meta
+    // -------------------------------------------
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Browsable(false)]
+    public int Version { get; set; }
+
+    [Browsable(false)]
+    public int RatingRequests { get; set; }
+
+    // -------------------------------------------
+    // Methods
+    // -------------------------------------------
+
     public async Task UpgradeAsync()
     {
         if (this.Version >= CurrentConfigVersion)
@@ -497,15 +512,4 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
         this.Version = CurrentConfigVersion;
         await this.SaveAsync();
     }
-
-    // -------------------------------------------
-    // Meta
-    // -------------------------------------------
-    
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [Browsable(false)]
-    public int Version { get; set; }
-
-    [Browsable(false)]
-    public int RatingRequests { get; set; }
 }

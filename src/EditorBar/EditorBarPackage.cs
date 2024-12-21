@@ -65,17 +65,11 @@ public sealed class EditorBarPackage : AsyncPackage
         // upgrade settings from previous versions
         var options = await GeneralOptionsModel.GetLiveInstanceAsync();
 
-        await this.UpgradeSettingsAsync(options, cancellationToken);
+        await options.UpgradeAsync();
 
         await this.RegisterCommandsAsync();
 
         var prompt = new RatingPrompt("JPSoftworks.EditorBar", Vsix.Name, options, UsagesBeforeRatingPrompt);
         prompt.RegisterSuccessfulUsage();
-    }
-
-    private async Task UpgradeSettingsAsync(GeneralOptionsModel options, CancellationToken cancellationToken)
-    {
-        await this.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
-        await options.UpgradeAsync();
     }
 }

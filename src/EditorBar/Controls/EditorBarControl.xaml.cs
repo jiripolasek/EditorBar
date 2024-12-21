@@ -4,6 +4,7 @@
 //
 // ------------------------------------------------------------
 
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -518,14 +519,35 @@ public partial class EditorBarControl : IDisposable
         Launcher.OpenInDefaultEditor(this.FilePath);
     }
 
-    private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    [SuppressMessage("Microsoft.VisualStudio.Threading.Analyzers", "VSTHRD100:Avoid async void methods", Justification = "Event handlers needs async void")]
+    private async void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        if ((bool)e.NewValue)
+        try
         {
+            var isVisible = (bool)e.NewValue;
+            if (!isVisible)
+                return;
+
+            // upgrade settings
+            try
+            {
+                await GeneralOptionsModel.Instance.UpgradeAsync();
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync();
+            }
+
+            // reload
             this.OnSettingsChanged();
 
+            // check for rating prompt
             var prompt = new RatingPrompt("JPSoftworks.EditorBar", Vsix.Name, GeneralOptionsModel.Instance, EditorBarPackage.UsagesBeforeRatingPrompt);
             prompt.RegisterSuccessfulUsage();
+        }
+        catch (Exception outerException)
+        {
+            await outerException.LogAsync();
         }
     }
 
@@ -536,11 +558,11 @@ public partial class EditorBarControl : IDisposable
 
     private void OnSettingsChanged()
     {
-        if (this.IsVisible)
-        {
-            this.ReapplySettings();
-            this.UpdateAsync(true).FireAndForget();
-        }
+        if (!this.IsVisible)
+            return;
+
+        this.ReapplySettings();
+        this.UpdateAsync(true).FireAndForget();
     }
 
     private void OnGeneralPageOnSaved(GeneralOptionsModel _)
