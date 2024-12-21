@@ -480,7 +480,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     // Meta
     // -------------------------------------------
 
-    [EditorBrowsable(EditorBrowsableState.Never)]
     [Browsable(false)]
     public int Version { get; set; }
 
