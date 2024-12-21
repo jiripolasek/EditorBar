@@ -57,8 +57,8 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
     [Category(AppearanceCategoryName)]
     [DisplayName("File name display style")]
     [Description("Show path relative to the solution root.")]
-    [DefaultValue(FileLabel.RelativePathInSolution)]
-    public FileLabel FileLabelStyle { get; set; } = FileLabel.RelativePathInSolution;
+    [DefaultValue(FileLabel.FileName)]
+    public FileLabel FileLabelStyle { get; set; } = FileLabel.FileName;
 
     [Category(AppearanceCategoryName)]
     [DisplayName("Show solution folders")]
@@ -99,8 +99,8 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
     [Category(AppearanceCategoryName)]
     [DisplayName("Visual Style")]
     [Description("Choose the theme of the Editor Bar.")]
-    [DefaultValue(VisualStyle.FullRowCommandBar)]
-    public VisualStyle VisualStyle { get; set; } = VisualStyle.FullRowCommandBar;
+    [DefaultValue(VisualStyle.FullRowTransparent)]
+    public VisualStyle VisualStyle { get; set; } = VisualStyle.FullRowTransparent;
 
     // -------------------------------------------
     // General category
@@ -488,7 +488,14 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>
         // Sequential upgrade accross config versions
         if (this.Version < 2)
         {
-            this.FileLabelStyle = this.ShowPathRelativeToSolutionRoot ? FileLabel.RelativePathInSolution : FileLabel.AbsolutePath;
+            // When upgrading from version 1 to 2, we need to change the default value of FileLabelStyle
+            // If the user had relative paths enabled, then we set the FileLabelStyle to FileName (not relative), because with this update
+            // we are also adding breadcrumbs for in-project folders and parent folder that supersedes the need for relative paths.
+            // User can disable these new features and revert to relative paths if they want manually.
+            //
+            // For absolute path, let's just keep the setting as it is. User might be anoyed by the long paths, which may force them to
+            // go to settings. This should be "fixed" later by adding What's new dialog.
+            this.FileLabelStyle = this.ShowPathRelativeToSolutionRoot ? FileLabel.FileName : FileLabel.AbsolutePath;
         }
 
         this.Version = CurrentConfigVersion;
