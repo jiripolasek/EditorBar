@@ -21,6 +21,9 @@
     <LangVersion>default</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Themes\Generic.ChevronButton.xaml</ApplicationManifest>
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -51,14 +54,16 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>5</WarningLevel>
     <LangVersion>default</LangVersion>
     <CreateVsixContainer>True</CreateVsixContainer>
     <CopyVsixExtensionFiles>False</CopyVsixExtensionFiles>
     <Nullable>enable</Nullable>
+    <DocumentationFile>bin\Debug\EditorBar.xml</DocumentationFile>
+    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>embedded</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -66,20 +71,126 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>default</LangVersion>
     <Nullable>enable</Nullable>
+    <DocumentationFile>bin\Release\EditorBar.xml</DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands\Abstractions\IMenuContextService.cs" />
+    <Compile Include="Commands\Abstractions\MenuContext.cs" />
+    <Compile Include="Commands\Abstractions\MenuExtensions.cs" />
+    <Compile Include="Commands\Abstractions\BaseMenuContextCommand.cs" />
+    <Compile Include="Commands\Abstractions\MenuContextService.cs" />
+    <Compile Include="Commands\Abstractions\MenuId.cs" />
+    <Compile Include="Commands\Abstractions\MenuIdAttribute.cs" />
+    <Compile Include="Commands\File\LocateInSolutionExplorerCommand.cs" />
+    <Compile Include="Commands\General\BaseFocusBreadcrumbCommand.cs" />
+    <Compile Include="Commands\General\FocusEditorBarFileCrumbCommand.cs" />
+    <Compile Include="Commands\General\FocusEditorBarInnermostTypeCrumbCommand.cs" />
+    <Compile Include="Commands\General\FocusEditorBarProjectBreadcrumbCommand.cs" />
+    <Compile Include="Commands\Location\BasePhysicalLocationContextMenuCommand.cs" />
+    <Compile Include="Commands\Location\LocateProjectInSolutionExplorerCommand.cs" />
+    <Compile Include="Commands\Location\LocatePhysicalDirectoryInSolutionExplorerCommand.cs" />
+    <Compile Include="Commands\Location\OpenProjectPropertiesCommand.cs" />
+    <Compile Include="Helpers\SingleActionGatedExecutor.cs" />
+    <Compile Include="Helpers\Events\Abstractions\ISettingsRefreshAggregator.cs" />
+    <Compile Include="Helpers\Events\Abstractions\IStructureRefreshAggregator.cs" />
+    <Compile Include="Helpers\Events\Abstractions\SettingsRefreshEventArgs.cs" />
+    <Compile Include="Helpers\Events\Abstractions\SettingsRefreshReason.cs" />
+    <Compile Include="Helpers\Events\Abstractions\SolutionProjectChangeReason.cs" />
+    <Compile Include="Helpers\Rx\RxLoggingExtensions.cs" />
+    <Compile Include="Helpers\Rx\Pauser.cs" />
+    <Compile Include="Helpers\Rx\SelectNothingObservableExtensions.cs" />
+    <Compile Include="Helpers\Rx\SubjectFactory.cs" />
+    <Compile Include="Helpers\Rx\ThrottleFirst.cs" />
+    <Compile Include="ViewModels\Breadcrumbs\BreadcrumbModel%28of TModel%29.cs" />
+    <Compile Include="ViewModels\Breadcrumbs\PhysicalDirectoryBreadcrumbModel.cs" />
+    <Compile Include="ViewModels\Breadcrumbs\PhysicalDirectoryModel.cs" />
+    <Compile Include="Presentation\BackgroundConverter.cs" />
+    <Compile Include="Services\LocationProviders\Abstractions\NullProjectInfo.cs" />
+    <Compile Include="Services\StructureProviders\Abstractions\IStructureProviderFactory.cs" />
+    <Compile Include="Services\StructureProviders\Abstractions\IStructureProviderService.cs" />
+    <Compile Include="Services\StructureProviders\PlainText\PlainTextStructureProviderFactory.cs" />
+    <Compile Include="Services\StructureProviders\Roslyn\RoslynStructureProviderFactory.cs" />
+    <Compile Include="Services\StructureProviders\Xml\XmlStructureProviderFactory.cs" />
+    <Compile Include="ViewModels\EditorBarViewModel.cs" />
+    <Compile Include="ViewModels\LegacyLabelViewModel.cs" />
+    <Compile Include="ViewModels\LocationBreadcrumbsViewModel.cs" />
+    <Compile Include="ViewModels\StructuralBreadcrumbsViewModel.cs" />
+    <Compile Include="Helpers\DisposableExtensions.cs" />
+    <Compile Include="Helpers\Events\LocationBreadcrumbEventAggregator.cs" />
+    <Compile Include="Helpers\Events\StructureRefreshAggregator.cs" />
+    <Compile Include="Helpers\Events\SettingsRefreshAggregator.cs" />
+    <Compile Include="Helpers\Events\SolutionProjectChangeTracker.cs" />
+    <Compile Include="Helpers\Presentation\BrushHelper.cs" />
+    <Compile Include="Helpers\VisualStudio\BulkObservableCollectionExtensions.cs" />
+    <Compile Include="Helpers\VisualStudio\ClipboardHelper.cs" />
+    <Compile Include="Commands\Location\CopyFullPathContainingFolderCommand.cs" />
+    <Compile Include="Commands\Location\CopyPhysicalDirectoryFullPathContainingFolderCommand.cs" />
+    <Compile Include="Commands\Location\LocationBreadcrumbMenuContext.cs" />
+    <Compile Include="Commands\Location\BaseLocationMenuContextCommand.cs" />
+    <Compile Include="Commands\Location\OpenProjectContainingFolderCommand.cs" />
+    <Compile Include="Commands\Location\OpenPhysicalDirectoryContainingFolderCommand.cs" />
+    <Compile Include="Commands\Structural\CopyDocIdCommand.cs" />
+    <Compile Include="Commands\Structural\CopyFullNameCommand.cs" />
+    <Compile Include="Commands\Structural\StructureBreadcrumbMenuContext.cs" />
+    <Compile Include="Commands\Structural\BaseStructureMenuContextCommand.cs" />
+    <Compile Include="Commands\Structural\NavigateToCodeElementCommand.cs" />
+    <Compile Include="Controls\EditorBarControlContainer.xaml.cs">
+      <DependentUpon>EditorBarControlContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\IconDisplay.xaml.cs">
+      <DependentUpon>IconDisplay.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Services\StructureProviders\Abstractions\AnchorPoint.cs" />
+    <Compile Include="Services\StructureProviders\Abstractions\AnchorPointTextSpan.cs" />
+    <Compile Include="Helpers\CodeAnalysis\CodeAnalysisHelper.cs" />
+    <Compile Include="Controls\EditorBarBreadcrumbs.xaml.cs">
+      <DependentUpon>EditorBarBreadcrumbs.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Services\StructureProviders\Abstractions\SymbolAncherPoint.cs" />
+    <Compile Include="Helpers\Events\CompositionEventSource.cs" />
+    <Compile Include="Helpers\CodeAnalysis\FileStructureHelper.cs" />
+    <Compile Include="Helpers\Events\GenericEventSource.cs" />
+    <Compile Include="Helpers\CodeAnalysis\IconProviderForCodeAnalysis.cs" />
+    <Compile Include="Helpers\IconIds.cs" />
+    <Compile Include="Controls\LegacyFileLabel.xaml.cs">
+      <DependentUpon>LegacyFileLabel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\Events\Abstractions\IMyEventSource.cs" />
+    <Compile Include="Helpers\IntelliSenseProjectContextContainer.cs" />
+    <Compile Include="Helpers\Events\Abstractions\SolutionProjectChangedEventArgs.cs" />
+    <Compile Include="Controls\MemberList.xaml.cs">
+      <DependentUpon>MemberList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MemberListPopup.xaml.cs">
+      <DependentUpon>MemberListPopup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SymbolChevronButton.cs" />
+    <Compile Include="Helpers\Matchers.cs" />
+    <Compile Include="Helpers\VisualStudio\ProjectProperties.cs" />
+    <Compile Include="Helpers\CodeAnalysis\RoslynWorkspaceExtensions.cs" />
+    <Compile Include="Helpers\CodeAnalysis\SourceTextExtensions.cs" />
+    <Compile Include="Helpers\PathUtils.cs" />
+    <Compile Include="Helpers\StackedImageMoniker.cs" />
+    <Compile Include="Helpers\StopwatchStatement.cs" />
+    <Compile Include="Helpers\Presentation\StyleHelper.cs" />
+    <Compile Include="Helpers\CodeAnalysis\SymbolExtensions.cs" />
+    <Compile Include="Helpers\SymbolUsageKind.cs" />
+    <Compile Include="Helpers\VisualStudio\VirtualProjectFinder.cs" />
+    <Compile Include="Helpers\VisualStudio\VsImageHelper.cs" />
+    <Compile Include="Helpers\VisualStudio\TextViewExtensions.cs" />
     <Compile Include="MefComponents\BaseEditorBarFactory.cs" />
     <Compile Include="MefComponents\BottomEditorBarFactory.cs" />
-    <Compile Include="Models\BreadcrumbModel.cs" />
-    <Compile Include="Commands\CopyFullPathToClipboardCommand.cs" />
-    <Compile Include="Commands\CopyRelativePathToClipboardCommand.cs" />
-    <Compile Include="Commands\EditorBarFileActionMenuBridge.cs" />
-    <Compile Include="Commands\EditorBarFileActionMenuBridgeCommand.cs" />
-    <Compile Include="Commands\EditorBarOptionsCommand.cs" />
-    <Compile Include="Commands\OpenContainingFolderCommand.cs" />
-    <Compile Include="Commands\OpenInDefaultEditorCommand.cs" />
-    <Compile Include="Commands\OpenInExternalEditorCommand.cs" />
-    <Compile Include="Commands\ToggleEditorBarCommand.cs" />
+    <Compile Include="ViewModels\Breadcrumbs\BreadcrumbModel.cs" />
+    <Compile Include="Commands\File\CopyFullPathToClipboardCommand.cs" />
+    <Compile Include="Commands\File\CopyRelativePathToClipboardCommand.cs" />
+    <Compile Include="Commands\File\FileActionMenuContext.cs" />
+    <Compile Include="Commands\File\BaseFileActionMenuContextCommand.cs" />
+    <Compile Include="Commands\General\EditorBarOptionsCommand.cs" />
+    <Compile Include="Commands\File\OpenContainingFolderCommand.cs" />
+    <Compile Include="Commands\File\OpenInDefaultEditorCommand.cs" />
+    <Compile Include="Commands\File\OpenInExternalEditorCommand.cs" />
+    <Compile Include="Commands\General\ToggleEditorBarCommand.cs" />
     <Compile Include="Controls\ChevronButton.cs" />
     <Compile Include="Controls\ColorButton.xaml.cs">
       <DependentUpon>ColorButton.xaml</DependentUpon>
@@ -87,30 +198,85 @@
     <Compile Include="Controls\ColorSelector.xaml.cs">
       <DependentUpon>ColorSelector.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\FileSystemWrapper.cs" />
-    <Compile Include="Models\IProjectWrapper.cs" />
-    <Compile Include="Models\KnownFakeRoot.cs" />
-    <Compile Include="Models\KnownFakeRoots.cs" />
-    <Compile Include="Models\MiscFilesWrapper.cs" />
+    <Compile Include="Services\Abstractions\FileStructureElementModel.cs" />
+    <Compile Include="ViewModels\MemberListItemViewModel.cs" />
+    <Compile Include="ViewModels\Breadcrumbs\ProjectContainerBreadcrumbModel.cs" />
+    <Compile Include="ViewModels\SeparatorListItemViewModel.cs" />
+    <Compile Include="ViewModels\Breadcrumbs\StructureBreadcrumbViewModel.cs" />
+    <Compile Include="Services\StructureProviders\Roslyn\SymbolFileStructureElementModel.cs" />
+    <Compile Include="Services\LocationProviders\Abstractions\FileSystemProjectInfo.cs" />
+    <Compile Include="Services\LocationProviders\Abstractions\IHasSolutionFolders.cs" />
+    <Compile Include="Services\LocationProviders\Abstractions\IProjectInfo.cs" />
+    <Compile Include="Services\LocationProviders\Abstractions\KnownFakeRoot.cs" />
+    <Compile Include="Services\LocationProviders\Abstractions\KnownFakeRoots.cs" />
+    <Compile Include="Services\LocationProviders\Abstractions\MiscFilesProjectInfo.cs" />
+    <Compile Include="Services\StructureProviders\Abstractions\BaseStructureModel.cs" />
+    <Compile Include="Services\StructureProviders\Abstractions\FileModel.cs" />
+    <Compile Include="Services\StructureProviders\Abstractions\MemberModel.cs" />
+    <Compile Include="Services\StructureProviders\Abstractions\FunctionModel.cs" />
+    <Compile Include="Services\StructureProviders\Abstractions\TypeModel.cs" />
+    <Compile Include="Services\StructureProviders\Xml\Models\XmlNodeStructureModel.cs" />
     <Compile Include="Options\FileLabel.cs" />
     <Compile Include="Options\VisualStyle.cs" />
+    <Compile Include="Polyfill\System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.cs" />
+    <Compile Include="Polyfill\System.Runtime.CompilerServices.RequiredMemberAttribute.cs" />
+    <Compile Include="Presentation\BrightnessConverter.cs" />
+    <Compile Include="Presentation\GenericType.cs" />
     <Compile Include="Presentation\ColorToBrushConverter.cs" />
     <Compile Include="Controls\EditorBarControl.xaml.cs">
       <DependentUpon>EditorBarControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="MefComponents\EditorBarMargin.cs" />
-    <Compile Include="Models\ProjectWrapper.cs" />
-    <Compile Include="Models\SolutionProject.cs" />
+    <Compile Include="Services\LocationProviders\Abstractions\GenericProjectInfo.cs" />
+    <Compile Include="Services\LocationProviders\Abstractions\BaseSolutionProjectInfo.cs" />
+    <Compile Include="Presentation\ContrastForegroundBrushConverter.cs" />
+    <Compile Include="Presentation\IsFirstItemConverter.cs" />
+    <Compile Include="Presentation\LeftBorderThicknessConverter.cs" />
+    <Compile Include="Presentation\MonikerToCollapsedConverter.cs" />
+    <Compile Include="Presentation\MyItemContainerStyleSelector.cs" />
+    <Compile Include="Presentation\NullToCollapsedConverter.cs" />
+    <Compile Include="Presentation\OrConverter.cs" />
+    <Compile Include="Presentation\SeparatorStrokeConverter.cs" />
+    <Compile Include="Presentation\SymbolDateTemplateSelector.cs" />
+    <Compile Include="Resources\Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Services\CodeNavigationDecorator.cs" />
+    <Compile Include="Services\CodeNavigationService.cs" />
+    <Compile Include="Services\Abstractions\ICodeNavigationService.cs" />
+    <Compile Include="Services\Abstractions\ITextNavigationService.cs" />
+    <Compile Include="Services\Abstractions\IWorkspaceMonitor.cs" />
+    <Compile Include="Services\Navigator.cs" />
+    <Compile Include="Services\RatingService.cs" />
+    <Compile Include="Services\StructureProviders\BaseStructureProvider.cs" />
+    <Compile Include="Services\StructureProviders\StructureProviderService.cs" />
+    <Compile Include="Services\StructureProviders\Abstractions\IStructureProvider.cs" />
+    <Compile Include="Services\StructureProviders\StructureProvider.cs" />
+    <Compile Include="Services\StructureProviders\PlainText\PlainTextFileStructureProvider.cs" />
+    <Compile Include="Services\LocationProviders\Abstractions\LocationNavModel.cs" />
+    <Compile Include="Services\LocationProviders\Abstractions\ILocationProvider.cs" />
+    <Compile Include="Services\StructureProviders\Roslyn\RoslynObservableStructureProvider.cs" />
+    <Compile Include="Services\StructureProviders\Roslyn\RoslynWorkspaceFileStructureProvider.cs" />
+    <Compile Include="Services\StructureProviders\Abstractions\StructureNavModel.cs" />
+    <Compile Include="Services\StructureProviders\StructuredDocumentStructureProvider.cs" />
+    <Compile Include="Services\StructureProviders\Xml\XmlFileStructureProvider.cs" />
+    <Compile Include="Services\StructureProviders\Xml\XPathSegment.cs" />
+    <Compile Include="Services\StructureProviders\Xml\XPathSegmentKind.cs" />
+    <Compile Include="Services\LocationProviders\ToolkitLocationProvider.cs" />
+    <Compile Include="Services\LocationProviders\WorkspaceLocationProvider.cs" />
+    <Compile Include="Services\TextViewExtensions.cs" />
+    <Compile Include="Services\WorkspaceMonitor.cs" />
     <Compile Include="VSCommandTable.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>VSCommandTable.vsct</DependentUpon>
     </Compile>
-    <Compile Include="Fx\ViewModel.cs" />
     <Compile Include="GlobalUsings.cs" />
-    <Compile Include="Helpers\ColorExtensions.cs" />
-    <Compile Include="Helpers\IsExternalInitPolyfil.cs" />
-    <Compile Include="Helpers\NullabilityPolyfil.cs" />
+    <Compile Include="Helpers\Presentation\ColorExtensions.cs" />
+    <Compile Include="Polyfill\System.Runtime.CompilerServices.IsExternalInit.cs" />
+    <Compile Include="Polyfill\NullabilityPolyfills.cs" />
     <Compile Include="Helpers\Launcher.cs" />
     <Compile Include="Options\FileAction.cs" />
     <Compile Include="Options\EnumToDescriptionConverter.cs" />
@@ -119,11 +285,11 @@
     <Compile Include="Options\GeneralOptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\GeneralOptionsControl.xaml.cs">
+    <Compile Include="Controls\Options\GeneralOptionsControl.xaml.cs">
       <DependentUpon>GeneralOptionsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Options\GeneralOptionsModel.cs" />
-    <Compile Include="Presentation\BooleanConverter.cs" />
+    <Compile Include="Presentation\BooleanConverter %28of T%29.cs" />
     <Compile Include="Presentation\InvertedBooleanToVisibilityConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EditorBarPackage.cs" />
@@ -137,9 +303,10 @@
     <Compile Include="ViewModels\EditorSegmentOptionsViewModel.cs" />
     <Compile Include="ViewModels\EnumViewModel.cs" />
     <Compile Include="ViewModels\OptionsPageViewModel.cs" />
-    <Compile Include="Helpers\VisualStudioHelper.cs" />
+    <Compile Include="Helpers\VisualStudio\VisualStudioHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Polyfill\System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute.cs" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
       <Generator>VsixManifestGenerator</Generator>
@@ -157,12 +324,13 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
     <Reference Include="System.ComponentModel.Composition" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Community.VisualStudio.Toolkit.17">
-      <Version>17.0.527</Version>
+      <Version>17.0.533</Version>
     </PackageReference>
     <PackageReference Include="Community.VisualStudio.VSCT">
       <Version>16.0.29.6</Version>
@@ -172,12 +340,38 @@
     <PackageReference Include="JetBrains.Annotations">
       <Version>2024.3.0</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.12.40392" ExcludeAssets="runtime">
+    <PackageReference Include="Microsoft.Bcl.HashCode">
+      <Version>1.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp">
+      <Version>4.4.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.EditorFeatures.Text">
+      <Version>4.4.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic">
+      <Version>4.4.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common">
+      <Version>4.4.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.IO.Redist">
+      <Version>6.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.4.33103.184" ExcludeAssets="runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.12.2069">
+    <PackageReference Include="Microsoft.VisualStudio.SDK.Analyzers">
+      <Version>17.7.47</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.4.2124">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Reactive">
+      <Version>6.0.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -189,11 +383,35 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\EditorBarBreadcrumbs.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\EditorBarControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\GeneralOptionsControl.xaml">
+    <Page Include="Controls\EditorBarControlContainer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Options\GeneralOptionsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\IconDisplay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\LegacyFileLabel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\MemberList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\MemberListPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -205,11 +423,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Themes\Generic.ChevronButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\LICENSE.txt">
       <Link>Resources\LICENSE.txt</Link>
@@ -226,6 +453,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

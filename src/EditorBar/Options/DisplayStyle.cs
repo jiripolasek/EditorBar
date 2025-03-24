@@ -4,6 +4,8 @@
 // 
 // ------------------------------------------------------------
 
+#nullable enable
+
 namespace JPSoftworks.EditorBar.Options;
 
 /// <summary>

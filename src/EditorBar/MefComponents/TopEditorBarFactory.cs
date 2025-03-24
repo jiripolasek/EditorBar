@@ -1,8 +1,10 @@
 ﻿// ------------------------------------------------------------
-//
+// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-//
+// 
 // ------------------------------------------------------------
+
+#nullable enable
 
 using System.ComponentModel.Composition;
 using JPSoftworks.EditorBar.Options;
@@ -25,4 +27,4 @@ namespace JPSoftworks.EditorBar.MefComponents;
 [Order(After = PredefinedMarginNames.HorizontalScrollBar)]
 [ContentType(StandardContentTypeNames.Text)]
 [TextViewRole(PredefinedTextViewRoles.Document)]
-class TopEditorBarFactory() : BaseEditorBarFactory(BarPosition.Top);
+internal class TopEditorBarFactory() : BaseEditorBarFactory(BarPosition.Top);

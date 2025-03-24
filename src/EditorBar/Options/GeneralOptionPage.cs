@@ -4,6 +4,8 @@
 // 
 // ------------------------------------------------------------
 
+#nullable enable
+
 using System.Runtime.InteropServices;
 using System.Windows;
 using JPSoftworks.EditorBar.Controls;
@@ -37,6 +39,9 @@ public class GeneralOptionPage : UIElementDialogPage
         }
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GeneralOptionPage" /> class.
+    /// </summary>
     public GeneralOptionPage()
     {
         // Subscribe to the Saved event to reinitialize the control when the settings are saved.

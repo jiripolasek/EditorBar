@@ -4,6 +4,8 @@
 // 
 // ------------------------------------------------------------
 
+#nullable enable
+
 using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
@@ -25,15 +27,21 @@ internal class EnumToDescriptionConverter(Type type) : EnumConverter(type)
     public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object? value, Type destType)
     {
         if (value == null)
+        {
             throw new ArgumentException("Value is not valid enum member.", nameof(value));
+        }
 
         var fieldName = Enum.GetName(this._enumType, value);
         if (fieldName == null)
+        {
             throw new ArgumentException("Value is not valid enum member.", nameof(value));
+        }
 
         var fi = this._enumType.GetField(fieldName);
         if (fi == null)
+        {
             throw new ArgumentException("Value is not valid enum member.", nameof(value));
+        }
 
         var descriptionAttribute = fi.GetCustomAttribute<DescriptionAttribute>();
         return descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description!)
@@ -53,7 +61,9 @@ internal class EnumToDescriptionConverter(Type type) : EnumConverter(type)
     public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object? value)
     {
         if (value is not string stringValue)
+        {
             throw new ArgumentException("Unsupported type of value.", nameof(value));
+        }
 
         foreach (var fi in this._enumType.GetFields())
         {

@@ -1,8 +1,10 @@
 ﻿// ------------------------------------------------------------
-//
+// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-//
+// 
 // ------------------------------------------------------------
+
+#nullable enable
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression (IDE0079)
 
@@ -19,7 +21,8 @@ namespace JPSoftworks.EditorBar.Options;
 /// </summary>
 /// <seealso cref="BaseOptionModel{GeneralPage}" />
 [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global", Justification = "Used implicitly.")]
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Setters are used implicitly by PropertyGrid.")]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global",
+    Justification = "Setters are used implicitly by PropertyGrid.")]
 public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRatingConfig
 {
     private const int CurrentConfigVersion = 2;
@@ -34,6 +37,7 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     internal const string PathToEnabledProperty = RegistryCollectionName + @"\" + nameof(Enabled);
 
     // keep legacy name to  keep settings for existing users intact
+    /// <inheritdoc />
     protected override string CollectionName => RegistryCollectionName;
 
     // -------------------------------------------  
@@ -57,7 +61,7 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     [DisplayName("File name display style")]
     [Description("Show path relative to the solution root.")]
     [DefaultValue(FileLabel.FileName)]
-    public FileLabel FileLabelStyle { get; set; } = FileLabel.FileName;
+    public FileLabel FileLabelStyle { get; set; } = FileLabel.Hidden;
 
     [Category(AppearanceCategoryName)]
     [DisplayName("Show solution folders")]
@@ -91,7 +95,8 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
 
     [Category(AppearanceCategoryName)]
     [DisplayName("Display mode")]
-    [Description("Choose the style of the Editor Bar. Normal mode is more specious, compact mode gives you more vertical space for you code.")]
+    [Description(
+        "Choose the style of the Editor Bar. Normal mode is more specious, compact mode gives you more vertical space for you code.")]
     [DefaultValue(DisplayStyle.Normal)]
     public DisplayStyle DisplayStyle { get; set; } = DisplayStyle.Normal;
 
@@ -100,6 +105,20 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     [Description("Choose the theme of the Editor Bar.")]
     [DefaultValue(VisualStyle.FullRowTransparent)]
     public VisualStyle VisualStyle { get; set; } = VisualStyle.FullRowTransparent;
+
+    // show structural breadcrumbs
+    [Category(AppearanceCategoryName)]
+    [DisplayName("Show code structure breadcrumbs")]
+    [Description("Show breadcrumbs for code structure elements like classes, methods, etc.")]
+    [DefaultValue(true)]
+    public bool ShowCodeStructureBreadcrumbs { get; set; } = true;
+
+    // show structural breadcrumbs
+    [Category(AppearanceCategoryName)]
+    [DisplayName("Show file name breadcrumb")]
+    [Description("Show file name breadcrumb.")]
+    [DefaultValue(true)]
+    public bool ShowFileNameBreadcrumb { get; set; } = true;
 
     // -------------------------------------------
     // General category
@@ -111,10 +130,142 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     [DefaultValue(true)]
     public bool Enabled { get; set; } = true;
 
+    // -------------------------------------------
+    // External Editor category
+    // -------------------------------------------
+
+    [Category(ExternalEditorCategoryName)]
+    [DisplayName("External editor executable")]
+    [Description("Path to external editor or command.")]
+    [DefaultValue("notepad.exe")]
+    public string? ExternalEditorCommand { get; set; } = "notepad.exe";
+
+    [Category(ExternalEditorCategoryName)]
+    [DisplayName("External editor executable arguments")]
+    [Description("Path to external editor or command. " + Launcher.FileNamePlaceholderConstant +
+                 " represents the file name.")]
+    [DefaultValue(Launcher.FileNamePlaceholderConstant)]
+    public string? ExternalEditorCommandArguments { get; set; } = Launcher.FileNamePlaceholderConstant;
+
+    // -------------------------------------------
+    // Activation rules category
+    // -------------------------------------------
+
+    [Category(GeneralCategoryName)]
+    [DisplayName("Display in diff views")]
+    [Description("Determines if the Editor Bar is visible in diff views.")]
+    [DefaultValue(false)]
+    public bool DisplayInDiffViews { get; set; }
+
+    [Category(GeneralCategoryName)]
+    [DisplayName("Display in auxiliary documents")]
+    [Description("Determines if the Editor Bar is visible in auxiliary documents.")]
+    [DefaultValue(false)]
+    public bool DisplayInAuxiliaryDocuments { get; set; }
+
+    [Category(GeneralCategoryName)]
+    [DisplayName("Display in read-only documents")]
+    [Description("Determines if the Editor Bar is visible in read-only documents.")]
+    [DefaultValue(false)]
+    public bool DisplayInNonEditableDocuments { get; set; }
+
+    // display in blam
+    [Category(GeneralCategoryName)]
+    [DisplayName("Display in Blame")]
+    [Description("Determines if the Editor Bar is visible in annotations / blame view.")]
+    [DefaultValue(false)]
+    public bool DisplayInBlame { get; set; }
+
+    // display in temp files
+    [Category(GeneralCategoryName)]
+    [DisplayName("Display in temp files")]
+    [Description("Determines if the Editor Bar is visible in temp files.")]
+    [DefaultValue(false)]
+    public bool DisplayInTempFiles { get; set; }
+
+    // -------------------------------------------
+    // Additional Actions category
+    // -------------------------------------------
+
+    [Category(AdditionalActionCategoryName)]
+    [DisplayName("Double-click action")]
+    [Description("Action to be performed when double-clicking on the file path.")]
+    [DefaultValue(typeof(FileAction), nameof(FileAction.OpenContainingFolder))]
+    [TypeConverter(typeof(EnumToDescriptionConverter))]
+    public FileAction FileAction { get; set; } = FileAction.OpenContainingFolder;
+
+    [Category(AdditionalActionCategoryName)]
+    [DisplayName("Double-click + CTRL action")]
+    [Description("Action to be performed when double-clicking on the file path.")]
+    [DefaultValue(typeof(FileAction), nameof(FileAction.OpenInExternalEditor))]
+    [TypeConverter(typeof(EnumToDescriptionConverter))]
+    public FileAction AlternateFileAction { get; set; } = FileAction.OpenInExternalEditor;
+
+
+    // -------------------------------------------
+    // Debug category
+    // -------------------------------------------
+    [Category("Debug")]
+    [DisplayName("Debug mode")]
+    [Description("Enable debug mode.")]
+    [DefaultValue(false)]
+    public bool DebugMode { get; set; }
+
+    // -------------------------------------------
+    // Meta
+    // -------------------------------------------
+
+    [Browsable(false)] public int Version { get; set; }
+
+    [Browsable(false)] public string? VsixVersion { get; set; }
+
+    [Browsable(false)] public int RatingRequests { get; set; }
+
 
     private static bool EqualColor(Color left, Color right)
     {
         return left.ToArgb() == right.ToArgb();
+    }
+
+    // -------------------------------------------
+    // Methods
+    // -------------------------------------------
+
+    public async Task UpgradeAsync()
+    {
+        var changed = false;
+
+        // marked last used extension version; if changed, we can show What's new dialog, etc.
+        if (this.VsixVersion != Vsix.Version)
+        {
+            this.VsixVersion = Vsix.Version;
+            changed = true;
+        }
+
+        // check last used config version and upgrade if necessary
+        if (this.Version < CurrentConfigVersion)
+        {
+            // Sequential upgrade accross config versions
+            if (this.Version < 2)
+            {
+                // When upgrading from version 1 to 2, we need to change the default value of FileLabelStyle
+                // If the user had relative paths enabled, then we set the FileLabelStyle to FileName (not relative), because with this update
+                // we are also adding breadcrumbs for in-project folders and parent folder that supersedes the need for relative paths.
+                // User can disable these new features and revert to relative paths if they want manually.
+                //
+                // For absolute path, let's just keep the setting as it is. User might be anoyed by the long paths, which may force them to
+                // go to settings. This should be "fixed" later by adding What's new dialog.
+                this.FileLabelStyle = this.ShowPathRelativeToSolutionRoot ? FileLabel.FileName : FileLabel.AbsolutePath;
+            }
+
+            this.Version = CurrentConfigVersion;
+            changed = true;
+        }
+
+        if (changed)
+        {
+            await this.SaveAsync();
+        }
     }
 
     // -------------------------------------------
@@ -376,6 +527,7 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
 
     #endregion
 
+
     #region Project Folders Foreground
 
     private static readonly Color ProjectFoldersForegroundDefaultColor = SystemColors.ControlText;
@@ -398,138 +550,95 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
 
     #endregion
 
-    // -------------------------------------------
-    // External Editor category
-    // -------------------------------------------
 
-    [Category(ExternalEditorCategoryName)]
-    [DisplayName("External editor executable")]
-    [Description("Path to external editor or command.")]
-    [DefaultValue("notepad.exe")]
-    public string? ExternalEditorCommand { get; set; } = "notepad.exe";
+    #region File Background
 
-    [Category(ExternalEditorCategoryName)]
-    [DisplayName("External editor executable arguments")]
-    [Description("Path to external editor or command. " + Launcher.FileNamePlaceholderConstant + " represents the file name.")]
-    [DefaultValue(Launcher.FileNamePlaceholderConstant)]
-    public string? ExternalEditorCommandArguments { get; set; } = Launcher.FileNamePlaceholderConstant;
+    private static readonly Color FileBreadcrumbBackgroundDefault = Color.FromArgb(0, 255, 255, 255);
 
-    // -------------------------------------------
-    // Activation rules category
-    // -------------------------------------------
+    [Category(ColorsCategoryName)]
+    [DisplayName("File background color")]
+    [Description("Background color of File element.")]
+    public Color FileBreadcrumbBackground { get; set; } = FileBreadcrumbBackgroundDefault;
 
-    [Category(GeneralCategoryName)]
-    [DisplayName("Display in diff views")]
-    [Description("Determines if the Editor Bar is visible in diff views.")]
-    [DefaultValue(false)]
-    public bool DisplayInDiffViews { get; set; }
-
-    [Category(GeneralCategoryName)]
-    [DisplayName("Display in auxiliary documents")]
-    [Description("Determines if the Editor Bar is visible in auxiliary documents.")]
-    [DefaultValue(false)]
-    public bool DisplayInAuxiliaryDocuments { get; set; }
-
-    [Category(GeneralCategoryName)]
-    [DisplayName("Display in read-only documents")]
-    [Description("Determines if the Editor Bar is visible in read-only documents.")]
-    [DefaultValue(false)]
-    public bool DisplayInNonEditableDocuments { get; set; }
-
-    // display in blam
-    [Category(GeneralCategoryName)]
-    [DisplayName("Display in Blame")]
-    [Description("Determines if the Editor Bar is visible in annotations / blame view.")]
-    [DefaultValue(false)]
-    public bool DisplayInBlame { get; set; }
-
-    // display in temp files
-    [Category(GeneralCategoryName)]
-    [DisplayName("Display in temp files")]
-    [Description("Determines if the Editor Bar is visible in temp files.")]
-    [DefaultValue(false)]
-    public bool DisplayInTempFiles { get; set; }
-
-    // -------------------------------------------
-    // Additional Actions category
-    // -------------------------------------------
-
-    [Category(AdditionalActionCategoryName)]
-    [DisplayName("Double-click action")]
-    [Description("Action to be performed when double-clicking on the file path.")]
-    [DefaultValue(typeof(FileAction), nameof(FileAction.OpenContainingFolder))]
-    [TypeConverter(typeof(EnumToDescriptionConverter))]
-    public FileAction FileAction { get; set; } = FileAction.OpenContainingFolder;
-
-    [Category(AdditionalActionCategoryName)]
-    [DisplayName("Double-click + CTRL action")]
-    [Description("Action to be performed when double-clicking on the file path.")]
-    [DefaultValue(typeof(FileAction), nameof(FileAction.OpenInExternalEditor))]
-    [TypeConverter(typeof(EnumToDescriptionConverter))]
-    public FileAction AlternateFileAction { get; set; } = FileAction.OpenInExternalEditor;
-
-
-
-    // -------------------------------------------
-    // Debug category
-    // -------------------------------------------
-    [Category("Debug")]
-    [DisplayName("Debug mode")]
-    [Description("Enable debug mode.")]
-    [DefaultValue(false)]
-    public bool DebugMode { get; set; }
-
-    // -------------------------------------------
-    // Meta
-    // -------------------------------------------
-
-    [Browsable(false)]
-    public int Version { get; set; }
-
-    [Browsable(false)]
-    public string? VsixVersion { get; set; }
-
-    [Browsable(false)]
-    public int RatingRequests { get; set; }
-
-    // -------------------------------------------
-    // Methods
-    // -------------------------------------------
-
-    public async Task UpgradeAsync()
+    public bool ShouldSerializeFileBreadcrumbBackground()
     {
-        var changed = false;
-
-        // marked last used extension version; if changed, we can show What's new dialog, etc.
-        if (this.VsixVersion != Vsix.Version)
-        {
-            this.VsixVersion = Vsix.Version;
-            changed = true;
-        }
-
-        // check last used config version and upgrade if necessary
-        if (this.Version < CurrentConfigVersion)
-        {
-            // Sequential upgrade accross config versions
-            if (this.Version < 2)
-            {
-                // When upgrading from version 1 to 2, we need to change the default value of FileLabelStyle
-                // If the user had relative paths enabled, then we set the FileLabelStyle to FileName (not relative), because with this update
-                // we are also adding breadcrumbs for in-project folders and parent folder that supersedes the need for relative paths.
-                // User can disable these new features and revert to relative paths if they want manually.
-                //
-                // For absolute path, let's just keep the setting as it is. User might be anoyed by the long paths, which may force them to
-                // go to settings. This should be "fixed" later by adding What's new dialog.
-                this.FileLabelStyle = this.ShowPathRelativeToSolutionRoot ? FileLabel.FileName : FileLabel.AbsolutePath;
-            }
-
-            this.Version = CurrentConfigVersion;
-            changed = true;
-        }
-
-        if (changed)
-        {
-            await this.SaveAsync();
-        }
+        return !EqualColor(this.FileBreadcrumbBackground, FileBreadcrumbBackgroundDefault);
     }
+
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public void ResetSerializeFileBreadcrumbBackground()
+    {
+        this.FileBreadcrumbBackground = FileBreadcrumbBackgroundDefault;
+    }
+
+    #endregion
+
+
+    #region File Foreground
+
+    private static readonly Color FileBreadcrumbForegroundDefaultColor = SystemColors.ControlText;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("File text color")]
+    [Description("Foreground color of File element.")]
+    public Color FileBreadcrumbForeground { get; set; } = FileBreadcrumbForegroundDefaultColor;
+
+    public bool ShouldSerializeFileBreadcrumbForeground()
+    {
+        return !EqualColor(this.FileBreadcrumbForeground, FileBreadcrumbForegroundDefaultColor);
+    }
+
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public void ResetSerializeFileBreadcrumbForeground()
+    {
+        this.FileBreadcrumbForeground = FileBreadcrumbForegroundDefaultColor;
+    }
+
+    #endregion
+
+
+    #region Structure Background
+
+    private static readonly Color StructureBreadcrumbBackgroundDefault = Color.FromArgb(0, 255, 255, 255);
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Code structure element background color")]
+    [Description("Background color of Code structureelement.")]
+    public Color StructureBreadcrumbBackground { get; set; } = StructureBreadcrumbBackgroundDefault;
+
+    public bool ShouldSerializeStructureBreadcrumbBackground()
+    {
+        return !EqualColor(this.StructureBreadcrumbBackground, StructureBreadcrumbBackgroundDefault);
+    }
+
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public void ResetSerializeStructureBreadcrumbBackground()
+    {
+        this.StructureBreadcrumbBackground = StructureBreadcrumbBackgroundDefault;
+    }
+
+    #endregion
+
+
+    #region Structure Foreground
+
+    private static readonly Color StructureBreadcrumbForegroundDefaultColor = SystemColors.ControlText;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Code structure element text color")]
+    [Description("Foreground color of Code structure element.")]
+    public Color StructureBreadcrumbForeground { get; set; } = StructureBreadcrumbForegroundDefaultColor;
+
+    public bool ShouldSerializeStructureBreadcrumbForeground()
+    {
+        return !EqualColor(this.StructureBreadcrumbForeground, StructureBreadcrumbForegroundDefaultColor);
+    }
+
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public void ResetSerializeStructureBreadcrumbForeground()
+    {
+        this.StructureBreadcrumbForeground = StructureBreadcrumbForegroundDefaultColor;
+    }
+
+    #endregion
 }

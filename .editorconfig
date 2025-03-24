@@ -17,8 +17,20 @@ insert_final_newline = false
 # Mine
 file_header_template = ------------------------------------------------------------\n\nCopyright (c) Jiří Polášek. All rights reserved.\n\n------------------------------------------------------------
 trim_trailing_whitespace = true
+line_length = 140
 
 #### .NET Coding Conventions ####
+
+# R#
+csharp_keep_existing_attribute_arrangement = true
+csharp_wrap_before_eq = true
+csharp_wrap_after_declaration_lpar = true
+csharp_wrap_before_declaration_rpar = false;
+csharp_wrap_parameters_style = chop_if_long
+csharp_wrap_primary_constructor_parameters_style = chop_if_long
+csharp_wrap_object_and_collection_initializer_style = chop_if_long
+csharp_wrap_before_primary_constructor_declaration_lpar = false
+csharp_wrap_after_primary_constructor_declaration_lpar = true
 
 # Organize usings
 dotnet_separate_import_directive_groups = false

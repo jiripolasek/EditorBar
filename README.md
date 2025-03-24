@@ -1,8 +1,17 @@
-# Editor Bar
+<div align="center">
 
-<p align="center">
+<p>
 	<img alt="Editor Bar Icon" src="assets/Icon.png" />
 </p>
+
+<h1>Editor Bar<br /><span style="font-weight: 300; opacity: 0.5">for Visual Studio 2022</span></h1>
+
+[![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/jiripolasek.EditorBar?style=for-the-badge&label=VS%20Marketplace&link=https%3A%2F%2Fmarketplace.visualstudio.com%2Fitems%3FitemName%3Djiripolasek.EditorBar)](https://marketplace.visualstudio.com/items?itemName=jiripolasek.EditorBar)
+[![Visual Studio Marketplace Rating](https://img.shields.io/visual-studio-marketplace/stars/jiripolasek.EditorBar?style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=jiripolasek.EditorBar)
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/jiripolasek.EditorBar?style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=jiripolasek.EditorBar)
+[![Static Badge](https://img.shields.io/badge/💚%20popularity-great-brightgreen?style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=jiripolasek.EditorBar)
+
+</div>
 
 ## Introduction
 
@@ -12,13 +21,19 @@ This functionality addresses common challenges when editing files with similar n
 
 ## Features
 
+<div align="center">
+
 ![Breadcrumbs](assets/breadcrumbs.png)
 
-- **Breadcrumb Navigation:** Highlights key elements of the file location:
+</div>
+
+- **Breadcrumb Navigation:** Highlights key elements of the file location and current caret position in the file:
   - Solution folders
   - Project name
   - Project folders
   - Parent folder name
+  - File name
+  - File structure (types, members, nodes, ...)
 
 - **Customizable Options:**
   - Select what to display in the breadcrumbs bar.

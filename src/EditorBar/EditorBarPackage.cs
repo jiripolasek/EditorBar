@@ -1,14 +1,18 @@
 ﻿// ------------------------------------------------------------
-//
+// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-//
+// 
 // ------------------------------------------------------------
+
+#nullable enable
 
 using System.Runtime.InteropServices;
 using System.Threading;
 using Community.VisualStudio.Toolkit;
-using JPSoftworks.EditorBar.Commands;
+using JPSoftworks.EditorBar.Commands.Abstractions;
 using JPSoftworks.EditorBar.Options;
+using JPSoftworks.EditorBar.Services;
+using JPSoftworks.EditorBar.Services.LocationProviders;
 using Microsoft.VisualStudio.Shell;
 
 namespace JPSoftworks.EditorBar;
@@ -33,52 +37,57 @@ namespace JPSoftworks.EditorBar;
 /// </remarks>
 [InstalledProductRegistration(Vsix.Name, Vsix.Description, Vsix.Version)]
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-[Guid(PackageGuidString)]
+[Guid(PackageGuids.EditorBarString)]
 [ProvideOptionPage(typeof(GeneralOptionPage), "Editor Bar", "General", 0, 0, true)]
 [ProvideProfile(typeof(GeneralOptionPage), "Editor Bar", "General", 0, 0, true)]
 [ProvideMenuResource("Menus.ctmenu", 1)]
-[ProvideService(typeof(EditorBarFileActionMenuBridge), IsAsyncQueryable = true)]
-[ProvideAutoLoad(EditorBarPackage.EditorBarEnabledAutoload, PackageAutoLoadFlags.BackgroundLoad)]
-[ProvideUIContextRule(EditorBarPackage.EditorBarEnabledAutoload, // we've to load the package to provide Checked status for the ToggleEditorBarCommand
-    name: "Auto load when Editor Bar is Enabled",
-    expression: "editorBarEnabled",
-    termNames: ["editorBarEnabled"],
-    termValues: ["UserSettingsStoreQuery:" + GeneralOptionsModel.PathToEnabledProperty],
-    delay: 100)]
+[ProvideService(typeof(IMenuContextService), IsAsyncQueryable = true)]
+[ProvideService(typeof(ILocationProvider), IsAsyncQueryable = true)]
+[ProvideAutoLoad(PackageGuids.EditorBarAutoloadUIContextGuidString, PackageAutoLoadFlags.BackgroundLoad)]
+[ProvideUIContextRule(
+    // we've to load the package to provide Checked status for the ToggleEditorBarCommand
+    PackageGuids.EditorBarAutoloadUIContextGuidString,
+    "Auto load when Editor Bar is Enabled",
+    "editorBarEnabled",
+    ["editorBarEnabled"],
+    ["UserSettingsStoreQuery:" + GeneralOptionsModel.PathToEnabledProperty],
+    100)]
 public sealed class EditorBarPackage : AsyncPackage
 {
-    private const string EditorBarEnabledAutoload = "3c1dfe70-bb76-4e6d-b86c-a7c6ed149cf2";
-
-    /// <summary>
-    /// EditorBarPackage GUID string.
-    /// </summary>
-    private const string PackageGuidString = "ef5d9a25-5e0d-4428-8762-56d4dc816eeb";
-
-    /// <summary>
-    /// Defines number of time the extension is used before the rating prompt is shown (usage is incremented on successful usage, only once per session).
-    /// </summary>
-    internal const int UsagesBeforeRatingPrompt = 6;
-
-
     /// <inheritdoc />
-    /// <exception cref="OperationCanceledException">Thrown back at the awaiting caller if <paramref name="cancellationToken" /> is canceled, even if the caller is already on the main thread.</exception>
-    protected override async Task InitializeAsync(CancellationToken cancellationToken,
+    /// <exception cref="OperationCanceledException">
+    /// Thrown back at the awaiting caller if
+    /// <paramref name="cancellationToken" /> is canceled, even if the caller is already on the main thread.
+    /// </exception>
+    protected override async Task InitializeAsync(
+        CancellationToken cancellationToken,
         IProgress<ServiceProgressData> progress)
     {
-        this.AddService(typeof(EditorBarFileActionMenuBridge), (_, _, _) => Task.FromResult<object?>(new EditorBarFileActionMenuBridge()), promote: true);
+        try
+        {
+            this.AddService(typeof(IMenuContextService),
+                static (_, _, _) => Task.FromResult<object?>(new MenuContextService()), true);
 
-        // When initialized asynchronously, the current thread may be a background thread at this point.
-        // Do any initialization that requires the UI thread after switching to the UI thread.
-        await this.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
+            this.AddService(typeof(ILocationProvider),
+                static (_, _, _) => Task.FromResult<object?>(new ToolkitLocationProvider()), true);
 
-        // upgrade settings from previous versions
-        var options = await GeneralOptionsModel.GetLiveInstanceAsync();
+            // When initialized asynchronously, the current thread may be a background thread at this point.
+            // Do any initialization that requires the UI thread after switching to the UI thread.
+            await this.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
 
-        await options.UpgradeAsync();
+            // upgrade settings from previous versions
+            var options = await GeneralOptionsModel.GetLiveInstanceAsync();
 
-        await this.RegisterCommandsAsync();
+            await options.UpgradeAsync();
 
-        var prompt = new RatingPrompt("JPSoftworks.EditorBar", Vsix.Name, options, UsagesBeforeRatingPrompt);
-        prompt.RegisterSuccessfulUsage();
+            await this.RegisterCommandsAsync();
+
+            RatingService.RegisterSuccessfulUsage();
+        }
+        catch (Exception ex)
+        {
+            await ex.LogAsync();
+            throw;
+        }
     }
 }

@@ -4,6 +4,8 @@
 // 
 // ------------------------------------------------------------
 
+#nullable enable
+
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
@@ -13,7 +15,7 @@ namespace JPSoftworks.EditorBar.Presentation;
 /// <summary>
 /// Converts a Color object to a SolidColorBrush object.
 /// </summary>
-public class ColorToBrushConverter : IValueConverter
+internal class ColorToBrushConverter : IValueConverter
 {
     /// <summary>
     /// Converts a Color object to a SolidColorBrush object.

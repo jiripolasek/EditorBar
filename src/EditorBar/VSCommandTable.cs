@@ -12,14 +12,14 @@ namespace JPSoftworks.EditorBar
     /// </summary>
     internal sealed partial class PackageGuids
     {
-        public const string guidEditorBarPackageString = "ef5d9a25-5e0d-4428-8762-56d4dc816eeb";
-        public static Guid guidEditorBarPackage = new Guid(guidEditorBarPackageString);
+        public const string EditorBarString = "ef5d9a25-5e0d-4428-8762-56d4dc816eeb";
+        public static Guid EditorBar = new Guid(EditorBarString);
 
-        public const string guidUIContextGuidString = "3c1dfe70-bb76-4e6d-b86c-a7c6ed149cf2";
-        public static Guid guidUIContextGuid = new Guid(guidUIContextGuidString);
+        public const string EditorBarAutoloadUIContextGuidString = "3c1dfe70-bb76-4e6d-b86c-a7c6ed149cf2";
+        public static Guid EditorBarAutoloadUIContextGuid = new Guid(EditorBarAutoloadUIContextGuidString);
 
-        public const string guidEditorBarPackageCmdSetString = "264c2d6c-e85c-4cbb-a800-0c412f8d91f1";
-        public static Guid guidEditorBarPackageCmdSet = new Guid(guidEditorBarPackageCmdSetString);
+        public const string EditorBarCmdSetString = "264c2d6c-e85c-4cbb-a800-0c412f8d91f1";
+        public static Guid EditorBarCmdSet = new Guid(EditorBarCmdSetString);
 
         public const string guidImagesString = "8ec912c7-6f7f-457d-bbe8-318409383d92";
         public static Guid guidImages = new Guid(guidImagesString);
@@ -32,9 +32,13 @@ namespace JPSoftworks.EditorBar
         public const int EditorBarViewMenuGroup = 0x1120;
         public const int EditorBarViewSubMenu = 0x1130;
         public const int EditorBarViewSubMenuGroup = 0x1231;
+        public const int EditorBarViewFocusGroup = 0x1232;
         public const int EditorBarTextEditorToolbarGroup = 0x1140;
         public const int ToggleEditorBarCommand = 0x0100;
         public const int EditorBarOptionsCommand = 0x0101;
+        public const int FocusEditorBarProjectsCrumbCommand = 0x0102;
+        public const int FocusEditorBarFileCrumbCommand = 0x0103;
+        public const int FocusEditorBarInnermostTypeCrumbCommand = 0x0104;
         public const int EditorBarFileActionMenu = 0x2000;
         public const int EditorBarFileActionMenuCopyPathGroup = 0x2001;
         public const int EditorBarFileActionMenuOpenFileGroup = 0x2002;
@@ -44,6 +48,40 @@ namespace JPSoftworks.EditorBar
         public const int EditorBarFileAction_OpenFileInExternalEditorCommand = 0x2012;
         public const int EditorBarFileAction_CopyFullPathCommand = 0x2013;
         public const int EditorBarFileAction_CopyRelativePathCommand = 0x2014;
+        public const int EditorBarFileAction_LocateInSolutionExplorer = 0x2015;
+        public const int EditorBarStructureBreadcrumbMenu = 0x3000;
+        public const int EditorBarStructureBreadcrumbMenuStaticCommandsGroup = 0x3001;
+        public const int EditorBarStructureBreadcrumbMenuDynamicCommandsGroup = 0x3002;
+        public const int EditorBarStructureBreadcrumbMenuNavigateToCodeElementCommand = 0x3010;
+        public const int EditorBarStructureBreadcrumbMenuChildrenElementsCommand = 0x3020;
+        public const int EditorBarStructureBreadcrumbMenuCopyDocIdCommand = 0x3030;
+        public const int EditorBarStructureBreadcrumbMenuCopyFullName = 0x3040;
+        public const int EditorBarTypeBreadcrumbMenu = 0x4000;
+        public const int EditorBarTypeBreadcrumbMenu_PrimaryGroup = 0x4001;
+        public const int EditorBarTypeBreadcrumbMenu_GotoGroup = 0x4002;
+        public const int EditorBarTypeBreadcrumbMenu_SyncGroup = 0x4003;
+        public const int EditorBarMemberBreadcrumbMenu = 0x5000;
+        public const int EditorBarMemberBreadcrumbMenu_PrimaryGroup = 0x5001;
+        public const int EditorBarMemberBreadcrumbMenu_GotoGroup = 0x5002;
+        public const int EditorBarMemberBreadcrumbMenu_SyncGroup = 0x5003;
+        public const int EditorBarProjectBreadcrumbMenu = 0x6000;
+        public const int EditorBarProjectBreadcrumbMenu_PrimaryGroup = 0x6001;
+        public const int EditorBarProjectBreadcrumbMenu_GotoGroup = 0x6002;
+        public const int EditorBarProjectBreadcrumbMenu_SyncGroup = 0x6003;
+        public const int EditorBarProjectBreadcrumbMenu_ContainerGroup = 0x6004;
+        public const int EditorBarProjectBreadcrumbMenu_PropertyGroup = 0x6006;
+        public const int EditorBarProjectBreadcrumbMenu_CopyProjectFullPathCommand = 0x6010;
+        public const int EditorBarProjectBreadcrumbMenu_CopyProjectRelativePathCommand = 0x6011;
+        public const int EditorBarProjectBreadcrumbMenu_OpenContainingFolderCommand = 0x6012;
+        public const int EditorBarProjectBreadcrumbMenu_OpenPropertiesCommand = 0x6013;
+        public const int EditorBarProjectBreadcrumbMenu_LocateInSolutionExplorerCommand = 0x6014;
+        public const int EditorBarPhysicalDirectoryMenu = 0x7000;
+        public const int EditorBarPhysicalDirectoryMenu_PrimaryGroup = 0x7001;
+        public const int EditorBarPhysicalDirectoryMenu_ContainerGroup = 0x7002;
+        public const int EditorBarPhysicalDirectoryMenu_CopyFullPathCommand = 0x7010;
+        public const int EditorBarPhysicalDirectoryMenu_CopyRelativePathCommand = 0x7011;
+        public const int EditorBarPhysicalDirectoryMenu_OpenContainingFolderCommand = 0x7012;
+        public const int EditorBarPhysicalDirectoryMenu_LocateInSolutionExplorerCommand = 0x7013;
         public const int bmpToggleEditorBar = 0x0001;
     }
 }
