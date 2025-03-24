@@ -102,6 +102,7 @@
     <Compile Include="Helpers\Rx\SelectNothingObservableExtensions.cs" />
     <Compile Include="Helpers\Rx\SubjectFactory.cs" />
     <Compile Include="Helpers\Rx\ThrottleFirst.cs" />
+    <Compile Include="Services\StructureProviders\Abstractions\NullBreadcrumbProvider.cs" />
     <Compile Include="ViewModels\Breadcrumbs\BreadcrumbModel%28of TModel%29.cs" />
     <Compile Include="ViewModels\Breadcrumbs\PhysicalDirectoryBreadcrumbModel.cs" />
     <Compile Include="ViewModels\Breadcrumbs\PhysicalDirectoryModel.cs" />

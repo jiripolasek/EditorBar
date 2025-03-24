@@ -41,19 +41,19 @@ internal abstract class BaseStructureProvider : StructureProvider
             .Where(static t => t.EventArgs.FileActionType.HasFlag(FileActionTypes.DocumentRenamed))
             .Select(static e => e.EventArgs)
             .ObserveOn(Dispatcher.CurrentDispatcher)
-            .LogAndRetry();
+            .LogAndRetry("fileActionOccurred");
 
         this.DocumentNameChanged = fileActionOccurred
             .Select(static e => e.FilePath)
             .StartWith(textDocument.FilePath)
-            .LogAndRetry();
+            .LogAndRetry("DocumentNameChanged");
 
         this.CaretPositionChanged = Observable.FromEventPattern<CaretPositionChangedEventArgs>(
                 handler => this.TextView.Caret!.PositionChanged += handler,
                 handler => this.TextView.Caret!.PositionChanged -= handler)
             .Throttle(TimeSpan.FromMilliseconds(50))
             .Select(static e => e.EventArgs.NewPosition.BufferPosition)
-            .LogAndRetry();
+            .LogAndRetry("CaretPositionChanged");
 
         this.ContentChanged = Observable.FromEventPattern(
                 handler => this._textBuffer.PostChanged += handler,
@@ -61,11 +61,11 @@ internal abstract class BaseStructureProvider : StructureProvider
             .Where(_ => this.TextView.Caret != null)
             .Select(_ => this.TextView.Caret!.Position.BufferPosition)
             .Throttle(TimeSpan.FromMilliseconds(250))
-            .LogAndRetry();
+            .LogAndRetry("ContentChanged");
 
         this.UnifiedSource = this.CaretPositionChanged
             .Merge(this.ContentChanged)
             .StartWith(this.TextView.Caret?.Position.BufferPosition ?? new SnapshotPoint())
-            .LogAndRetry();
+            .LogAndRetry("UnifiedSource");
     }
 }

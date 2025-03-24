@@ -51,6 +51,7 @@ internal partial class EditorBarControl : IDisposable
 
         this.DataContext = this._viewModel =
             new EditorBarViewModel(textView, textDocument, joinableTaskFactory, structureProviderService);
+        this._viewModel.AddTo(this._disposables);
 
         this.InitializeComponent();
 

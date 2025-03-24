@@ -94,8 +94,11 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
             += (_, _) => this.CombineBreadcrumbsAsync().FireAndForget();
         this.LocationBreadcrumbs.AddTo(this._disposables);
 
-        this.StructuralBreadcrumbs =
-            new StructuralBreadcrumbsViewModel(textView, this._workspaceMonitor, structureProviderService);
+        this.StructuralBreadcrumbs = new StructuralBreadcrumbsViewModel(
+            textView,
+            this._workspaceMonitor,
+            structureProviderService,
+            settingsRefreshAggregator);
         this.StructuralBreadcrumbs.StructuralBreadcrumbs.CollectionChanged
             += (_, _) => this.CombineBreadcrumbsAsync().FireAndForget();
         this.StructuralBreadcrumbs.AddTo(this._disposables);

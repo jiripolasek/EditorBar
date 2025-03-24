@@ -7,7 +7,6 @@
 #nullable enable
 
 using System.Globalization;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -34,32 +33,33 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
 {
     private static readonly FileNameToImageMonikerConverter FileNameToImageMonikerConverter = new();
 
-    private readonly BehaviorSubject<IObservable<BreadcrumbState>> _activeStructureProviderStream
+    private readonly BehaviorSubject<IObservable<BreadcrumbState>> _activeBreadcrumbsProviderStream
         = SubjectFactory.CreateEmpty<BreadcrumbState>();
 
     private readonly CompositeDisposable _disposables = [];
     private readonly ITextDocument _document;
-    private readonly IObservable<string> _documentFilePathChanged;
+    private readonly IObservable<string> _pathChangesStream;
     private readonly IStructureProviderService _structureProviderService;
     private readonly IWpfTextView _textView;
     private readonly IWorkspaceMonitor _workspaceMonitor;
 
-    private FileModel? _previousFileCrumb;
-    private IReadOnlyList<BaseStructureModel>? _previousStructureModel;
+    private List<BaseStructureModel> _previousStructure = [];
 
     public BulkObservableCollection<BreadcrumbModel> StructuralBreadcrumbs { get; } = [];
 
     public StructuralBreadcrumbsViewModel(
         IWpfTextView textView,
         IWorkspaceMonitor workspaceMonitor,
-        IStructureProviderService structureProviderService)
+        IStructureProviderService structureProviderService,
+        SettingsRefreshAggregator settingsRefreshAggregator)
     {
         this._textView = Requires.NotNull(textView, nameof(textView));
         this._workspaceMonitor = Requires.NotNull(workspaceMonitor, nameof(workspaceMonitor));
         this._structureProviderService = Requires.NotNull(structureProviderService, nameof(structureProviderService));
+        Requires.NotNull(settingsRefreshAggregator, nameof(settingsRefreshAggregator));
 
         this._document = this._textView.GetTextDocumentFromDocumentBuffer()!;
-        this._documentFilePathChanged = Observable
+        this._pathChangesStream = Observable
             .Defer(() => Observable.Return(this._document.FilePath))
             .Concat(Observable
                 .FromEventPattern<TextDocumentFileActionEventArgs>(this._document,
@@ -67,25 +67,31 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
                 .Select(static e => e.EventArgs.FilePath))
             .DistinctUntilChanged();
 
-        IStructureRefreshAggregator structureRefreshAggregator =
-            new StructureRefreshAggregator(this._textView, this._workspaceMonitor);
+        var settingsChangesStream = Observable
+            .Defer(static () => Observable.FromAsync(static () => GeneralOptionsModel.GetLiveInstanceAsync()))
+            .Concat(Observable.FromEventPattern(
+                    settingsRefreshAggregator,
+                    nameof(ISettingsRefreshAggregator.SettingsRefreshRequested))
+                .SelectMany(static _ => Observable.FromAsync(static () => GeneralOptionsModel.GetLiveInstanceAsync())));
+
+        var structureRefreshAggregator = new StructureRefreshAggregator(this._textView, this._workspaceMonitor);
         structureRefreshAggregator.AddTo(this._disposables);
+
         _ = Observable
-            .FromEventPattern<EventArgs>(structureRefreshAggregator,
-                nameof(IStructureRefreshAggregator.RefreshRequested))
+            .FromEventPattern<EventArgs>(structureRefreshAggregator, nameof(IStructureRefreshAggregator.RefreshRequested))
+            .CombineLatest(settingsChangesStream)
             .Replay(1)
             .RefCount()
             .Subscribe(_ => this.UpdateFileStructureProvider())
             .AddTo(this._disposables);
 
-        this._activeStructureProviderStream
+        _ = Observable.CombineLatest(
+                this._activeBreadcrumbsProviderStream,
+                settingsChangesStream,
+                static (structureProvider, settings) => structureProvider.Select(state => (state, settings)))
+            .LogAndRetry("Combine active structure provider and settings")
             .Switch()
-            .SelectMany(async tuple =>
-            {
-                await this.UpdateFileStructureAsync(tuple);
-                return Unit.Default;
-            })
-            .Subscribe()
+            .Subscribe(tuple => this.UpdateFileStructure(tuple.state, tuple.settings!))
             .AddTo(this._disposables);
 
         this.UpdateFileStructureProvider();
@@ -104,69 +110,54 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
         }
 
         var currentProvider = this._textView.GetCurrentFileStructureProvider();
-        var shouldShowBreadcrumbs = GeneralOptionsModel.Instance.ShowCodeStructureBreadcrumbs;
-        var provider = shouldShowBreadcrumbs
+        var shouldShowStructureBreadcrumbs = GeneralOptionsModel.Instance.ShowCodeStructureBreadcrumbs;
+        var provider = shouldShowStructureBreadcrumbs
             ? this._structureProviderService.CreateProvider(this._textView, this._workspaceMonitor.CurrentWorkspace)
-            : null;
-
-        // TODO: don't replace the provider if it's the same
+            : NullBreadcrumbProvider.Instance;
 
         currentProvider?.Dispose();
         this._textView.SetCurrentFileStructureProvider(provider);
 
-        var newBreadcrumbsSource = provider == null
-            ? Observable.Empty<BreadcrumbState>()
-            : Observable.CombineLatest(
-                    provider.BreadcrumbsChanged,
-                    this._documentFilePathChanged,
-                    static (breadcrumbs, filePath) => new BreadcrumbState(breadcrumbs, filePath))
-                .LogAndRetry();
-        this._activeStructureProviderStream.OnNext(newBreadcrumbsSource);
+        var newBreadcrumbsSource = Observable.CombineLatest(
+                provider.BreadcrumbsChanged,
+                this._pathChangesStream,
+                static (breadcrumbs, filePath) => new BreadcrumbState(breadcrumbs, filePath))
+            .LogAndRetry("newBreadcrumbsSource");
+        this._activeBreadcrumbsProviderStream.OnNext(newBreadcrumbsSource);
     }
 
-    private async Task UpdateFileStructureAsync(BreadcrumbState state)
+    private void UpdateFileStructure(BreadcrumbState state, GeneralOptionsModel options)
     {
         if (this._textView.IsClosed)
         {
             return;
         }
 
-        var fileCrumb = FileModel.Create(
-            state.FilePath ?? "",
-            state.Breadcrumbs?.CanRootHaveChildren ?? false);
+        var currentBreadcrumbs = new List<BaseStructureModel>();
 
-        BreadcrumbModel[] structureBreadcrumbs;
-        if (GeneralOptionsModel.Instance.ShowCodeStructureBreadcrumbs && state.Breadcrumbs != null)
+        if (options.ShowFileNameBreadcrumb)
         {
-            var fileStructureModel = state.Breadcrumbs.Breadcrumbs;
-            if (this._previousStructureModel?.SequenceEqual(fileStructureModel) == true &&
-                fileCrumb != this._previousFileCrumb)
-            {
-                return;
-            }
-
-            this._previousStructureModel = fileStructureModel;
-            structureBreadcrumbs = await this.RebuildStructureBreadcrumbsAsync([fileCrumb, .. fileStructureModel]);
-        }
-        else
-        {
-            this._previousStructureModel = null;
-            structureBreadcrumbs = await this.RebuildStructureBreadcrumbsAsync([fileCrumb]);
+            var fileCrumb = FileModel.Create(
+                state.FilePath ?? "",
+                state.Breadcrumbs?.CanRootHaveChildren ?? false);
+            currentBreadcrumbs.Add(fileCrumb);
         }
 
-        this._previousFileCrumb = fileCrumb;
-        this.StructuralBreadcrumbs.SetRange(structureBreadcrumbs);
-    }
+        if (options.ShowCodeStructureBreadcrumbs && state.Breadcrumbs != null)
+        {
+            currentBreadcrumbs.AddRange(state.Breadcrumbs.Breadcrumbs);
+        }
 
-    private async Task<BreadcrumbModel[]> RebuildStructureBreadcrumbsAsync(
-        IEnumerable<BaseStructureModel?> structureModels)
-    {
-        var options = await GeneralOptionsModel.GetLiveInstanceAsync();
+        if (this._previousStructure.SequenceEqual(currentBreadcrumbs))
+        {
+            return;
+        }
 
-        return structureModels
-            .OfType<BaseStructureModel>()
+        this._previousStructure = currentBreadcrumbs;
+        var structureBreadcrumbs = currentBreadcrumbs
             .Select(structureModel => this.BuildCrumb(structureModel, options))
             .ToArray();
+        this.StructuralBreadcrumbs.SetRange(structureBreadcrumbs);
     }
 
     private BreadcrumbModel BuildCrumb(BaseStructureModel baseStructureModel, GeneralOptionsModel options)
@@ -279,10 +270,10 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
         new StructureBreadcrumbMenuContext(typeModel, this._textView).ShowMenu();
     }
 
-    private record struct BreadcrumbState(StructureNavModel? Breadcrumbs, string? FilePath);
-
     public Task InitializeAsync()
     {
         return Task.CompletedTask;
     }
+
+    private record struct BreadcrumbState(StructureNavModel? Breadcrumbs, string? FilePath);
 }
