@@ -25,7 +25,7 @@ namespace JPSoftworks.EditorBar.Options;
     Justification = "Setters are used implicitly by PropertyGrid.")]
 public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRatingConfig
 {
-    private const int CurrentConfigVersion = 2;
+    private const int CurrentConfigVersion = 3;
 
     private const string AppearanceCategoryName = "Appearance";
     private const string GeneralCategoryName = "General";
@@ -245,7 +245,7 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
         // check last used config version and upgrade if necessary
         if (this.Version < CurrentConfigVersion)
         {
-            // Sequential upgrade accross config versions
+            // Sequential upgrade across config versions
             if (this.Version < 2)
             {
                 // When upgrading from version 1 to 2, we need to change the default value of FileLabelStyle
@@ -253,9 +253,20 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
                 // we are also adding breadcrumbs for in-project folders and parent folder that supersedes the need for relative paths.
                 // User can disable these new features and revert to relative paths if they want manually.
                 //
-                // For absolute path, let's just keep the setting as it is. User might be anoyed by the long paths, which may force them to
+                // For absolute path, let's just keep the setting as it is. User might be annoyed by the long paths, which may force them to
                 // go to settings. This should be "fixed" later by adding What's new dialog.
                 this.FileLabelStyle = this.ShowPathRelativeToSolutionRoot ? FileLabel.FileName : FileLabel.AbsolutePath;
+            }
+
+            if (this.Version < 3)
+            {
+                // When upgrading from version 2 to 3, we change value of FileLabelStyle.
+                // If the user had FileLabelStyle set to FileName, we now change it to hidden, because its functions
+                // will be covered by the new file name breadcrumb.
+                if (this.FileLabelStyle == FileLabel.FileName)
+                {
+                    this.FileLabelStyle = FileLabel.Hidden;
+                }
             }
 
             this.Version = CurrentConfigVersion;
