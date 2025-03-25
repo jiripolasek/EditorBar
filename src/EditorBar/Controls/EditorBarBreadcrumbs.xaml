@@ -1,0 +1,100 @@
+﻿<UserControl x:Class="JPSoftworks.EditorBar.Controls.EditorBarBreadcrumbs"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:JPSoftworks.EditorBar.Controls"
+             xmlns:presentation="clr-namespace:JPSoftworks.EditorBar.Presentation"
+             xmlns:puiImaging="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:puiUtilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
+             xmlns:viewModels="clr-namespace:JPSoftworks.EditorBar.ViewModels"
+             mc:Ignorable="d"
+             Name="RootControl"
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type=viewModels:EditorBarViewModel}">
+
+    <UserControl.Resources>
+        <puiUtilities:BrushToColorConverter x:Key="BrushToColorConverter" x:Shared="True" />
+        <presentation:BreadcrumbSeparatorColorConverter x:Key="BreadcrumbSeparatorColorConverter" x:Shared="True" />
+        <presentation:ContrastForegroundBrushConverter x:Key="ContrastForegroundBrushConverter" x:Shared="True" />
+        <presentation:SolidColorFallbackConverter x:Key="SolidColorFallbackConverter" x:Shared="True" />
+
+        <DataTemplate DataType="{x:Type viewModels:BreadcrumbModel}">
+            <local:SymbolChevronButton
+                x:Name="SymbolChevronButton"
+                Command="{Binding Command}"
+                ContextCommand="{Binding ContextCommand}"
+                ModelsAccessor="{Binding ItemsProvider}"
+                ShowRightBorder="True"
+                DataContext="{Binding}"
+                puiImaging:ImageThemingUtilities.ImageBackgroundColor="{Binding CustomBackground, ElementName=SymbolChevronButton, Converter={StaticResource BrushToColorConverter}}">
+
+                <local:SymbolChevronButton.CustomBackground>
+                    <MultiBinding Converter="{StaticResource SolidColorFallbackConverter}">
+                        <Binding Path="Background" />
+                        <Binding Path="Background"
+                                 RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:EditorBarControl}" />
+                    </MultiBinding>
+                </local:SymbolChevronButton.CustomBackground>
+
+                <local:SymbolChevronButton.Foreground>
+                    <MultiBinding Converter="{StaticResource ContrastForegroundBrushConverter}">
+                        <Binding ElementName="SymbolChevronButton" Path="CustomBackground" />
+                        <Binding Path="Foreground" />
+                    </MultiBinding>
+                </local:SymbolChevronButton.Foreground>
+
+                <local:SymbolChevronButton.RightBorderBrush>
+                    <MultiBinding Converter="{StaticResource BreadcrumbSeparatorColorConverter}">
+                        <Binding Path="Background"
+                                 RelativeSource="{RelativeSource AncestorType={x:Type local:EditorBarControl}}" />
+                        <Binding Path="Background" />
+                        <!-- ReSharper disable once Xaml.PossibleNullReferenceException -->
+                        <Binding Path="NextBreadcrumb.Background" />
+                    </MultiBinding>
+                </local:SymbolChevronButton.RightBorderBrush>
+
+                <local:SymbolChevronButton.Content>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <StackPanel.Resources>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding Path=CanHaveChildren}" Value="True" />
+                                            <Condition
+                                                Binding="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=IsMouseOver}"
+                                                Value="True" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="TextDecorations" Value="Underline" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Resources>
+                        <local:IconDisplay Icon="{Binding Icon}" ImageMoniker="{Binding ImageMoniker}" Margin="0,0,4,0" />
+                        <TextBlock Text="{Binding Text}" x:Name="MemberName" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                </local:SymbolChevronButton.Content>
+
+            </local:SymbolChevronButton>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <StackPanel Orientation="Horizontal">
+        <ItemsControl
+            x:Name="BreadcrumbsItemsControl"
+            DockPanel.Dock="Left"
+            ItemsSource="{Binding Breadcrumbs}"
+            Style="{DynamicResource BreadcrumbsPart}"
+            Focusable="False">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel IsItemsHost="True" Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </StackPanel>
+
+</UserControl>

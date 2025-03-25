@@ -1,11 +1,13 @@
 ﻿// ------------------------------------------------------------
-//
+// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-//
+// 
 // ------------------------------------------------------------
 
+#nullable enable
+
 using System.Windows.Media;
-using JPSoftworks.EditorBar.Fx;
+using Microsoft.VisualStudio.PlatformUI;
 
 namespace JPSoftworks.EditorBar.ViewModels;
 
@@ -15,10 +17,10 @@ namespace JPSoftworks.EditorBar.ViewModels;
 /// <remarks>
 /// This class provides properties for the foreground color, background color, and visibility of the editor segment.
 /// </remarks>
-public class EditorSegmentOptionsViewModel : ViewModel
+public class EditorSegmentOptionsViewModel : ObservableObject
 {
-    private Color _foregroundColor;
     private Color _backgroundColor;
+    private Color _foregroundColor;
     private bool _isVisible;
 
     /// <summary>
@@ -27,7 +29,7 @@ public class EditorSegmentOptionsViewModel : ViewModel
     public Color ForegroundColor
     {
         get => this._foregroundColor;
-        set => this.SetField(ref this._foregroundColor, value);
+        set => this.SetProperty(ref this._foregroundColor, value);
     }
 
     /// <summary>
@@ -36,7 +38,7 @@ public class EditorSegmentOptionsViewModel : ViewModel
     public Color BackgroundColor
     {
         get => this._backgroundColor;
-        set => this.SetField(ref this._backgroundColor, value);
+        set => this.SetProperty(ref this._backgroundColor, value);
     }
 
     /// <summary>
@@ -45,6 +47,6 @@ public class EditorSegmentOptionsViewModel : ViewModel
     public bool IsVisible
     {
         get => this._isVisible;
-        set => this.SetField(ref this._isVisible, value);
+        set => this.SetProperty(ref this._isVisible, value);
     }
 }

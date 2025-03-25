@@ -1,14 +1,14 @@
 ﻿<UserControl x:Class="JPSoftworks.EditorBar.Controls.ColorButton"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:JPSoftworks.EditorBar.Controls"
              xmlns:presentation="clr-namespace:JPSoftworks.EditorBar.Presentation"
              xmlns:platformUi="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
              xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
              xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              x:Name="Root"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -21,7 +21,7 @@
                     <ControlTemplate TargetType="Button">
                         <Grid>
                             <ContentPresenter />
-                            <Border x:Name="Border" BorderThickness="2" BorderBrush="Transparent"></Border>
+                            <Border x:Name="Border" BorderThickness="2" BorderBrush="Transparent" />
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -224,22 +224,37 @@
         </x:Array>
     </UserControl.Resources>
     <Grid>
-        <Button x:Name="ToggleButton" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Click="ToggleButton_OnClick" Padding="2">
+        <Button x:Name="ToggleButton" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                Click="ToggleButton_OnClick" Padding="2">
             <StackPanel Orientation="Horizontal">
-                <Label Content="{Binding Label, RelativeSource={RelativeSource AncestorType=local:ColorButton}, Mode=OneWay}" Padding="5,2" />
-                <Border CornerRadius="1" MinWidth="32" MinHeight="16" Background="{Binding SelectedColor, Converter={StaticResource ColorToBrushConverter}, RelativeSource={RelativeSource AncestorType=local:ColorButton}, Mode=OneWay}" />
+                <Border CornerRadius="2" MinWidth="32" MinHeight="16">
+                    <Border.Background>
+                        <DrawingBrush TileMode="Tile" Viewport="0,0,8,8" ViewportUnits="Absolute">
+                            <DrawingBrush.Drawing>
+                                <GeometryDrawing Geometry="M0,0 H1 V1 H2 V2 H1 V1 H0Z" Brush="Gray" />
+                            </DrawingBrush.Drawing>
+                        </DrawingBrush>
+                    </Border.Background>
+                    <Border CornerRadius="1" MinWidth="32" MinHeight="16"
+                            Background="{Binding SelectedColor, Converter={StaticResource ColorToBrushConverter}, RelativeSource={RelativeSource AncestorType=local:ColorButton}, Mode=OneWay}" />
+                </Border>
+                <Label
+                    Content="{Binding Label, RelativeSource={RelativeSource AncestorType=local:ColorButton}, Mode=OneWay}"
+                    Padding="5,2" />
             </StackPanel>
         </Button>
 
-        <Popup x:Name="Popup" 
-               PlacementTarget="{x:Reference ToggleButton}" 
-               Placement="Bottom" 
-               StaysOpen="False" 
-               AllowsTransparency="True" 
+        <Popup x:Name="Popup"
+               PlacementTarget="{x:Reference ToggleButton}"
+               Placement="Bottom"
+               StaysOpen="False"
+               AllowsTransparency="True"
                SnapsToDevicePixels="True"
                PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
-            <platformUi:SystemDropShadowChrome Color="#71000000" MinWidth="{Binding ActualWidth, ElementName=Root}" Margin="0,0,5,5">
-                <Border Background="{x:Static SystemColors.ControlBrush}" BorderBrush="{x:Static SystemColors.ControlDarkBrush}" BorderThickness="1">
+            <platformUi:SystemDropShadowChrome Color="#71000000" MinWidth="{Binding ActualWidth, ElementName=Root}"
+                                               Margin="0,0,5,5">
+                <Border Background="{x:Static SystemColors.ControlBrush}"
+                        BorderBrush="{x:Static SystemColors.ControlDarkBrush}" BorderThickness="1">
                     <StackPanel>
                         <!-- ad colors -->
                         <Border Margin="4">
@@ -251,8 +266,11 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type Color}">
-                                        <Button Tag="{Binding}" Click="SetColor_Click" Style="{StaticResource ColorSwatchButtonStyle}" Width="20" Height="20">
-                                            <Border Background="{Binding Converter={StaticResource ColorToBrushConverter}}" />
+                                        <Button Tag="{Binding}"
+                                                Click="SetColor_Click"
+                                                Style="{StaticResource ColorSwatchButtonStyle}" Width="20" Height="20">
+                                            <Border
+                                                Background="{Binding Converter={StaticResource ColorToBrushConverter}}" />
                                         </Button>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -269,8 +287,11 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type Color}">
-                                        <Button Tag="{Binding}" Click="SetColor_Click" Style="{StaticResource ColorSwatchButtonStyle}" Width="20" Height="20">
-                                            <Border Background="{Binding Converter={StaticResource ColorToBrushConverter}}" />
+                                        <Button Tag="{Binding}"
+                                                Click="SetColor_Click"
+                                                Style="{StaticResource ColorSwatchButtonStyle}" Width="20" Height="20">
+                                            <Border
+                                                Background="{Binding Converter={StaticResource ColorToBrushConverter}}" />
                                         </Button>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -279,9 +300,11 @@
                         <!-- extra -->
                         <Border Margin="4">
                             <StackPanel>
-                                <Button Background="Transparent" BorderBrush="Transparent" Click="SetColor_Click" Tag="{x:Static Colors.Transparent}">
+                                <Button Background="Transparent" BorderBrush="Transparent" Click="SetColor_Click"
+                                        Tag="{x:Static Colors.Transparent}">
                                     <StackPanel Orientation="Horizontal">
-                                        <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.TransparentBackground}" />
+                                        <imaging:CrispImage
+                                            Moniker="{x:Static catalog:KnownMonikers.TransparentBackground}" />
                                         <Label>Transparent</Label>
                                     </StackPanel>
                                 </Button>

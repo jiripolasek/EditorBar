@@ -1,125 +1,80 @@
 ﻿<UserControl x:Class="JPSoftworks.EditorBar.Controls.EditorBarControl"
+             x:ClassModifier="internal"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
              xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
              xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
-             xmlns:puiUtilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
              xmlns:puiImaging="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
              xmlns:puiShell="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
              xmlns:controls="clr-namespace:JPSoftworks.EditorBar.Controls"
-             xmlns:models="clr-namespace:JPSoftworks.EditorBar.Models"
+             xmlns:viewModels="clr-namespace:JPSoftworks.EditorBar.ViewModels"
              mc:Ignorable="d"
              Style="{DynamicResource EditorBarControlStyle}"
              Background="{DynamicResource {x:Static puiShell:EnvironmentColors.CommandBarGradientBrushKey}}"
              puiImaging:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}"
              d:DesignHeight="450" d:DesignWidth="800"
-             Name="RootControl">
+             d:DataContext="{d:DesignInstance Type={x:Type viewModels:EditorBarViewModel}}"
+             KeyboardNavigation.TabNavigation="Local"
+             x:Name="RootControl">
     <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary>
-                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-                    <puiUtilities:BrushToColorConverter x:Key="BrushToColorConverter" />
-                </ResourceDictionary>
-                <ResourceDictionary Source="pack://application:,,,/EditorBar;component/Themes/Generic.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
+        <ResourceDictionary Source="pack://application:,,,/EditorBar;component/Themes/Generic.xaml" />
     </UserControl.Resources>
 
     <Grid>
 
-        <Border x:Name="EditorBarBorder" Style="{DynamicResource EditorBarBorderStyle}">
-            <DockPanel>
+        <Border Style="{DynamicResource EditorBarBorderStyle}" x:Name="EditorBarBorder">
+            <DockPanel VerticalAlignment="Center" KeyboardNavigation.TabNavigation="Local">
 
-                <!-- control button on the right -->
-                <Border DockPanel.Dock="Right">
-                    <Border.Style>
-                        <Style TargetType="Border">
-                            <Setter Property="Opacity" Value="0"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsMouseOver, ElementName=EditorBarBorder}" Value="True">
-                                    <DataTrigger.EnterActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation To="1" Duration="0:0:0.2" Storyboard.TargetProperty="Opacity"/>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </DataTrigger.EnterActions>
-                                    <DataTrigger.ExitActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation To="0" Duration="0:0:0.4" Storyboard.TargetProperty="Opacity"/>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </DataTrigger.ExitActions>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
-                    <StackPanel Orientation="Horizontal">
-                        <Button Click="DebugButtonClicked" 
+                <Border DockPanel.Dock="Right" Style="{StaticResource CommandBarBorderStyle}">
+
+                    <StackPanel Orientation="Horizontal" KeyboardNavigation.TabNavigation="Local"
+                                KeyboardNavigation.TabIndex="2">
+                        <Button Command="{Binding ShowDebugInformationCommand}"
                                 ToolTip="Debug"
                                 Style="{DynamicResource NoBorderButtonStyle}"
-                                Visibility="{Binding IsDevelopmentModeEnabled, ElementName=RootControl, Converter={StaticResource BooleanToVisibilityConverter} }">
+                                Visibility="{Binding IsDevelopmentModeEnabled, Converter={StaticResource BooleanToVisibilityConverter} }"
+                                TabIndex="2">
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" />
                         </Button>
-                        <Button Click="OpenDefaultEditorClicked" 
+                        <Button Command="{Binding OpenDefaultEditorCommand }"
                                 ToolTip="Open in Default Editor"
-                                Style="{DynamicResource NoBorderButtonStyle}">
+                                Style="{DynamicResource NoBorderButtonStyle}"
+                                TabIndex="3">
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.OpenFileDialog}" />
                         </Button>
                         <Button x:Name="OpenExternalEditorButton"
-                                Click="OpenExternalEditorClicked" 
+                                Command="{Binding OpenExternalEditorCommand}"
                                 ToolTip="Open in External Editor"
                                 Style="{DynamicResource NoBorderButtonStyle}">
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.OpenFile}" />
                         </Button>
-                        <Button Click="OpenFolderClicked" ToolTip="Open Containing Folder"
+                        <Button ToolTip="Open Containing Folder"
+                                Command="{Binding OpenContainingFolderCommand }"
                                 Style="{DynamicResource NoBorderButtonStyle}">
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.OpenFolder}" />
                         </Button>
-                        <Button Click="OpenOptionsButtonClicked" ToolTip="Options..."
+                        <Button ToolTip="Options..."
+                                Command="{Binding OpenSettingsCommand}"
                                 Style="{DynamicResource NoBorderButtonStyle}">
-                            <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.Settings}"  />
+                            <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.Settings}" />
                         </Button>
                     </StackPanel>
+
                 </Border>
 
-                <!-- Path visualization -->
-                <DockPanel Margin="1" VerticalAlignment="Center">
+                <!-- Breadcrumbs on the left -->
+                <controls:EditorBarBreadcrumbs DockPanel.Dock="Left"
+                                               Background="{Binding ElementName=RootControl, Path=Background}"
+                                               x:Name="EditorBarBreadcrumbs"
+                                               KeyboardNavigation.TabNavigation="Local"
+                                               KeyboardNavigation.TabIndex="0" />
 
-                    <ItemsControl DockPanel.Dock="Left" ItemsSource="{Binding Breadcrumbs, ElementName=RootControl}" Style="{DynamicResource BreadcrumbsPart}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="{x:Type models:BreadcrumbModel}">
-                                <controls:ChevronButton Background="{Binding Background}" 
-                                                        Foreground="{Binding Foreground}"
-                                                        IsMiddle="{Binding IsMiddle}" 
-                                                        Content="{Binding Text}" 
-                                                        Command="{Binding Command}" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel IsItemsHost="True" Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                    </ItemsControl>
-
-                    <!-- Document Path -->
-                    <Border Style="{DynamicResource DocumentPathElement}" Background="Transparent" MouseRightButtonUp="UIElement_OnMouseRightButtonUp" ToolTip="Document path">
-                        <Label Style="{DynamicResource LabelWithoutAccelerator}"
-                               Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}"
-                               MouseDoubleClick="PathLabel_OnMouseDoubleClick"
-                               VerticalContentAlignment="Center"
-                               Name="PathLabel">
-                            (document path placeholder)
-                        </Label>
-                    </Border>
-
-                </DockPanel>
+                <!-- Document Path -->
+                <controls:LegacyFileLabel DataContext="{Binding LocationBreadcrumbs.LegacyLabelModel, Mode=OneWay}"
+                                          KeyboardNavigation.TabNavigation="Local"
+                                          KeyboardNavigation.TabIndex="1" />
             </DockPanel>
 
         </Border>

@@ -1,8 +1,10 @@
 ﻿// ------------------------------------------------------------
-//
+// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-//
+// 
 // ------------------------------------------------------------
+
+#nullable enable
 
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -16,7 +18,7 @@ using JPSoftworks.EditorBar;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany(Vsix.Author)]
 [assembly: AssemblyProduct(Vsix.Name)]
-[assembly: AssemblyCopyright("(c) 2024 " + Vsix.Author)]
+[assembly: AssemblyCopyright("(c) 2025 " + Vsix.Author)]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

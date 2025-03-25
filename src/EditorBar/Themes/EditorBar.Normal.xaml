@@ -14,8 +14,10 @@
         <Setter Property="BorderBrush" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarBorderKey}}" />
         <Setter Property="Margin" Value="2" />
         <Setter Property="Padding" Value="2" />
-        <Setter Property="TextElement.FontFamily" Value="{DynamicResource {x:Static shell:VsFonts.EnvironmentFontFamilyKey}}" />
-        <Setter Property="TextElement.FontSize" Value="{DynamicResource {x:Static shell:VsFonts.EnvironmentFontSizeKey}}" />
+        <Setter Property="TextElement.FontFamily"
+                Value="{DynamicResource {x:Static shell:VsFonts.EnvironmentFontFamilyKey}}" />
+        <Setter Property="TextElement.FontSize"
+                Value="{DynamicResource {x:Static shell:VsFonts.EnvironmentFontSizeKey}}" />
     </Style>
 
     <Style x:Key="DocumentPathElement" TargetType="Border">

@@ -1,0 +1,99 @@
+﻿<UserControl x:Class="JPSoftworks.EditorBar.Controls.MemberList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:presentation="clr-namespace:JPSoftworks.EditorBar.Presentation"
+             xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+             xmlns:platformUI="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:platofrmUIUtilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
+             xmlns:controls="clr-namespace:JPSoftworks.EditorBar.Controls"
+             xmlns:viewModels="clr-namespace:JPSoftworks.EditorBar.ViewModels"
+             mc:Ignorable="d"
+             Focusable="False"
+             d:DesignHeight="450" d:DesignWidth="800"
+             KeyboardNavigation.TabNavigation="Local"
+             IsTabStop="False"
+             platformUI:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}">
+    <UserControl.Resources>
+
+        <platofrmUIUtilities:BrushToColorConverter x:Key="BrushToColorConverter" />
+
+        <DataTemplate x:Key="DataTemplate" DataType="{x:Type viewModels:MemberListItemViewModel}">
+            <Grid Margin="0,2,0,2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="4" />
+                    <ColumnDefinition Width="*" SharedSizeGroup="C1" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="C2" />
+                </Grid.ColumnDefinitions>
+
+                <controls:IconDisplay Icon="{Binding Path=(viewModels:MemberListItemViewModel.Icon)}"
+                                      ImageMoniker="{Binding Path=(viewModels:MemberListItemViewModel.ImageMoniker)}" />
+                <TextBlock Grid.Column="2" Text="{Binding Path=(viewModels:MemberListItemViewModel.PrimaryName)}"
+                           VerticalAlignment="Center" />
+                <TextBlock Grid.Column="3"
+                           FontSize="{DynamicResource {x:Static shell:VsFonts.Environment90PercentFontSizeKey}}"
+                           Opacity=".5" Text="{Binding Path=(viewModels:MemberListItemViewModel.SecondaryName) }"
+                           TextAlignment="Right" VerticalAlignment="Center" Margin="8,0,0,0" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SeparatorTemplate" DataType="{x:Type viewModels:SeparatorListItemViewModel}">
+            <Separator IsHitTestVisible="False" Focusable="False">
+                <Separator.Template>
+                    <!-- horizontal separator rule -->
+                    <ControlTemplate>
+                        <Rectangle HorizontalAlignment="Stretch"
+                                   Height="2"
+                                   SnapsToDevicePixels="True"
+                                   UseLayoutRounding="True"
+                                   Fill="Gray" />
+                    </ControlTemplate>
+                </Separator.Template>
+            </Separator>
+        </DataTemplate>
+
+
+        <Style x:Key="SeparatorItemContainerStyle" TargetType="ListBoxItem">
+            <Setter Property="IsHitTestVisible" Value="False" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="IsEnabled" Value="False" />
+            <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
+        </Style>
+
+
+        <Style x:Key="NormalItemContainerStyle" TargetType="ListBoxItem" />
+
+        <presentation:SymbolDateTemplateSelector x:Key="SymbolDateTemplateSelector"
+                                                 SymbolTemplate="{StaticResource DataTemplate}"
+                                                 SeparatorTemplate="{StaticResource SeparatorTemplate}" />
+        <presentation:MyItemContainerStyleSelector x:Key="MyItemContainerStyleSelector"
+                                                   NormalItemStyle="{StaticResource NormalItemContainerStyle}"
+                                                   SeparatorItemStyle="{StaticResource SeparatorItemContainerStyle}" />
+    </UserControl.Resources>
+
+    <Grid>
+        <ListBox x:Name="ListBox"
+                 BorderThickness="0"
+                 PreviewKeyDown="ListBox_OnPreviewKeyDown"
+                 MouseLeftButtonUp="ListBox_OnMouseLeftButtonDown"
+                 Focusable="True"
+                 TabIndex="0"
+                 Grid.IsSharedSizeScope="True"
+                 IsTextSearchEnabled="True"
+                 IsTextSearchCaseSensitive="False"
+                 TextSearch.TextPath="(models:MemberListItemViewModel.SearchText)"
+                 KeyboardNavigation.ControlTabNavigation="Cycle"
+                 KeyboardNavigation.DirectionalNavigation="Cycle"
+                 ItemTemplateSelector="{StaticResource SymbolDateTemplateSelector}"
+                 ItemContainerStyleSelector="{StaticResource MyItemContainerStyleSelector}"
+                 platformUI:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
+    </Grid>
+</UserControl>

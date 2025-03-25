@@ -4,11 +4,16 @@
 // 
 // ------------------------------------------------------------
 
+#nullable enable
+
 using System.IO;
 using System.Windows;
 using EnvDTE;
 using EnvDTE80;
+using JPSoftworks.EditorBar.Controls;
+using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Options;
+using JPSoftworks.EditorBar.Services.StructureProviders;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Differencing;
@@ -19,10 +24,10 @@ using Microsoft.VisualStudio.Threading;
 namespace JPSoftworks.EditorBar.MefComponents;
 
 /// <summary>
-/// Represents margin for <see cref="IWpfTextView" />. It is used to display <see cref="Controls.EditorBarControl" /> in the
-/// editor.
+/// Represents margin for <see cref="IWpfTextView" />. It is used to display <see cref="Controls.EditorBarControl" /> in
+/// the editor.
 /// </summary>
-public class EditorBarMargin : IWpfTextViewMargin
+internal class EditorBarMargin : IWpfTextViewMargin
 {
     // collection of text view roles that are used in diff views
     private static readonly string[] DiffViews =
@@ -33,11 +38,32 @@ public class EditorBarMargin : IWpfTextViewMargin
         DifferenceViewerRoles.InlineViewTextViewRole
     ];
 
-    private readonly Controls.EditorBarControl _editorBarControl;
-    private readonly IWpfTextView _textView;
+    private readonly EditorBarControlContainer _editorBarControl;
+    private readonly JoinableTaskFactory _joinableTaskFactory;
     private readonly BarPosition _position;
     private readonly IServiceProvider _serviceProvider;
-    private readonly JoinableTaskFactory _joinableTaskFactory;
+    private readonly IWpfTextView _textView;
+
+    /// <summary>
+    /// Gets the size of the margin.
+    /// </summary>
+    /// <remarks>
+    /// For a horizontal margin this is the height of the margin,
+    /// since the width will be determined by the <see cref="T:Microsoft.VisualStudio.Text.Editor.ITextView" />.
+    /// For a vertical margin this is the width of the margin, since the height will be determined by the
+    /// <see cref="T:Microsoft.VisualStudio.Text.Editor.ITextView" />.
+    /// </remarks>
+    public double MarginSize => this.Enabled ? this._editorBarControl.ActualHeight : 0;
+
+    /// <summary>
+    /// Determines whether the margin is enabled.
+    /// </summary>
+    public bool Enabled { get; private set; }
+
+    /// <summary>
+    /// Gets the <see cref="T:System.Windows.FrameworkElement" /> that renders the margin.
+    /// </summary>
+    public FrameworkElement VisualElement => this._editorBarControl;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EditorBarMargin" /> class.
@@ -45,14 +71,23 @@ public class EditorBarMargin : IWpfTextViewMargin
     /// <param name="textView">The text view.</param>
     /// <param name="joinableTaskFactory">A factory for starting asynchronous tasks that can mitigate deadlocks.</param>
     /// <param name="serviceProvider"></param>
+    /// <param name="structureProviderService"></param>
     /// <param name="position">The position.</param>
-    public EditorBarMargin(IWpfTextView textView, JoinableTaskFactory joinableTaskFactory,
-        IServiceProvider serviceProvider, BarPosition position)
+    public EditorBarMargin(
+        IWpfTextView textView,
+        JoinableTaskFactory joinableTaskFactory,
+        IServiceProvider serviceProvider,
+        IStructureProviderService structureProviderService,
+        BarPosition position)
     {
         this._textView = textView;
         this._position = position;
         this._joinableTaskFactory = joinableTaskFactory;
-        this._editorBarControl = new Controls.EditorBarControl(textView, joinableTaskFactory);
+        this._editorBarControl = new EditorBarControlContainer(
+            textView,
+            joinableTaskFactory,
+            structureProviderService,
+            false);
         this._serviceProvider = serviceProvider;
 
         GeneralOptionsModel.Saved += this.GeneralPageOnSaved;
@@ -86,31 +121,12 @@ public class EditorBarMargin : IWpfTextViewMargin
         return marginName == "EditorBar-" + this._position ? this : null;
     }
 
-    /// <summary>
-    /// Gets the size of the margin.
-    /// </summary>
-    /// <remarks>
-    /// For a horizontal margin this is the height of the margin,
-    /// since the width will be determined by the <see cref="T:Microsoft.VisualStudio.Text.Editor.ITextView" />.
-    /// For a vertical margin this is the width of the margin, since the height will be determined by the
-    /// <see cref="T:Microsoft.VisualStudio.Text.Editor.ITextView" />.
-    /// </remarks>
-    public double MarginSize => this.Enabled ? this._editorBarControl.ActualHeight : 0;
-
-    /// <summary>
-    /// Determines whether the margin is enabled.
-    /// </summary>
-    public bool Enabled { get; private set; }
-
-    /// <summary>
-    /// Gets the <see cref="T:System.Windows.FrameworkElement" /> that renders the margin.
-    /// </summary>
-    public FrameworkElement VisualElement => this._editorBarControl;
-
     private void GeneralPageOnSaved(GeneralOptionsModel generalOptionsModel)
     {
         this.Enabled = generalOptionsModel.Enabled && generalOptionsModel.BarPosition == this._position;
-        this._editorBarControl.Visibility = this.Enabled && this.IsSupported(generalOptionsModel) ? Visibility.Visible : Visibility.Collapsed;
+        this._editorBarControl.Visibility = this.Enabled && this.IsSupported(generalOptionsModel)
+            ? Visibility.Visible
+            : Visibility.Collapsed;
     }
 
     private bool IsSupported(GeneralOptionsModel generalOptionsModel)
@@ -135,6 +151,9 @@ public class EditorBarMargin : IWpfTextViewMargin
         Blame:
             DOCUMENT,EDITABLE,INTERACTIVE,ZOOMABLE,ANNOTATE
             # blame is a temp file
+        CSHTML (== main document view):
+           DEBUGGABLE,PRIMARYDOCUMENT,ANALYZABLE,DOCUMENT,EDITABLE,INTERACTIVE,STRUCTURED,ZOOMABLE,UBIDIFF,UBIRIGHTDIFF
+
 
         Non-document view roles
         -----------------------
@@ -150,7 +169,9 @@ public class EditorBarMargin : IWpfTextViewMargin
         {
             var textViewRoleSet = this._textView.Roles;
             if (textViewRoleSet == null)
+            {
                 return false;
+            }
 
             var isPrimaryDocument = textViewRoleSet.Contains(PredefinedTextViewRoles.PrimaryDocument);
             var isDocument = textViewRoleSet.Contains(PredefinedTextViewRoles.Document);
@@ -161,7 +182,9 @@ public class EditorBarMargin : IWpfTextViewMargin
             var isBlame = textViewRoleSet.Contains("ANNOTATE");
 
             if (!isInteractive)
+            {
                 return false;
+            }
 
             // if its a diff view, force  show of the bar regardless of the other settings
             // there are multiple text views in diff view, each have different roles
@@ -169,34 +192,42 @@ public class EditorBarMargin : IWpfTextViewMargin
             // note: in left/right diff view, force bar on the both sides so the
             //   lines on both sides match with each other
             if (isDiffView)
+            {
                 return generalOptionsModel.DisplayInDiffViews;
+            }
 
             if (!isPrimaryDocument && !isDocument)
+            {
                 return false;
+            }
 
             var fileStatus = this.GetFileReadOnlyStatus(this._textView);
 
             // if there's no file, don't show the bar
             var isGhost = string.IsNullOrWhiteSpace(fileStatus.FileName!);
             if (isGhost)
+            {
                 return false;
+            }
 
             isEditable &= !fileStatus.IsReadOnly && !isGhost;
 
-            var isTemp = !isGhost && fileStatus.FileName!.StartsWith(Path.GetTempPath(), StringComparison.OrdinalIgnoreCase);
+            var isTemp = !isGhost &&
+                         fileStatus.FileName!.StartsWith(Path.GetTempPath(), StringComparison.OrdinalIgnoreCase);
 
             var checkBlame = !isBlame || (isBlame && generalOptionsModel.DisplayInBlame);
 
             // should we display bar for temp files?
             // - the blame file is a temp file, so ignore this rule in that case
-            var checkTemp = isBlame || (!isTemp || (isTemp && generalOptionsModel.DisplayInTempFiles));
+            var checkTemp = isBlame || !isTemp || (isTemp && generalOptionsModel.DisplayInTempFiles);
 
             // is strictly auxiliary document
-            var checkAux = !isStrictlyAuxiliaryDocument || (isStrictlyAuxiliaryDocument && generalOptionsModel.DisplayInAuxiliaryDocuments);
+            var checkAux = !isStrictlyAuxiliaryDocument ||
+                           (isStrictlyAuxiliaryDocument && generalOptionsModel.DisplayInAuxiliaryDocuments);
 
             // is (non-)editable
             var checkNonEditable = isEditable || (!isEditable && generalOptionsModel.DisplayInNonEditableDocuments);
-            
+
             return (isPrimaryDocument || checkAux) && !isDiffView && checkNonEditable && checkBlame && checkTemp;
         }
         catch (Exception ex)
@@ -207,48 +238,65 @@ public class EditorBarMargin : IWpfTextViewMargin
         return false;
     }
 
-    private DocumentStatus GetFileReadOnlyStatus(ITextView textView)
+    private DocumentStatus GetFileReadOnlyStatus(IWpfTextView textView)
     {
         return this._joinableTaskFactory.Run(async () => await this.GetFileReadOnlyStatusCoreAsync(textView));
     }
 
-    private async Task<DocumentStatus> GetFileReadOnlyStatusCoreAsync(ITextView textView)
+    private async Task<DocumentStatus> GetFileReadOnlyStatusCoreAsync(IWpfTextView textView)
     {
         await this._joinableTaskFactory.SwitchToMainThreadAsync();
 
-        var vsTextView = textView.Properties.GetProperty<IVsTextView>(typeof(IVsTextView));
-        if (vsTextView == null)
-            return new DocumentStatus(string.Empty, false);
-
         try
         {
-            var documentView = await vsTextView.ToDocumentViewAsync();
+            var documentView = await textView.ToDocumentViewAsync();
             if (documentView == null)
+            {
                 return new DocumentStatus(string.Empty, false);
+            }
 
-            var filePath = documentView.FilePath;
+            var filePath = documentView.FilePath ?? textView.TextBuffer?.GetTextDocument()?.FilePath;
+
+            // if we still don't have the file path, try to get it from the text view
+            // this will get the path for .cshtml files, for example (.cshtml files use the Razor editor, which is
+            // a projection buffer in the Visual Studio editor system)
+            //
+            // for now I can't enable this as it needs more work to get it working in the EditorBar control
+            filePath ??= textView.GetTextDocumentFromDocumentBuffer()?.FilePath;
+
             if (filePath == null)
+            {
                 return new DocumentStatus(string.Empty, false);
+            }
 
             if (IsBufferReadOnly(documentView.TextBuffer))
+            {
                 return new DocumentStatus(filePath, true);
+            }
 
             if (this.IsDocumentReadOnly(filePath))
+            {
                 return new DocumentStatus(filePath, true);
+            }
 
             return new DocumentStatus(filePath, false);
         }
         catch (Exception ex)
         {
+#if DEBUG
             await ex.LogAsync("Failed to determine readonly status of the document.");
+#endif
             return new DocumentStatus(string.Empty, false);
         }
     }
 
+
     private static bool IsBufferReadOnly(ITextBuffer? textBuffer)
     {
         if (textBuffer == null)
+        {
             return false;
+        }
 
         try
         {
@@ -266,7 +314,9 @@ public class EditorBarMargin : IWpfTextViewMargin
         ThreadHelper.ThrowIfNotOnUIThread();
 
         if (string.IsNullOrWhiteSpace(filePath))
+        {
             return false;
+        }
 
         try
         {
@@ -275,7 +325,9 @@ public class EditorBarMargin : IWpfTextViewMargin
                 foreach (Document doc in dte.Documents!)
                 {
                     if (string.Equals(doc.FullName!, filePath, StringComparison.OrdinalIgnoreCase))
+                    {
                         return doc.ReadOnly;
+                    }
                 }
             }
         }

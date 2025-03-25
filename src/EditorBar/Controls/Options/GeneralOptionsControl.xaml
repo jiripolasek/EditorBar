@@ -1,0 +1,326 @@
+﻿<UserControl x:Class="JPSoftworks.EditorBar.Controls.GeneralOptionsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:JPSoftworks.EditorBar.Controls"
+             xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+             xmlns:viewModels="clr-namespace:JPSoftworks.EditorBar.ViewModels"
+             xmlns:presentation="clr-namespace:JPSoftworks.EditorBar.Presentation"
+             xmlns:options="clr-namespace:JPSoftworks.EditorBar.Options"
+             xmlns:platformUI="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=controls:GeneralOptionsControl, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Thickness x:Key="UIElementMargin">0,0,0,12</Thickness>
+
+        <Style TargetType="GroupBox">
+            <Setter Property="Margin" Value="0,0,0,12" />
+            <Setter Property="Padding" Value="4" />
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Padding" Value="2" />
+        </Style>
+        <Style x:Key="HintTextBlockStyle" TargetType="TextBlock">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="FontSize"
+                    Value="{DynamicResource {x:Static shell:VsFonts.Environment90PercentFontSizeKey}}" />
+            <Setter Property="Foreground" Value="{x:Static SystemColors.GrayTextBrush}" />
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="Padding" Value="0,4,0,4" />
+        </Style>
+    </UserControl.Resources>
+    <ScrollViewer>
+        <StackPanel>
+
+            <GroupBox Header="Editor Bar">
+                <StackPanel>
+                    <CheckBox Content="Show _Editor Bar" IsChecked="{Binding ViewModel.IsEnabled}" />
+                    <TextBlock Margin="22,4,0,0" Style="{StaticResource HintTextBlockStyle}">
+                        You can toggle Editor Bar using a menu command
+                        <Run FontWeight="SemiBold">View / Editor Bar</Run> or assign a keyboard shortcut to toggle Editor Bar on and off using
+                        <Hyperlink Click="CustomizeKeyboardHyperlink_OnClick">Environment / Keyboard</Hyperlink>
+                        options.
+                    </TextBlock>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Appearance">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" MinWidth="160" />
+                        <ColumnDefinition Width="Auto" MinWidth="240" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Column="0" Grid.Row="0" Content="_Position" Target="{x:Reference BarPositionComboBox}"
+                           VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                           Margin="{StaticResource UIElementMargin}" />
+                    <!--<ComboBox x:Name="BarPositionComboBox" Grid.Column="1" Grid.Row="0" ItemsSource="{Binding ViewModel.BarPositions}" SelectedValue="{Binding ViewModel.BarPosition, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />-->
+                    <Border Grid.Column="1" Grid.Row="0" Margin="{StaticResource UIElementMargin}">
+                        <Border.Resources>
+                            <Style BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton" />
+                            <presentation:GenericType x:Key="BarPositionViewModelType"
+                                                      BaseType="{x:Type viewModels:EnumViewModel`1}"
+                                                      InnerType="{x:Type options:BarPosition}" />
+                        </Border.Resources>
+                        <ListBox x:Name="BarPositionComboBox" ItemsSource="{Binding ViewModel.BarPositions}"
+                                 SelectedValue="{Binding ViewModel.BarPosition, Mode=TwoWay}" SelectedValuePath="Value">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                <RadioButton
+                                                    IsChecked="{Binding IsSelected, RelativeSource={x:Static RelativeSource.TemplatedParent}}">
+                                                    <ContentPresenter />
+                                                </RadioButton>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{StaticResource BarPositionViewModelType}">
+                                    <TextBlock Text="{Binding DisplayName}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBox.Template>
+                                <ControlTemplate>
+                                    <platformUI:SpacingWrapPanel IsItemsHost="True" Orientation="Horizontal"
+                                                                 ShouldStretchItemsToFill="True"
+                                                                 VerticalItemSpacing="2" HorizontalItemSpacing="2"
+                                                                 ItemWidth="90" ItemHeight="45" />
+                                </ControlTemplate>
+                            </ListBox.Template>
+                        </ListBox>
+                    </Border>
+
+                    <Label Grid.Column="0" Grid.Row="1" Content="Display _mode"
+                           Target="{Binding ElementName=DisplayModeComboBox}" VerticalAlignment="Stretch"
+                           VerticalContentAlignment="Center" Margin="{StaticResource UIElementMargin}" />
+                    <!--<ComboBox x:Name="DisplayModeComboBox" Grid.Column="1" Grid.Row="1" ItemsSource="{Binding ViewModel.DisplayStyles}" SelectedValue="{Binding ViewModel.DisplayStyle, Mode=TwoWay}" SelectedValuePath="Value" DisplayMemberPath="DisplayName" />-->
+                    <Border Grid.Column="1" Grid.Row="1" Margin="{StaticResource UIElementMargin}">
+                        <Border.Resources>
+                            <Style BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton" />
+                            <presentation:GenericType x:Key="DisplayStyleEnumViewModelType"
+                                                      BaseType="{x:Type viewModels:EnumViewModel`1}"
+                                                      InnerType="{x:Type options:DisplayStyle}" />
+                        </Border.Resources>
+                        <ListBox x:Name="DisplayModeComboBox" ItemsSource="{Binding ViewModel.DisplayStyles}"
+                                 SelectedValue="{Binding ViewModel.DisplayStyle, Mode=TwoWay}"
+                                 SelectedValuePath="Value">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                <RadioButton
+                                                    IsChecked="{Binding IsSelected, RelativeSource={x:Static RelativeSource.TemplatedParent}}">
+                                                    <ContentPresenter />
+                                                </RadioButton>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{StaticResource DisplayStyleEnumViewModelType}">
+                                    <TextBlock Text="{Binding DisplayName}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBox.Template>
+                                <ControlTemplate>
+                                    <platformUI:SpacingWrapPanel IsItemsHost="True" Orientation="Horizontal"
+                                                                 ShouldStretchItemsToFill="True"
+                                                                 VerticalItemSpacing="2" HorizontalItemSpacing="2"
+                                                                 ItemWidth="90" ItemHeight="45" />
+                                </ControlTemplate>
+                            </ListBox.Template>
+                        </ListBox>
+                    </Border>
+
+                    <Label Grid.Column="0" Grid.Row="2"
+                           Content="_Background"
+                           Target="{Binding ElementName=VisualStyleComboBox}"
+                           VerticalAlignment="Stretch"
+                           VerticalContentAlignment="Center"
+                           Margin="{StaticResource UIElementMargin}" />
+                    <ComboBox x:Name="VisualStyleComboBox"
+                              Grid.Column="1" Grid.Row="2"
+                              ItemsSource="{Binding ViewModel.VisualStyles}"
+                              SelectedValue="{Binding ViewModel.VisualStyle, Mode=TwoWay}"
+                              SelectedValuePath="Value"
+                              DisplayMemberPath="DisplayName"
+                              Margin="{StaticResource UIElementMargin}"
+                              VerticalAlignment="Stretch"
+                              VerticalContentAlignment="Center" />
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Header="Breadcrumbs">
+                <StackPanel Grid.IsSharedSizeScope="True">
+                    <controls:ColorSelector LabelContent="_Solution root"
+                                            IsChecked="{Binding ViewModel.SolutionRootSegment.IsVisible}"
+                                            ForegroundColor="{Binding ViewModel.SolutionRootSegment.ForegroundColor}"
+                                            BackgroundColor="{Binding ViewModel.SolutionRootSegment.BackgroundColor}" />
+                    <controls:ColorSelector LabelContent="No_n-solution root" IsCheckable="False"
+                                            IsChecked="{Binding ViewModel.SolutionRootSegment.IsVisible}"
+                                            ForegroundColor="{Binding ViewModel.NonSolutionRootSegment.ForegroundColor}"
+                                            BackgroundColor="{Binding ViewModel.NonSolutionRootSegment.BackgroundColor}" />
+                    <controls:ColorSelector LabelContent="Solution _folders"
+                                            IsChecked="{Binding ViewModel.SolutionFolderSegment.IsVisible}"
+                                            ForegroundColor="{Binding ViewModel.SolutionFolderSegment.ForegroundColor}"
+                                            BackgroundColor="{Binding ViewModel.SolutionFolderSegment.BackgroundColor}" />
+                    <controls:ColorSelector LabelContent="P_roject"
+                                            IsChecked="{Binding ViewModel.ProjectNameSegment.IsVisible}"
+                                            ForegroundColor="{Binding ViewModel.ProjectNameSegment.ForegroundColor}"
+                                            BackgroundColor="{Binding ViewModel.ProjectNameSegment.BackgroundColor}" />
+                    <controls:ColorSelector LabelContent="Pr_oject folders"
+                                            IsChecked="{Binding ViewModel.ProjectFolderSegments.IsVisible}"
+                                            ForegroundColor="{Binding ViewModel.ProjectFolderSegments.ForegroundColor}"
+                                            BackgroundColor="{Binding ViewModel.ProjectFolderSegments.BackgroundColor}" />
+                    <controls:ColorSelector LabelContent="_Parent folder"
+                                            IsChecked="{Binding ViewModel.ParentFolderSegment.IsVisible}"
+                                            ForegroundColor="{Binding ViewModel.ParentFolderSegment.ForegroundColor}"
+                                            BackgroundColor="{Binding ViewModel.ParentFolderSegment.BackgroundColor}" />
+
+                    <controls:ColorSelector LabelContent="_File name"
+                                            IsChecked="{Binding ViewModel.FileSegment.IsVisible}"
+                                            ForegroundColor="{Binding ViewModel.FileSegment.ForegroundColor}"
+                                            BackgroundColor="{Binding ViewModel.FileSegment.BackgroundColor}" />
+                    <controls:ColorSelector LabelContent="_File structure"
+                                            IsChecked="{Binding ViewModel.CodeStructureSegment.IsVisible}"
+                                            ForegroundColor="{Binding ViewModel.CodeStructureSegment.ForegroundColor}"
+                                            BackgroundColor="{Binding ViewModel.CodeStructureSegment.BackgroundColor}" />
+
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Visibility">
+                <StackPanel Grid.IsSharedSizeScope="True">
+                    <Label Margin="{StaticResource UIElementMargin}">Display Editor Bar in these documents and views:</Label>
+                    <StackPanel>
+                        <CheckBox IsChecked="True" IsEnabled="False" Content="Primary document views"
+                                  Margin="{StaticResource UIElementMargin}" />
+                        <CheckBox IsChecked="{Binding ViewModel.DisplayInAuxiliaryDocuments}"
+                                  Content="Auxiliary document views" Margin="{StaticResource UIElementMargin}" />
+                        <CheckBox IsChecked="{Binding ViewModel.DisplayInDiffViews}" Content="Comparison view"
+                                  Margin="{StaticResource UIElementMargin}" />
+                        <CheckBox IsChecked="{Binding ViewModel.DisplayInNonEditableDocuments}"
+                                  Content="Non-editable documents" Margin="{StaticResource UIElementMargin}" />
+                        <CheckBox IsChecked="{Binding ViewModel.DisplayInBlame}" Content="Annotation / blame"
+                                  Margin="{StaticResource UIElementMargin}" />
+                        <CheckBox IsChecked="{Binding ViewModel.DisplayInTemp}" Content="Temporary files"
+                                  Margin="{StaticResource UIElementMargin}" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Path Label">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" MinWidth="160" />
+                        <ColumnDefinition Width="Auto" MinWidth="240" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Column="0" Grid.Row="0" Content="Display style"
+                           Target="{Binding ElementName=PathStyleComboBox2}" VerticalAlignment="Stretch"
+                           VerticalContentAlignment="Center" Margin="{StaticResource UIElementMargin}" />
+                    <ComboBox x:Name="PathStyleComboBox2" Grid.Column="1" Grid.Row="0"
+                              ItemsSource="{Binding ViewModel.PathStyles}"
+                              SelectedValue="{Binding ViewModel.PathStyle, Mode=TwoWay}" SelectedValuePath="Value"
+                              DisplayMemberPath="DisplayName" Margin="{StaticResource UIElementMargin}"
+                              VerticalAlignment="Stretch" VerticalContentAlignment="Center" />
+
+                    <StackPanel Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">
+
+                        <Label Content="Quick Actions" Target="{Binding ElementName=DoubleClickActionComboBox}" />
+                        <Grid Margin="24,0,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" MinWidth="160" />
+                                <ColumnDefinition Width="Auto" MinWidth="240" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Label Grid.Column="0" Grid.Row="0" Content="_Double-click:"
+                                   Target="{Binding ElementName=DoubleClickActionComboBox}" />
+                            <ComboBox x:Name="DoubleClickActionComboBox" Grid.Column="1" Grid.Row="0"
+                                      ItemsSource="{Binding ViewModel.DoubleClickActions}"
+                                      SelectedValue="{Binding ViewModel.DoubleClickActionOnFileLabel, Mode=TwoWay}"
+                                      SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
+
+                            <Label Grid.Column="0" Grid.Row="1" Content="_Ctrl + Double-click:"
+                                   Target="{Binding ElementName=DoubleClickCtrlActionComboBox}" />
+                            <ComboBox x:Name="DoubleClickCtrlActionComboBox" Grid.Column="1" Grid.Row="1"
+                                      ItemsSource="{Binding ViewModel.DoubleClickActions}"
+                                      SelectedValue="{Binding ViewModel.DoubleClickCtrlActionOnFileLabel, Mode=TwoWay}"
+                                      SelectedValuePath="Value" DisplayMemberPath="DisplayName" />
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Header="External Editor">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" MinWidth="160" />
+                        <ColumnDefinition Width="Auto" MinWidth="240" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Column="0" Grid.Row="0" Content="_Editor path:"
+                           Target="{Binding ElementName=ExternalEditorPathTextBox}" />
+                    <DockPanel Grid.Column="1" Grid.Row="0">
+                        <Button MinWidth="24" DockPanel.Dock="Right" Content="..."
+                                Command="{Binding ViewModel.BrowseForExternalEditorCommand}" VerticalAlignment="Center"
+                                MinHeight="{Binding ActualHeight, ElementName=ExternalEditorPathTextBox}"
+                                Margin="4,0,0,0" />
+                        <TextBox x:Name="ExternalEditorPathTextBox"
+                                 Text="{Binding ViewModel.ExternalEditorPath, UpdateSourceTrigger=PropertyChanged, Delay=0}"
+                                 VerticalAlignment="Center" />
+                    </DockPanel>
+
+                    <Label Grid.Column="0" Grid.Row="1" Content="Editor _arguments:"
+                           Target="{Binding ElementName=ExternalEditorArgumentsTextBox}" />
+                    <TextBox x:Name="ExternalEditorArgumentsTextBox" Grid.Column="1" Grid.Row="1"
+                             Text="{Binding ViewModel.ExternalEditorArguments, UpdateSourceTrigger=PropertyChanged, Delay=0}"
+                             VerticalAlignment="Center" />
+
+                    <TextBlock Style="{StaticResource HintTextBlockStyle}" Grid.Column="1" Grid.Row="2" MaxWidth="240">
+                        Use $(FilePath) as a placeholder for name of the current file.
+                    </TextBlock>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Header="Development">
+                <StackPanel Grid.IsSharedSizeScope="True">
+                    <CheckBox IsChecked="{Binding ViewModel.IsDebugModeEnabled}" Content="Enabled development mode" />
+                </StackPanel>
+            </GroupBox>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

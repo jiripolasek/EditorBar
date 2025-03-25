@@ -1,8 +1,12 @@
 ﻿// ------------------------------------------------------------
-//
+// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-//
+// 
 // ------------------------------------------------------------
+
+#nullable enable
+
+using System.Diagnostics.CodeAnalysis;
 
 namespace JPSoftworks.EditorBar.ViewModels;
 
@@ -15,17 +19,20 @@ public class EnumViewModel<TValue>
     /// <summary>
     /// Gets or sets the display name of the enumeration value.
     /// </summary>
-    public string DisplayName { get; init; }
+    [UsedImplicitly]
+    public required string DisplayName { get; init; }
 
     /// <summary>
     /// Gets or sets the value of the enumeration.
     /// </summary>
-    public TValue? Value { get; init; }
+    [UsedImplicitly]
+    public required TValue? Value { get; init; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="EnumViewModel{T}"/> class.
+    /// Initializes a new instance of the <see cref="EnumViewModel{T}" /> class.
     /// </summary>
     /// <param name="value">The value of the enumeration.</param>
+    [SetsRequiredMembers]
     public EnumViewModel(TValue? value)
     {
         this.DisplayName = value == null ? "-" : value.ToString();
@@ -33,10 +40,11 @@ public class EnumViewModel<TValue>
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="EnumViewModel{T}"/> class.
+    /// Initializes a new instance of the <see cref="EnumViewModel{T}" /> class.
     /// </summary>
     /// <param name="value">The value of the enumeration.</param>
     /// <param name="displayName">The display name of the enumeration value.</param>
+    [SetsRequiredMembers]
     public EnumViewModel(TValue? value, string displayName)
     {
         this.DisplayName = displayName ?? throw new ArgumentNullException(nameof(displayName));
