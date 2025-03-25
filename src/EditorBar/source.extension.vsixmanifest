@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" ?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="EditorBar.d5a61a21-bc87-477e-b916-ead20fb3fafb" Version="2.0.5" Language="en-US" Publisher="Jiří Polášek" />
+        <Identity Id="EditorBar.d5a61a21-bc87-477e-b916-ead20fb3fafb" Version="2.0.1000" Language="en-US" Publisher="Jiří Polášek" />
         <DisplayName>Editor Bar</DisplayName>
-        <Description xml:space="preserve">Shows location of the current file and highlights important parts like parent project or folder</Description>
+        <Description xml:space="preserve">Adds intuitive breadcrumbs to help you navigate file paths and code structure with ease.</Description>
         <MoreInfo>https://jiripolasek.com</MoreInfo>
         <License>Resources\LICENSE.txt</License>
         <Icon>Resources\Icon.png</Icon>
         <PreviewImage>Resources\Icon.png</PreviewImage>
-        <Tags>editor bar,path,file,breadcrumbs,location,project,directory,folder</Tags>
+        <Tags>editor bar,path,file,breadcrumbs,location,project,directory,folder,structure,</Tags>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.4, 18.0)">

@@ -10,11 +10,11 @@ namespace JPSoftworks.EditorBar
     {
         public const string Id = "EditorBar.d5a61a21-bc87-477e-b916-ead20fb3fafb";
         public const string Name = "Editor Bar";
-        public const string Description = @"Shows location of the current file and highlights important parts like parent project or folder";
+        public const string Description = @"Adds intuitive breadcrumbs to help you navigate file paths and code structure with ease.";
         public const string Language = "en-US";
-        public const string Version = "2.0.5";
+        public const string Version = "2.0.1000";
         public const string Author = "Jiří Polášek";
-        public const string Tags = "editor bar,path,file,breadcrumbs,location,project,directory,folder";
+        public const string Tags = "editor bar,path,file,breadcrumbs,location,project,directory,folder,structure,";
         public const bool IsPreview = false;
     }
 }
