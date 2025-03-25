@@ -1,14 +1,14 @@
 # Change Log
 
 ## 2.0.0
-- [x] Added: File structure breadcrumbs (code structure for C#, VB.NET and XML).
-    - Drop-drop menu with relevant child items (types in the file, members fields in types).
-    - Displays useful secondary information (e.g., method parameters, property types, constant value, xml node id or name).
-- [x] Added: Project segment can now display and switch target framework (in multi-targeted projects).
+- [x] Added: File structure breadcrumbs (code structure for C#, VB.NET, and XML).
+    - Drop-down menu with relevant child items (types in the file, members and fields within types).
+    - Displays useful secondary information (e.g., method parameters, property types, constant values, XML node IDs or names).
+- [x] Added: Project segment can now display and switch target framework for IntelliSense (in multi-targeted projects).
 - [x] Added: Keyboard shortcuts to focus specific segments (project, file, etc.).
-- [x] Added: "Locate in Soltion Explorer" context menu command for relevant segments.
-- [x] Added: "Copy Path" and "Open Containing Folder" context menu command for project and folder segments.
-- [x] Added: Automatic contrast fallback: when text contrast is insufficient, its color is automatically adjusted.
+- [x] Added: "Locate in Solution Explorer" context menu command for relevant segments.
+- [x] Added: "Copy Path" and "Open Containing Folder" context menu commands for project and folder segments.
+- [x] Added: Automatic contrast fallback; when text contrast is insufficient, its color is automatically adjusted.
 - [x] Changed: Improved performance and reduced memory usage.
 - [x] Changed: Updated options page.
 - [x] Changed: File path label is now hidden by default.
