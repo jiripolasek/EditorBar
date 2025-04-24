@@ -12,7 +12,7 @@ namespace JPSoftworks.EditorBar
         public const string Name = "Editor Bar";
         public const string Description = @"Adds intuitive breadcrumbs to help you navigate file paths and code structure with ease.";
         public const string Language = "en-US";
-        public const string Version = "2.0.1000";
+        public const string Version = "2.0.1024";
         public const string Author = "Jiří Polášek";
         public const string Tags = "editor bar,path,file,breadcrumbs,location,project,directory,folder,structure,";
         public const bool IsPreview = false;
