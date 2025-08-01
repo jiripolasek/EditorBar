@@ -68,6 +68,7 @@
                             <Path x:Name="PART_Separator" Data="M0,0 5,15 0,30"
                                   Visibility="{Binding ShowRightBorder, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:SymbolChevronButton}, Converter={StaticResource BooleanToVisibilityConverter}}"
                                   Stroke="{Binding RightBorderBrush, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:SymbolChevronButton}}"
+                                  Fill="Transparent"
                                   Stretch="Fill"
                                   StrokeThickness="1"
                                   VerticalAlignment="Stretch" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
