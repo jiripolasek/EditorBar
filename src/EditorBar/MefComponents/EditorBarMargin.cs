@@ -326,6 +326,8 @@ internal class EditorBarMargin : IWpfTextViewMargin
                 {
                     if (string.Equals(doc.FullName!, filePath, StringComparison.OrdinalIgnoreCase))
                     {
+                        // TODO: get rid of this
+                        // doc says Microsoft Internal Use Only
                         return doc.ReadOnly;
                     }
                 }
@@ -333,7 +335,9 @@ internal class EditorBarMargin : IWpfTextViewMargin
         }
         catch (Exception ex)
         {
+#if DEBUG
             ex.LogAsync("Failed to check readonly status of the document in DTE.").FireAndForget();
+#endif
         }
 
         return false;
