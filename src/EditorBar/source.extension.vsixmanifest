@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" ?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="EditorBar.d5a61a21-bc87-477e-b916-ead20fb3fafb" Version="2.0.1024" Language="en-US" Publisher="Jiří Polášek" />
+        <Identity Id="EditorBar.d5a61a21-bc87-477e-b916-ead20fb3fafb" Version="2.0.2048" Language="en-US" Publisher="Jiří Polášek" />
         <DisplayName>Editor Bar</DisplayName>
         <Description xml:space="preserve">Adds intuitive breadcrumbs to help you navigate file paths and code structure with ease.</Description>
         <MoreInfo>https://jiripolasek.com</MoreInfo>
