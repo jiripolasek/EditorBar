@@ -262,10 +262,55 @@ public partial class MemberList : UserControl
         if (string.IsNullOrWhiteSpace(filterText))
         {
             view.Filter = null;
+        }
+        else
+        {
+            view.Filter = this.FilterItem;
+        }
+
+        // After filter applied update placeholders
+        this.UpdatePlaceholders();
+    }
+
+    private void UpdatePlaceholders()
+    {
+        if (this.ListBox == null)
+        {
             return;
         }
 
-        view.Filter = this.FilterItem;
+        var sourceCollection = this._collectionViewSource.Source as System.Collections.IEnumerable;
+        bool hasAnySourceItem = false;
+        if (sourceCollection != null)
+        {
+            var enumerator = sourceCollection.GetEnumerator();
+            if (enumerator.MoveNext())
+            {
+                hasAnySourceItem = true;
+            }
+        }
+
+        var view = this._collectionViewSource.View;
+        var hasVisibleItems = view != null && !view.IsEmpty;
+        var filterActive = !string.IsNullOrWhiteSpace(this.FilterTextBox?.Text);
+
+        if (!hasAnySourceItem)
+        {
+            // Nothing at all
+            this.EmptyPlaceholder!.Visibility = Visibility.Visible;
+            this.FilteredPlaceholder!.Visibility = Visibility.Collapsed;
+        }
+        else if (filterActive && !hasVisibleItems)
+        {
+            // Filter removed all
+            this.EmptyPlaceholder!.Visibility = Visibility.Collapsed;
+            this.FilteredPlaceholder!.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            this.EmptyPlaceholder!.Visibility = Visibility.Collapsed;
+            this.FilteredPlaceholder!.Visibility = Visibility.Collapsed;
+        }
     }
 
     private bool FilterItem(object obj)
