@@ -14,7 +14,7 @@
              d:DesignHeight="450" d:DesignWidth="800"
              KeyboardNavigation.TabNavigation="Local"
              IsTabStop="False"
-             platformUI:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}">
+             x:Name="root">
     <UserControl.Resources>
 
         <platofrmUIUtilities:BrushToColorConverter x:Key="BrushToColorConverter" />
@@ -74,16 +74,29 @@
     </UserControl.Resources>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBox x:Name="FilterTextBox"
+                 Visibility="Collapsed"
+                 TextChanged="FilterTextBox_TextChanged"
+                 PreviewKeyDown="FilterTextBox_OnKeyDown">
+        </TextBox>
+
         <ListBox x:Name="ListBox"
+                 Grid.Row="1"
                  BorderThickness="0"
                  PreviewKeyDown="ListBox_OnPreviewKeyDown"
+                 PreviewTextInput="ListBox_OnPreviewTextInput"
                  MouseLeftButtonUp="ListBox_OnMouseLeftButtonDown"
                  Focusable="True"
                  TabIndex="0"
                  Grid.IsSharedSizeScope="True"
                  IsTextSearchEnabled="True"
                  IsTextSearchCaseSensitive="False"
-                 TextSearch.TextPath="(models:MemberListItemViewModel.SearchText)"
+                 TextSearch.TextPath="SearchText"
                  KeyboardNavigation.ControlTabNavigation="Cycle"
                  KeyboardNavigation.DirectionalNavigation="Cycle"
                  ItemTemplateSelector="{StaticResource SymbolDateTemplateSelector}"
