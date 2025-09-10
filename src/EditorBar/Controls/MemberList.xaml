@@ -96,6 +96,7 @@
                  Grid.IsSharedSizeScope="True"
                  IsTextSearchEnabled="True"
                  IsTextSearchCaseSensitive="False"
+                 IsSynchronizedWithCurrentItem="True"
                  TextSearch.TextPath="SearchText"
                  KeyboardNavigation.ControlTabNavigation="Cycle"
                  KeyboardNavigation.DirectionalNavigation="Cycle"

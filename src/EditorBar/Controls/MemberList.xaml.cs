@@ -45,11 +45,22 @@ public partial class MemberList : UserControl
         if (e.Key is Key.Enter or Key.Space)
         {
             this.OnItemSelected();
+            e.Handled = true;
+        }
+        else if (IsCtrlEdgeNavigation(e))
+        {
+            this.MoveSelectionToEdge(e.Key == Key.Up);
+            e.Handled = true;
         }
         else if (IsTextInputKey(e))
         {
             this.ShowFilterAndForwardKey(e);
         }
+    }
+
+    private static bool IsCtrlEdgeNavigation(KeyEventArgs e)
+    {
+        return (e.Key == Key.Up || e.Key == Key.Down) && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
     }
 
     private static bool IsTextInputKey(KeyEventArgs e)
@@ -76,13 +87,10 @@ public partial class MemberList : UserControl
             this.FilterTextBox.Text = string.Empty;
         }
 
-        // Focus the filter box and let it handle the key
         if (!this.FilterTextBox.IsKeyboardFocused)
         {
             this.FilterTextBox.Focus();
         }
-
-        // Do not mark handled here to allow text composition via PreviewTextInput
     }
 
     private void OnItemSelected()
@@ -100,19 +108,29 @@ public partial class MemberList : UserControl
 
     private void FilterTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
+        var view = this._collectionViewSource.View;
+
         if (string.IsNullOrEmpty(this.FilterTextBox!.Text))
         {
             this.FilterTextBox.Visibility = Visibility.Collapsed;
             // Return focus to list so user can continue navigating immediately
             this.ListBox!.Focus();
-            if (this.ListBox.SelectedIndex < 0 && this.ListBox.Items.Count > 0)
+            if (view != null && !view.IsEmpty)
             {
-                this.ListBox.SelectedIndex = 0;
+                if (this.ListBox.SelectedIndex < 0)
+                {
+                    view.MoveCurrentToFirst();
+                    this.ListBox.SelectedIndex = 0;
+                }
+                else
+                {
+                    _ = view.MoveCurrentToPosition(this.ListBox.SelectedIndex);
+                }
             }
         }
 
         this.UpdateFilterPredicate();
-        this._collectionViewSource?.View?.Refresh();
+        view?.Refresh();
     }
 
     private void FilterTextBox_OnKeyDown(object sender, KeyEventArgs e)
@@ -124,6 +142,11 @@ public partial class MemberList : UserControl
             this.UpdateFilterPredicate();
             this._collectionViewSource?.View?.Refresh();
             this.ListBox!.Focus();
+            e.Handled = true;
+        }
+        else if (IsCtrlEdgeNavigation(e))
+        {
+            this.MoveSelectionToEdge(e.Key == Key.Up);
             e.Handled = true;
         }
         else if (e.Key == Key.Down)
@@ -138,7 +161,6 @@ public partial class MemberList : UserControl
         }
         else if (e.Key == Key.Enter)
         {
-            // Ensure something is selected; if not, select first filtered item
             if (this.ListBox!.SelectedIndex < 0 && this.ListBox.Items.Count > 0)
             {
                 this.ListBox.SelectedIndex = 0;
@@ -158,14 +180,12 @@ public partial class MemberList : UserControl
             return;
         }
 
-        // When user starts typing while list has focus, show filter box and seed with the input
         if (this.FilterTextBox!.Visibility != Visibility.Visible)
         {
             this.FilterTextBox.Visibility = Visibility.Visible;
             this.FilterTextBox.Text = string.Empty;
         }
 
-        // Append typed text and focus
         this.FilterTextBox.Text += e.Text;
         this.FilterTextBox.CaretIndex = this.FilterTextBox.Text.Length;
         this.FilterTextBox.Focus();
@@ -175,31 +195,58 @@ public partial class MemberList : UserControl
 
     private void MoveSelection(int delta)
     {
-        var list = this.ListBox!;
-        var count = list.Items.Count;
-        if (count == 0)
+        var view = this._collectionViewSource?.View;
+        if (view == null || view.IsEmpty)
         {
             return;
         }
 
-        var newIndex = list.SelectedIndex;
-        if (newIndex < 0)
+        if (view.CurrentItem == null)
         {
-            newIndex = delta > 0 ? 0 : count - 1;
+            view.MoveCurrentToFirst();
         }
         else
         {
-            newIndex = (newIndex + delta) % count;
-            if (newIndex < 0)
+            bool moved = delta > 0 ? view.MoveCurrentToNext() : view.MoveCurrentToPrevious();
+            if (!moved)
             {
-                newIndex += count; // wrap negative
+                if (delta > 0)
+                {
+                    view.MoveCurrentToFirst();
+                }
+                else
+                {
+                    view.MoveCurrentToLast();
+                }
             }
         }
 
-        if (newIndex != list.SelectedIndex)
+        var current = view.CurrentItem;
+        if (current != null)
         {
-            list.SelectedIndex = newIndex;
-            list.ScrollIntoView(list.SelectedItem);
+            this.ListBox!.ScrollIntoView(current);
+        }
+    }
+
+    private void MoveSelectionToEdge(bool toFirst)
+    {
+        var view = this._collectionViewSource?.View;
+        if (view == null || view.IsEmpty)
+        {
+            return;
+        }
+        if (toFirst)
+        {
+            view.MoveCurrentToFirst();
+        }
+        else
+        {
+            view.MoveCurrentToLast();
+        }
+        var current = view.CurrentItem;
+        if (current != null)
+        {
+            this.ListBox!.ScrollIntoView(current);
         }
     }
 
@@ -214,7 +261,6 @@ public partial class MemberList : UserControl
         var filterText = this.FilterTextBox?.Text;
         if (string.IsNullOrWhiteSpace(filterText))
         {
-            // No filter -> show all
             view.Filter = null;
             return;
         }
@@ -232,7 +278,6 @@ public partial class MemberList : UserControl
 
         if (obj is SeparatorListItemViewModel)
         {
-            // Hide separators while filtering
             return false;
         }
 
