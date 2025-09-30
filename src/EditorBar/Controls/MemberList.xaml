@@ -9,6 +9,7 @@
              xmlns:platofrmUIUtilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
              xmlns:controls="clr-namespace:JPSoftworks.EditorBar.Controls"
              xmlns:viewModels="clr-namespace:JPSoftworks.EditorBar.ViewModels"
+             xmlns:platformUI1="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
              mc:Ignorable="d"
              Focusable="False"
              d:DesignHeight="450" d:DesignWidth="800"
@@ -71,6 +72,17 @@
         <presentation:MyItemContainerStyleSelector x:Key="MyItemContainerStyleSelector"
                                                    NormalItemStyle="{StaticResource NormalItemContainerStyle}"
                                                    SeparatorItemStyle="{StaticResource SeparatorItemContainerStyle}" />
+        
+        <Style x:Key="FilterBoxStyle" TargetType="TextBox">
+            <Setter Property="Padding" Value="6,4,6,4" />
+            <Setter Property="Margin" Value="1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUI1:CommonControlsColors.TextBoxBorderBrushKey}}" />
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUI1:CommonControlsColors.TextBoxBorderBrushKey}}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -80,6 +92,7 @@
         </Grid.RowDefinitions>
 
         <TextBox x:Name="FilterTextBox"
+                 Style="{StaticResource FilterBoxStyle}"
                  Visibility="Collapsed"
                  TextChanged="FilterTextBox_TextChanged"
                  PreviewKeyDown="FilterTextBox_OnKeyDown">
