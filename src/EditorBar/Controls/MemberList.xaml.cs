@@ -42,7 +42,11 @@ public partial class MemberList : UserControl
 
     private void ListBox_OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key is Key.Enter or Key.Space)
+        if (e.Key is Key.Escape)
+        {
+            this.HandleEscape(e);
+        }
+        else if (e.Key is Key.Enter or Key.Space)
         {
             this.OnItemSelected();
             e.Handled = true;
@@ -137,14 +141,11 @@ public partial class MemberList : UserControl
     {
         if (e.Key == Key.Escape)
         {
-            this.FilterTextBox!.Text = string.Empty;
-            this.FilterTextBox.Visibility = Visibility.Collapsed;
-            this.UpdateFilterPredicate();
-            this._collectionViewSource?.View?.Refresh();
-            this.ListBox!.Focus();
-            e.Handled = true;
+            this.HandleEscape(e);
+            return;
         }
-        else if (IsCtrlEdgeNavigation(e))
+
+        if (IsCtrlEdgeNavigation(e))
         {
             this.MoveSelectionToEdge(e.Key == Key.Up);
             e.Handled = true;
@@ -171,6 +172,18 @@ public partial class MemberList : UserControl
             }
             e.Handled = true;
         }
+    }
+
+    private void HandleEscape(KeyEventArgs e)
+    {
+        // If text present, clear and swallow; if already empty, let popup handle (close)
+        if (!string.IsNullOrEmpty(this.FilterTextBox!.Text))
+        {
+            this.FilterTextBox.Clear(); // triggers TextChanged -> collapse & focus list
+            e.Handled = true; // prevent popup from closing
+        }
+
+        return;
     }
 
     private void ListBox_OnPreviewTextInput(object sender, TextCompositionEventArgs e)

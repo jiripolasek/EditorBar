@@ -52,7 +52,7 @@ public partial class MemberListPopup : Popup
         }
     }
 
-    protected override void OnPreviewKeyDown(KeyEventArgs e)
+    protected override void OnKeyDown(KeyEventArgs e)
     {
         if (e.Key == Key.Escape)
         {
@@ -71,6 +71,6 @@ public partial class MemberListPopup : Popup
             e.Handled = true;
         }
 
-        base.OnPreviewKeyDown(e);
+        base.OnKeyDown(e);
     }
 }
