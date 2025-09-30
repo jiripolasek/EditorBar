@@ -9,12 +9,13 @@
              xmlns:platofrmUIUtilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
              xmlns:controls="clr-namespace:JPSoftworks.EditorBar.Controls"
              xmlns:viewModels="clr-namespace:JPSoftworks.EditorBar.ViewModels"
+             xmlns:platformUI1="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
              mc:Ignorable="d"
              Focusable="False"
              d:DesignHeight="450" d:DesignWidth="800"
              KeyboardNavigation.TabNavigation="Local"
              IsTabStop="False"
-             platformUI:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}">
+             x:Name="root">
     <UserControl.Resources>
 
         <platofrmUIUtilities:BrushToColorConverter x:Key="BrushToColorConverter" />
@@ -71,29 +72,75 @@
         <presentation:MyItemContainerStyleSelector x:Key="MyItemContainerStyleSelector"
                                                    NormalItemStyle="{StaticResource NormalItemContainerStyle}"
                                                    SeparatorItemStyle="{StaticResource SeparatorItemContainerStyle}" />
+        
+        <Style x:Key="FilterBoxStyle" TargetType="TextBox">
+            <Setter Property="Padding" Value="6,4,6,4" />
+            <Setter Property="Margin" Value="1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUI1:CommonControlsColors.TextBoxBorderBrushKey}}" />
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUI1:CommonControlsColors.TextBoxBorderBrushKey}}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
-        <ListBox x:Name="ListBox"
-                 BorderThickness="0"
-                 PreviewKeyDown="ListBox_OnPreviewKeyDown"
-                 MouseLeftButtonUp="ListBox_OnMouseLeftButtonDown"
-                 Focusable="True"
-                 TabIndex="0"
-                 Grid.IsSharedSizeScope="True"
-                 IsTextSearchEnabled="True"
-                 IsTextSearchCaseSensitive="False"
-                 TextSearch.TextPath="(models:MemberListItemViewModel.SearchText)"
-                 KeyboardNavigation.ControlTabNavigation="Cycle"
-                 KeyboardNavigation.DirectionalNavigation="Cycle"
-                 ItemTemplateSelector="{StaticResource SymbolDateTemplateSelector}"
-                 ItemContainerStyleSelector="{StaticResource MyItemContainerStyleSelector}"
-                 platformUI:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}">
-            <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel />
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-        </ListBox>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBox x:Name="FilterTextBox"
+                 Style="{StaticResource FilterBoxStyle}"
+                 Visibility="Collapsed"
+                 TextChanged="FilterTextBox_TextChanged"
+                 PreviewKeyDown="FilterTextBox_OnKeyDown">
+        </TextBox>
+
+        <!-- Content area with list and placeholders overlayed -->
+        <Grid Grid.Row="1">
+            <ListBox x:Name="ListBox"
+                     MinWidth="220"
+                     BorderThickness="0"
+                     PreviewKeyDown="ListBox_OnPreviewKeyDown"
+                     PreviewTextInput="ListBox_OnPreviewTextInput"
+                     MouseLeftButtonUp="ListBox_OnMouseLeftButtonDown"
+                     Focusable="True"
+                     TabIndex="0"
+                     Grid.IsSharedSizeScope="True"
+                     IsTextSearchEnabled="True"
+                     IsTextSearchCaseSensitive="False"
+                     IsSynchronizedWithCurrentItem="True"
+                     TextSearch.TextPath="SearchText"
+                     KeyboardNavigation.ControlTabNavigation="Cycle"
+                     KeyboardNavigation.DirectionalNavigation="Cycle"
+                     ItemTemplateSelector="{StaticResource SymbolDateTemplateSelector}"
+                     ItemContainerStyleSelector="{StaticResource MyItemContainerStyleSelector}"
+                     platformUI:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+
+            <TextBlock x:Name="EmptyPlaceholder"
+                       Text="No members found."
+                       Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextInactiveKey}}"
+                       FontStyle="Italic"
+                       Visibility="Collapsed"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Padding="16" />
+            <TextBlock x:Name="FilteredPlaceholder"
+                       Text="No matches for current filter."
+                       Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextInactiveKey}}"
+                       FontStyle="Italic"
+                       Visibility="Collapsed"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Padding="16" />
+        </Grid>
     </Grid>
 </UserControl>
