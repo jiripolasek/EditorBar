@@ -4,7 +4,7 @@
 	<img alt="Editor Bar Icon" src="assets/Icon.png" />
 </p>
 
-<h1>Editor Bar<br /><span style="font-weight: 300; opacity: 0.5">for Visual Studio 2022</span></h1>
+<h1>Editor Bar<br /><span style="font-weight: 300; opacity: 0.5">for Visual Studio</span></h1>
 
 [![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/jiripolasek.EditorBar?style=for-the-badge&label=VS%20Marketplace&link=https%3A%2F%2Fmarketplace.visualstudio.com%2Fitems%3FitemName%3Djiripolasek.EditorBar)](https://marketplace.visualstudio.com/items?itemName=jiripolasek.EditorBar)
 [![Visual Studio Marketplace Rating](https://img.shields.io/visual-studio-marketplace/stars/jiripolasek.EditorBar?style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=jiripolasek.EditorBar)
@@ -15,7 +15,7 @@
 
 ## Introduction
 
-**Editor Bar** is a Visual Studio 2022 extension designed to simplify your coding workflow by providing clear and intuitive breadcrumbs for effortless navigation.
+**Editor Bar** is a Visual Studio 2022 and a Visual Studio 2026 extension designed to simplify your coding workflow by providing clear and intuitive breadcrumbs for effortless navigation.
 
 The extension displays the current file path and project name, enabling quick identification of files with similar or identical names (like `launchSettings.json` in every project or `/Pages/Users/Edit.razor` vs `/Pages/Roles/Edit.razor`).
 
@@ -51,6 +51,9 @@ In supported files, it also displays breadcrumbs for symbols or nodes up to the 
   - Open file location in Windows Explorer.
   - Locate the item in Solution Explorer.
   - Switch active target framework for IntelliSense (in multi-targeting projects).
+
+- **Member search**
+  - Quickly find and navigate to any member in the current file using a searchable dropdown.
 
 - **Customizable Options**
   - Select what to display in the breadcrumbs bar.
