@@ -215,6 +215,11 @@ internal class EditorBarMargin : IWpfTextViewMargin
                 return false;
             }
 
+            if (this._textView.TextBuffer != null && !IsPullRequestEditor(this._textView.TextBuffer, isEditable, isDocument, isInteractive))
+            {
+                return false;
+            }
+
             isEditable &= !fileStatus.IsReadOnly && !isGhost;
 
             var isTemp = !isGhost &&
@@ -241,6 +246,33 @@ internal class EditorBarMargin : IWpfTextViewMargin
         }
 
         return false;
+    }
+
+    private static bool IsPullRequestEditor(ITextBuffer buffer, bool isEditable, bool isDocument, bool isInteractive)
+    {
+        // roles are exactly: ANALYZABLE, DOCUMENT, EDITABLE, INTERACTIVE
+        // Path: % temp %\tmpE8AE.tmp
+        // Type name: vs-markdown
+
+        if (!isEditable && !isDocument && !isInteractive)
+        {
+            return false;
+        }
+
+        if (buffer?.ContentType != null && buffer.ContentType.IsOfType("vs-markdown"))
+        {
+            var fileName = buffer.GetFileName();
+            if (fileName != null && Path.GetExtension(fileName) == ".tmp")
+            {
+                var tempPath = Path.GetTempPath();
+                if (fileName.StartsWith(tempPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     private DocumentStatus GetFileReadOnlyStatus(IWpfTextView textView)
@@ -313,7 +345,7 @@ internal class EditorBarMargin : IWpfTextViewMargin
                 or "RegularExpressionEditor"
                 or "TemplateTextEditor"
                 or "CodePanel"
-                or "StructuralSearchForm") 
+                or "StructuralSearchForm")
             {
                 return true;
             }
