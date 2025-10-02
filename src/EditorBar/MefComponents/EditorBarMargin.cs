@@ -210,6 +210,11 @@ internal class EditorBarMargin : IWpfTextViewMargin
                 return false;
             }
 
+            if (IsReSharper(fileStatus.FileName!))
+            {
+                return false;
+            }
+
             isEditable &= !fileStatus.IsReadOnly && !isGhost;
 
             var isTemp = !isGhost &&
@@ -288,6 +293,39 @@ internal class EditorBarMargin : IWpfTextViewMargin
 #endif
             return new DocumentStatus(string.Empty, false);
         }
+    }
+
+    private static bool IsReSharper(string filePath)
+    {
+        // ReSharper creates an editor window with a temp file, with constant file names, and weird extensions
+        //
+        // StackTraceExplorerEditor.Xuwujim
+        // Roles: ANALYZABLE, DEBUGGABLE, DOCUMENT, EDITABLE, INTERACTIVE, PRIMARYDOCUMENT, STRUCTURED, UBIDIFF, UBIRIGHTDIFF, ZOOMABLE
+
+        // check separately if we have a) a known file name, b) weird extension
+        var ext = Path.GetExtension(filePath);
+        var name = Path.GetFileNameWithoutExtension(filePath);
+        if (ext?.Length > 5)
+        {
+            if (name
+                is "StackTraceExplorerEditor"
+                or "CodeStylePreview"
+                or "RegularExpressionEditor"
+                or "TemplateTextEditor"
+                or "CodePanel"
+                or "StructuralSearchForm") 
+            {
+                return true;
+            }
+        }
+
+        // e.g. C:\Users\...\AppData\Local\JetBrains\Shared\vAny\DecompilerCache\ILViewer\82e7399e305a479b8f5b542013398b9f73400\78\8e72436b\02000028pdb136.il
+        if (filePath.IndexOf("JetBrains\\Shared\\vAny\\DecompilerCache\\ILViewer", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            return true;
+        }
+
+        return false;
     }
 
 
