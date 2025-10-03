@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.0.0
+- [x] Added: Member list is now searchable - start typing to filter the list.
+- [x] Added: Support for Visual 2026.
+- [x] Updated: Editor bar is hidden in ReSharper windows (e.g., Find Results, Unit Test Sessions).
+
+## 2.0.2048
+
+ - [x] Fixed: Breadcrumb separator rendering glitch in VS 17.14.10 Preview 1.0.
+ - [x] Fixed: Benign exception that could have previously appeared in the extension log.
+
+
 ## 2.0.0
 - [x] Added: File structure breadcrumbs (code structure for C#, VB.NET, and XML).
     - Drop-down menu with relevant child items (types in the file, members and fields within types).
