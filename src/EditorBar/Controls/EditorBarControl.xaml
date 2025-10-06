@@ -35,13 +35,16 @@
                                 ToolTip="Debug"
                                 Style="{DynamicResource NoBorderButtonStyle}"
                                 Visibility="{Binding IsDevelopmentModeEnabled, Converter={StaticResource BooleanToVisibilityConverter} }"
-                                TabIndex="2">
+                                TabIndex="2"
+                                PreviewGotKeyboardFocus="UIElement_OnPreviewGotKeyboardFocus">
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" />
                         </Button>
                         <Button Command="{Binding OpenDefaultEditorCommand }"
                                 ToolTip="Open in Default Editor"
                                 Style="{DynamicResource NoBorderButtonStyle}"
-                                TabIndex="3">
+                                TabIndex="3"
+                                PreviewGotKeyboardFocus="UIElement_OnPreviewGotKeyboardFocus"
+                                >
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.OpenFileDialog}" />
                         </Button>
                         <Button x:Name="OpenExternalEditorButton"

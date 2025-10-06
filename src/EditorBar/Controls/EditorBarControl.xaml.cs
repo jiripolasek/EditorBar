@@ -9,8 +9,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Disposables;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Helpers.Events;
 using JPSoftworks.EditorBar.Helpers.Presentation;
@@ -187,6 +189,26 @@ internal partial class EditorBarControl : IDisposable
         if (e.Key == Key.Escape)
         {
             this._textView.VisualElement?.Focus();
+        }
+    }
+
+    private void UIElement_OnPreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        // Hotfix: when VS fires View.NavigateBackwards or View.NavigateForwards command from keyboard shortcut,
+        // the change of active tab causes VS to change the focus. It moves focus to the first control, which is
+        // usually the first button in the editor bar. But the expected behavior is to keep the focus in the editor,
+        // so we need to move the focus back to the editor.
+        // This event will be raised multiple times, with different sources and old focuses, so I'm
+        // going to do the absolutely dumb thing here to make it reliable.
+
+        // Let's assume that we can accept focus changes from buttons that are before or after our button.
+        if (e.OldFocus != null && e.OldFocus is not Button)
+        {
+            _ = Dispatcher.BeginInvoke(() =>
+            {
+                this._textView.VisualElement?.Focus();
+            }, DispatcherPriority.Input);
+            e.Handled = true;
         }
     }
 }
