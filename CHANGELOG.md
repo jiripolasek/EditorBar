@@ -1,5 +1,8 @@
 # Change Log
 
+## 3.0.1024
+- [x] Fixed: An issue where Visual Studio incorrectly changed focus when *Navigate Backwards* or *Navigate Forwards* commands were used to navigate between files.
+
 ## 3.0.0
 - [x] Added: Member list is now searchable - start typing to filter the list.
 - [x] Added: Support for Visual 2026.
