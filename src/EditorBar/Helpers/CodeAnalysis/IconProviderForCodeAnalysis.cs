@@ -1,7 +1,7 @@
 ﻿// ------------------------------------------------------------
-// 
+//
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
+//
 // ------------------------------------------------------------
 
 #nullable enable
@@ -127,6 +127,7 @@ public static class IconProviderForCodeAnalysis
         {
             switch (t.TypeKind)
             {
+                case TypeKind.Extension:
                 case TypeKind.Class:
                     return t.DeclaredAccessibility switch
                     {
@@ -161,8 +162,7 @@ public static class IconProviderForCodeAnalysis
                     {
                         case Accessibility.Public:
                             {
-                                var implementsIDisposable =
-                                    t.AllInterfaces.Any(i => i.Name is "IDisposable" or "IAsyncDisposable");
+                                var implementsIDisposable = t.AllInterfaces.Any(static i => i.Name is "IDisposable" or "IAsyncDisposable");
                                 if (implementsIDisposable)
                                 {
                                     return IconIds.Disposable;
@@ -200,6 +200,13 @@ public static class IconProviderForCodeAnalysis
 
                 case TypeKind.TypeParameter:
                     return KnownImageIds.Type;
+                case TypeKind.Unknown:
+                case TypeKind.Array:
+                case TypeKind.Dynamic:
+                case TypeKind.Error:
+                case TypeKind.Pointer:
+                case TypeKind.Submission:
+                case TypeKind.FunctionPointer:
                 default:
                     return KnownImageIds.StatusError;
             }
@@ -207,20 +214,16 @@ public static class IconProviderForCodeAnalysis
 
         static int GetPropertyImageId(IPropertySymbol p)
         {
-            switch (p.DeclaredAccessibility)
+            return p.DeclaredAccessibility switch
             {
-                case Accessibility.Public: return KnownImageIds.PropertyPublic;
-                case Accessibility.Protected:
-                case Accessibility.ProtectedOrInternal:
-                    return KnownImageIds.PropertyProtected;
-                case Accessibility.Private:
-                    return p.ExplicitInterfaceImplementations.Length != 0
-                        ? IconIds.ExplicitInterfaceProperty
-                        : KnownImageIds.PropertyPrivate;
-                case Accessibility.ProtectedAndInternal:
-                case Accessibility.Internal: return KnownImageIds.PropertyInternal;
-                default: return KnownImageIds.Property;
-            }
+                Accessibility.Public => KnownImageIds.PropertyPublic,
+                Accessibility.Protected or Accessibility.ProtectedOrInternal => KnownImageIds.PropertyProtected,
+                Accessibility.Private => p.ExplicitInterfaceImplementations.Length != 0
+                    ? IconIds.ExplicitInterfaceProperty
+                    : KnownImageIds.PropertyPrivate,
+                Accessibility.ProtectedAndInternal or Accessibility.Internal => KnownImageIds.PropertyInternal,
+                _ => KnownImageIds.Property
+            };
         }
     }
 }
