@@ -1,7 +1,7 @@
 ﻿// ------------------------------------------------------------
-// 
+//
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
+//
 // ------------------------------------------------------------
 
 #nullable enable
@@ -232,7 +232,7 @@ internal static class FileStructureHelper
                     typeSymbol.GetFullMetadataName())
                 {
                     CanHaveChildren = typeSymbol.TypeKind is TypeKind.Class or TypeKind.Interface or TypeKind.Struct
-                        or TypeKind.Enum or TypeKind.Module
+                        or TypeKind.Enum or TypeKind.Module or TypeKind.Extension
                 };
 
             default:

@@ -1,7 +1,7 @@
 ﻿// ------------------------------------------------------------
-// 
+//
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
+//
 // ------------------------------------------------------------
 
 #nullable enable
@@ -159,8 +159,13 @@ internal class RoslynWorkspaceFileStructureProvider
         Workspace workspace,
         DocumentId documentId)
     {
-        var typeSymbol = await FindSymbolAsync(typeModel.FullName, workspace, documentId);
-        if (typeSymbol == null)
+        // Prefer resolving by the anchor (works for extension blocks + normal types).
+        // Fallback to old metadata-name lookup for safety.
+        var typeSymbol =
+            await TryResolveTypeSymbolByAnchorAsync(typeModel, workspace, documentId)
+            ?? await FindSymbolAsync(typeModel.FullName, workspace, documentId);
+
+        if (typeSymbol is null)
         {
             return ImmutableList<FileStructureElementModel>.Empty;
         }
@@ -202,6 +207,66 @@ internal class RoslynWorkspaceFileStructureProvider
                 })
             .Cast<FileStructureElementModel>()
             .ToImmutableList();
+    }
+    private static async Task<INamedTypeSymbol?> TryResolveTypeSymbolByAnchorAsync(
+        TypeModel typeModel,
+        Workspace workspace,
+        DocumentId documentId)
+    {
+        var document = workspace.CurrentSolution.GetDocument(documentId);
+        if (document is null)
+        {
+            return null;
+        }
+
+        var root = await document.GetSyntaxRootAsync().ConfigureAwait(false);
+        if (root is null)
+        {
+            return null;
+        }
+
+        var semanticModel = await document.GetSemanticModelAsync().ConfigureAwait(false);
+        if (semanticModel is null)
+        {
+            return null;
+        }
+
+        // map syntax nodes
+        if (!TryGetAnchorTextSpan(typeModel.AnchorPoint, out var anchorSpan))
+        {
+            return null;
+        }
+
+        var node = root.FindNode(anchorSpan, getInnermostNodeForTie: true);
+
+        // 1) If this TypeModel is an extension block, this finds it reliably.
+        var extensionDecl = node.FirstAncestorOrSelf<ExtensionBlockDeclarationSyntax>();
+        if (extensionDecl is not null)
+        {
+            return semanticModel.GetDeclaredSymbol(extensionDecl) as INamedTypeSymbol;
+        }
+
+        // 2) Normal types (class/struct/record/interface/etc.)
+        var typeDecl = node.FirstAncestorOrSelf<TypeDeclarationSyntax>();
+        if (typeDecl is not null)
+        {
+            return semanticModel.GetDeclaredSymbol(typeDecl) as INamedTypeSymbol;
+        }
+
+        // 3) Other "type-like" declarations if you model them as TypeModel
+        var enumDecl = node.FirstAncestorOrSelf<EnumDeclarationSyntax>();
+        if (enumDecl is not null)
+        {
+            return semanticModel.GetDeclaredSymbol(enumDecl) as INamedTypeSymbol;
+        }
+
+        return null;
+    }
+
+    private static bool TryGetAnchorTextSpan(AnchorPoint anchorPoint, out TextSpan span)
+    {
+        span = new TextSpan(anchorPoint.TextSpan.Start, anchorPoint.TextSpan.Length);
+        return true;
     }
 
     private static bool FilterSourceMembers(ISymbol member)
@@ -259,49 +324,52 @@ internal class RoslynWorkspaceFileStructureProvider
 
         var root = await document.GetSyntaxRootAsync().ConfigureAwait(false);
 
-        if (document.Project.Language == LanguageNames.CSharp)
+        switch (document.Project.Language)
         {
-            // detect top level statements file first
-            if (root is CompilationUnitSyntax compilationUnit &&
-                compilationUnit.Members.FirstOrDefault() is GlobalStatementSyntax firstGlobalStatementSyntax)
-            {
-                // this is top level statements file, we don't want to show types here, only method
-                return semanticModel.GetEnclosingSymbol(firstGlobalStatementSyntax.SpanStart) is not IMethodSymbol
-                    topLevelMainMethodSymbol
-                    ? []
-                    : [topLevelMainMethodSymbol];
-            }
+            case LanguageNames.CSharp:
+                {
+                    // detect top level statements file first
+                    if (root is CompilationUnitSyntax compilationUnit &&
+                        compilationUnit.Members.FirstOrDefault() is GlobalStatementSyntax firstGlobalStatementSyntax)
+                    {
+                        // this is top level statements file, we don't want to show types here, only method
+                        return semanticModel.GetEnclosingSymbol(firstGlobalStatementSyntax.SpanStart) is not IMethodSymbol
+                            topLevelMainMethodSymbol
+                            ? []
+                            : [topLevelMainMethodSymbol];
+                    }
 
-            // get document types
-            var types = GetNonTypeTypeContainers(root).Where(static syntaxNode =>
-                syntaxNode is BaseTypeDeclarationSyntax or DelegateDeclarationSyntax);
-            var symbols = types.Select(syntaxNode => semanticModel.GetDeclaredSymbol(syntaxNode)).OfType<ISymbol>()
-                .ToList();
+                    // get document types
+                    var types = GetNonTypeTypeContainers(root).Where(static syntaxNode =>
+                        syntaxNode is BaseTypeDeclarationSyntax or DelegateDeclarationSyntax);
+                    var symbols = types.Select(syntaxNode => semanticModel.GetDeclaredSymbol(syntaxNode)).OfType<ISymbol>()
+                        .ToList();
 
-            return symbols;
-        }
-        else if (document.Project.Language == LanguageNames.VisualBasic)
-        {
-            // Ensure the document is a VB.NET file by trying to cast the root.
-            if (root is not Microsoft.CodeAnalysis.VisualBasic.Syntax.CompilationUnitSyntax)
-            {
+                    return symbols;
+                }
+            case LanguageNames.VisualBasic:
+                {
+                    // Ensure the document is a VB.NET file by trying to cast the root.
+                    if (root is not Microsoft.CodeAnalysis.VisualBasic.Syntax.CompilationUnitSyntax)
+                    {
+                        return [];
+                    }
+
+                    // Retrieve all descendant nodes that represent VB.NET type declarations.
+                    // In VB.NET, these include classes, structures, interfaces, modules, enums, and delegates.
+                    var typeNodes = root.DescendantNodes().Where(static node =>
+                        node is TypeBlockSyntax or EnumBlockSyntax or DelegateStatementSyntax);
+
+                    // Use the semantic model to retrieve the declared symbol for each type node.
+                    var symbols = typeNodes.Select(node => semanticModel.GetDeclaredSymbol(node))
+                        .OfType<ISymbol>()
+                        .ToList();
+
+                    return symbols;
+                }
+            default:
                 return [];
-            }
-
-            // Retrieve all descendant nodes that represent VB.NET type declarations.
-            // In VB.NET, these include classes, structures, interfaces, modules, enums, and delegates.
-            var typeNodes = root.DescendantNodes().Where(static node =>
-                node is TypeBlockSyntax or EnumBlockSyntax or DelegateStatementSyntax);
-
-            // Use the semantic model to retrieve the declared symbol for each type node.
-            var symbols = typeNodes.Select(node => semanticModel.GetDeclaredSymbol(node))
-                .OfType<ISymbol>()
-                .ToList();
-
-            return symbols;
         }
-
-        return [];
     }
 
     private static IEnumerable<SyntaxNode> GetNonTypeTypeContainers(SyntaxNode? rootNode)

@@ -1,7 +1,7 @@
 ﻿// ------------------------------------------------------------
-// 
+//
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
+//
 // ------------------------------------------------------------
 
 #nullable enable
@@ -94,7 +94,7 @@ internal class CodeNavigationService : ICodeNavigationService, ITextNavigationSe
     {
         // Safely pattern-match to get the token for the identifier
         // You can expand this switch expression for other node types if needed
-        var identifierToken = syntaxNode switch
+        var targetToken = syntaxNode switch
         {
             MethodDeclarationSyntax methodDecl => methodDecl.Identifier,
             ConstructorDeclarationSyntax ctorDecl => ctorDecl.Identifier,
@@ -102,6 +102,7 @@ internal class CodeNavigationService : ICodeNavigationService, ITextNavigationSe
             EventDeclarationSyntax eventDecl => eventDecl.Identifier,
             FieldDeclarationSyntax fieldDecl => fieldDecl.Declaration.Variables.First().Identifier,
             EventFieldDeclarationSyntax eventField => eventField.Declaration.Variables.First().Identifier,
+            ExtensionBlockDeclarationSyntax extensionDecl => extensionDecl.Keyword,
             TypeDeclarationSyntax typeDecl => typeDecl.Identifier, // classes, structs, records
             EnumDeclarationSyntax enumDecl => enumDecl.Identifier,
             DelegateDeclarationSyntax delegateDecl => delegateDecl.Identifier,
@@ -110,13 +111,13 @@ internal class CodeNavigationService : ICodeNavigationService, ITextNavigationSe
         };
 
         // The start of the identifier token in the overall file
-        if (identifierToken != null)
+        if (targetToken != null)
         {
             // TODO: check the file path, if it's different, then we have to open new view with the target file
             var isSameFile = this.IsInCurrentFile(syntaxNode);
             if (isSameFile)
             {
-                await this.NavigateToPositionAsync(identifierToken.SpanStart);
+                await this.NavigateToPositionAsync(targetToken.SpanStart);
             }
             else
             {
