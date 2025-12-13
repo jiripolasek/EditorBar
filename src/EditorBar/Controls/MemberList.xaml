@@ -5,11 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:presentation="clr-namespace:JPSoftworks.EditorBar.Presentation"
              xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
-             xmlns:platformUI="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:platformUI="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+             xmlns:platformUIImaging="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
              xmlns:platofrmUIUtilities="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
              xmlns:controls="clr-namespace:JPSoftworks.EditorBar.Controls"
              xmlns:viewModels="clr-namespace:JPSoftworks.EditorBar.ViewModels"
-             xmlns:platformUI1="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
              mc:Ignorable="d"
              Focusable="False"
              d:DesignHeight="450" d:DesignWidth="800"
@@ -72,14 +72,18 @@
         <presentation:MyItemContainerStyleSelector x:Key="MyItemContainerStyleSelector"
                                                    NormalItemStyle="{StaticResource NormalItemContainerStyle}"
                                                    SeparatorItemStyle="{StaticResource SeparatorItemContainerStyle}" />
-        
+
         <Style x:Key="FilterBoxStyle" TargetType="TextBox">
             <Setter Property="Padding" Value="6,4,6,4" />
             <Setter Property="Margin" Value="1" />
-            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUI1:CommonControlsColors.TextBoxBorderBrushKey}}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUI:CommonControlsColors.TextBoxBorderBrushKey}}" />
+            <Setter Property="Background" Value="{DynamicResource {x:Static platformUI:CommonControlsColors.TextBoxBackgroundBrushKey}}" />
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static platformUI:CommonControlsColors.TextBoxTextBrushKey}}" />
             <Style.Triggers>
                 <Trigger Property="IsFocused" Value="True">
-                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUI1:CommonControlsColors.TextBoxBorderBrushKey}}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUI:CommonControlsColors.TextBoxBorderBrushKey}}" />
+                    <Setter Property="Background" Value="{DynamicResource {x:Static platformUI:CommonControlsColors.TextBoxBackgroundFocusedBrushKey}}" />
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static platformUI:CommonControlsColors.TextBoxTextFocusedBrushKey}}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -117,7 +121,7 @@
                      KeyboardNavigation.DirectionalNavigation="Cycle"
                      ItemTemplateSelector="{StaticResource SymbolDateTemplateSelector}"
                      ItemContainerStyleSelector="{StaticResource MyItemContainerStyleSelector}"
-                     platformUI:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}">
+                     platformUIImaging:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel />
