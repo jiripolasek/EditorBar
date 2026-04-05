@@ -125,18 +125,15 @@ public static class IconProviderForCodeAnalysis
 
         static int GetTypeImageId(INamedTypeSymbol t)
         {
+            if (t.IsExtensionType())
+            {
+                return GetClassLikeTypeImageId(t);
+            }
+
             switch (t.TypeKind)
             {
-                case TypeKind.Extension:
                 case TypeKind.Class:
-                    return t.DeclaredAccessibility switch
-                    {
-                        Accessibility.Public => KnownImageIds.ClassPublic,
-                        Accessibility.Protected or Accessibility.ProtectedOrInternal => KnownImageIds.ClassProtected,
-                        Accessibility.Private => KnownImageIds.ClassPrivate,
-                        Accessibility.ProtectedAndInternal or Accessibility.Internal => KnownImageIds.ClassInternal,
-                        _ => IconIds.Class
-                    };
+                    return GetClassLikeTypeImageId(t);
                 case TypeKind.Delegate:
                     return t.DeclaredAccessibility switch
                     {
@@ -209,6 +206,18 @@ public static class IconProviderForCodeAnalysis
                 case TypeKind.FunctionPointer:
                 default:
                     return KnownImageIds.StatusError;
+            }
+
+            static int GetClassLikeTypeImageId(INamedTypeSymbol typeSymbol)
+            {
+                return typeSymbol.DeclaredAccessibility switch
+                {
+                    Accessibility.Public => KnownImageIds.ClassPublic,
+                    Accessibility.Protected or Accessibility.ProtectedOrInternal => KnownImageIds.ClassProtected,
+                    Accessibility.Private => KnownImageIds.ClassPrivate,
+                    Accessibility.ProtectedAndInternal or Accessibility.Internal => KnownImageIds.ClassInternal,
+                    _ => IconIds.Class
+                };
             }
         }
 

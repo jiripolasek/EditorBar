@@ -225,15 +225,20 @@ internal static class FileStructureHelper
                     anchorPoint);
 
             case INamedTypeSymbol typeSymbol:
-                return new TypeModel(
-                    typeSymbol.ToDisplayString(SymbolFileStructureElementModel.SymbolDisplayFormat),
-                    VsImageHelper.GetImageMonikers(anchorPoint.Symbol.GetImageId()),
-                    anchorPoint,
-                    typeSymbol.GetFullMetadataName())
                 {
-                    CanHaveChildren = typeSymbol.TypeKind is TypeKind.Class or TypeKind.Interface or TypeKind.Struct
-                        or TypeKind.Enum or TypeKind.Module or TypeKind.Extension
-                };
+                    var canHaveChildren = typeSymbol.TypeKind is TypeKind.Class or TypeKind.Interface or TypeKind.Struct
+                        or TypeKind.Enum or TypeKind.Module
+                        || typeSymbol.IsExtensionType();
+
+                    return new TypeModel(
+                        typeSymbol.ToDisplayString(SymbolFileStructureElementModel.SymbolDisplayFormat),
+                        VsImageHelper.GetImageMonikers(anchorPoint.Symbol.GetImageId()),
+                        anchorPoint,
+                        typeSymbol.GetFullMetadataName())
+                    {
+                        CanHaveChildren = canHaveChildren
+                    };
+                }
 
             default:
                 return null;

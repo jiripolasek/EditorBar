@@ -239,25 +239,14 @@ internal class RoslynWorkspaceFileStructureProvider
 
         var node = root.FindNode(anchorSpan, getInnermostNodeForTie: true);
 
-        // 1) If this TypeModel is an extension block, this finds it reliably.
-        var extensionDecl = node.FirstAncestorOrSelf<ExtensionBlockDeclarationSyntax>();
-        if (extensionDecl is not null)
+        // Resolve the nearest declared type from the anchor so newer Roslyn nodes
+        // (for example extension blocks) keep working even when we compile against an older API surface.
+        foreach (var candidate in node.AncestorsAndSelf())
         {
-            return semanticModel.GetDeclaredSymbol(extensionDecl) as INamedTypeSymbol;
-        }
-
-        // 2) Normal types (class/struct/record/interface/etc.)
-        var typeDecl = node.FirstAncestorOrSelf<TypeDeclarationSyntax>();
-        if (typeDecl is not null)
-        {
-            return semanticModel.GetDeclaredSymbol(typeDecl) as INamedTypeSymbol;
-        }
-
-        // 3) Other "type-like" declarations if you model them as TypeModel
-        var enumDecl = node.FirstAncestorOrSelf<EnumDeclarationSyntax>();
-        if (enumDecl is not null)
-        {
-            return semanticModel.GetDeclaredSymbol(enumDecl) as INamedTypeSymbol;
+            if (semanticModel.GetDeclaredSymbol(candidate) is INamedTypeSymbol declaredTypeSymbol)
+            {
+                return declaredTypeSymbol;
+            }
         }
 
         return null;
