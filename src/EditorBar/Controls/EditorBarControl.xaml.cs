@@ -4,13 +4,11 @@
 
 #nullable enable
 
-using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Disposables;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Threading;
 using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Helpers.Events;
 using JPSoftworks.EditorBar.Helpers.Presentation;
@@ -150,18 +148,20 @@ internal partial class EditorBarControl : IDisposable
         }
     }
 
-    [SuppressMessage("Usage", "VSTHRD100:Avoid async void methods", Justification = "<Pending>")]
-    private async void ApplySettings()
+    private void ApplySettings()
     {
-        try
+        this._joinableTaskFactory.RunAsync(async () =>
         {
-            await this._joinableTaskFactory.SwitchToMainThreadAsync();
-            this.ReapplySettings();
-        }
-        catch (Exception ex)
-        {
-            await ex.LogAsync();
-        }
+            try
+            {
+                await this._joinableTaskFactory.SwitchToMainThreadAsync();
+                this.ReapplySettings();
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync();
+            }
+        }).FireAndForget();
     }
 
     public void FocusAndOpenProjectCrumb()
@@ -202,12 +202,12 @@ internal partial class EditorBarControl : IDisposable
         // Let's assume that we can accept focus changes from buttons that are before or after our button.
         if (e.OldFocus != null && e.OldFocus is not Button)
         {
-            _ = this.Dispatcher.BeginInvoke(
-                new Action(() =>
-                {
-                    this._textView.VisualElement?.Focus();
-                }),
-                DispatcherPriority.Input);
+            this._joinableTaskFactory.RunAsync(async () =>
+            {
+                await Task.Yield();
+                await this._joinableTaskFactory.SwitchToMainThreadAsync();
+                this._textView.VisualElement?.Focus();
+            }).FireAndForget();
             e.Handled = true;
         }
     }
