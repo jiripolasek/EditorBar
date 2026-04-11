@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text.Editor;
 using CompilationUnitSyntax = Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax;
 
@@ -115,6 +116,7 @@ internal class RoslynWorkspaceFileStructureProvider
                     NavigationAction = textView =>
                         textView.GetCodeNavigationService()
                             .NavigateToSymbolDeclarationInCurrentViewAsync(symbol, location)
+                            .FireAndForget()
                 })
             .Cast<FileStructureElementModel>()
             .ToImmutableList();
@@ -198,8 +200,9 @@ internal class RoslynWorkspaceFileStructureProvider
                 static member => member.Locations,
                 static (symbol, location) => new SymbolFileStructureElementModel(symbol, location)
                 {
-                    NavigationAction = view =>
-                        view.GetCodeNavigationService().NavigateToSymbolDeclarationInCurrentViewAsync(symbol)
+                    NavigationAction = view => view.GetCodeNavigationService()
+                        .NavigateToSymbolDeclarationInCurrentViewAsync(symbol)
+                        .FireAndForget()
                 })
             .Cast<FileStructureElementModel>()
             .ToImmutableList();

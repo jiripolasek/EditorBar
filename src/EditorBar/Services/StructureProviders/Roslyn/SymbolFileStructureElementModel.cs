@@ -11,6 +11,7 @@ using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Resources;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text.Editor;
 
 namespace JPSoftworks.EditorBar.Services.StructureProviders.Roslyn;
@@ -136,11 +137,11 @@ public record SymbolFileStructureElementModel : FileStructureElementModel
         }
     }
 
-    private async void NavigationAction2(IWpfTextView obj)
+    private void NavigationAction2(IWpfTextView obj)
     {
         if (this.TargetSymbol != null)
         {
-            await Navigator.NavigateToAnchorAsync(new SymbolAnchorPoint(this.TargetSymbol, this.Location));
+            Navigator.NavigateToAnchorAsync(new SymbolAnchorPoint(this.TargetSymbol, this.Location)).FireAndForget();
         }
     }
 

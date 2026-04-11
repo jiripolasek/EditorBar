@@ -7,8 +7,8 @@
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Windows.Threading;
 using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Shell;
 
 namespace JPSoftworks.EditorBar.Controls;
 
@@ -59,18 +59,21 @@ public partial class MemberListPopup : Popup
             var symbolChevronButton = this.FindAncestor<SymbolChevronButton>();
             if (symbolChevronButton != null)
             {
-                _ = this.Dispatcher!.BeginInvoke(
-                    new Action(() =>
-                    {
-                        //symbolChevronButton.AcquireWin32Focus(out _);
-                        symbolChevronButton.FocusButton();
-                    }),
-                    DispatcherPriority.ApplicationIdle);
+                FocusOwnerAsync(symbolChevronButton).FireAndForget();
             }
 
             e.Handled = true;
         }
 
         base.OnKeyDown(e);
+    }
+
+    private static async Task FocusOwnerAsync(SymbolChevronButton symbolChevronButton)
+    {
+        await Task.Yield();
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+        //symbolChevronButton.AcquireWin32Focus(out _);
+        symbolChevronButton.FocusButton();
     }
 }
