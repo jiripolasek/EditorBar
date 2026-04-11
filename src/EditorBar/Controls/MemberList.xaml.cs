@@ -1,13 +1,10 @@
 // ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -33,7 +30,8 @@ public partial class MemberList : UserControl
         this.UpdateFilterPredicate();
     }
 
-    public MemberList(IEnumerable<MemberListItemViewModel> members) : this()
+    public MemberList(IEnumerable<MemberListItemViewModel> members)
+        : this()
     {
         this._collectionViewSource.Source = members;
         this.ListBox!.ItemsSource = this._collectionViewSource.View;
@@ -64,7 +62,8 @@ public partial class MemberList : UserControl
 
     private static bool IsCtrlEdgeNavigation(KeyEventArgs e)
     {
-        return (e.Key == Key.Up || e.Key == Key.Down) && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
+        return (e.Key == Key.Up || e.Key == Key.Down) &&
+               (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
     }
 
     private static bool IsTextInputKey(KeyEventArgs e)
@@ -117,6 +116,7 @@ public partial class MemberList : UserControl
         if (string.IsNullOrEmpty(this.FilterTextBox!.Text))
         {
             this.FilterTextBox.Visibility = Visibility.Collapsed;
+
             // Return focus to list so user can continue navigating immediately
             this.ListBox!.Focus();
             if (view != null && !view.IsEmpty)
@@ -166,10 +166,12 @@ public partial class MemberList : UserControl
             {
                 this.ListBox.SelectedIndex = 0;
             }
+
             if (this.ListBox.SelectedItem != null)
             {
                 this.OnItemSelected();
             }
+
             e.Handled = true;
         }
     }
@@ -182,8 +184,6 @@ public partial class MemberList : UserControl
             this.FilterTextBox.Clear(); // triggers TextChanged -> collapse & focus list
             e.Handled = true; // prevent popup from closing
         }
-
-        return;
     }
 
     private void ListBox_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -248,6 +248,7 @@ public partial class MemberList : UserControl
         {
             return;
         }
+
         if (toFirst)
         {
             view.MoveCurrentToFirst();
@@ -256,6 +257,7 @@ public partial class MemberList : UserControl
         {
             view.MoveCurrentToLast();
         }
+
         var current = view.CurrentItem;
         if (current != null)
         {
@@ -292,7 +294,7 @@ public partial class MemberList : UserControl
             return;
         }
 
-        var sourceCollection = this._collectionViewSource.Source as System.Collections.IEnumerable;
+        var sourceCollection = this._collectionViewSource.Source as IEnumerable;
         bool hasAnySourceItem = false;
         if (sourceCollection != null)
         {

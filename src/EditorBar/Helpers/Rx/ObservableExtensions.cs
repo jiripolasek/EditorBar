@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -58,6 +56,7 @@ public static class ObservableExtensions
                 .Subscribe(active =>
                 {
                     isActive = !active;
+
                     // When becoming active, immediately emit the buffered value if one exists.
                     if (isActive && hasLatest)
                     {

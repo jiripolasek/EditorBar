@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -26,9 +24,9 @@ public static class StyleHelper
         string xamlFilePattern,
         string newStyleKey)
     {
-        Requires.NotNull(resourceCollection, nameof(resourceCollection));
-        Requires.NotNullOrWhiteSpace(xamlFilePattern, nameof(xamlFilePattern));
-        Requires.NotNullOrWhiteSpace(newStyleKey, nameof(newStyleKey));
+        Requires.NotNull(resourceCollection);
+        Requires.NotNullOrWhiteSpace(xamlFilePattern);
+        Requires.NotNullOrWhiteSpace(newStyleKey);
 
         // Infer the calling assembly's pack URI base
         var callingAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
@@ -42,7 +40,7 @@ public static class StyleHelper
     /// </summary>
     public static void ForceReloadResources(this FrameworkElement element)
     {
-        Requires.NotNull(element, nameof(element));
+        Requires.NotNull(element);
 
         var currentResources = element.Resources;
         element.Resources = null!;
@@ -69,13 +67,11 @@ public static class StyleHelper
 
         if (matchingDictionaries.Count == 1 &&
             matchingDictionaries[0]?.Source != null &&
-            string.Equals(matchingDictionaries[0]!.Source!.ToString(), newStyleUriKey,
-                StringComparison.OrdinalIgnoreCase))
+            string.Equals(matchingDictionaries[0]!.Source!.ToString(), newStyleUriKey, StringComparison.OrdinalIgnoreCase))
         {
             // Desired style is already applied, no action needed
             return;
         }
-
 
         foreach (var resourceDictionary in matchingDictionaries)
         {

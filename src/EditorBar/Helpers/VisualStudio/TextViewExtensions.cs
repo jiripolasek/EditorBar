@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -25,9 +23,10 @@ internal static class TextViewExtensions
     /// <returns>The <see cref="ITextDocument" /> if found; otherwise, <c>null</c>.</returns>
     public static ITextDocument? GetTextDocumentFromDocumentBuffer(this ITextView textView)
     {
-        Requires.NotNull(textView, nameof(textView));
+        Requires.NotNull(textView);
 
-        return textView.TextDataModel?.DocumentBuffer?.Properties!.TryGetProperty<ITextDocument>(typeof(ITextDocument),
+        return textView.TextDataModel?.DocumentBuffer?.Properties!.TryGetProperty<ITextDocument>(
+            typeof(ITextDocument),
             out var document) == true
             ? document
             : null;
@@ -40,9 +39,10 @@ internal static class TextViewExtensions
     /// <returns>The <see cref="ICodeNavigationService" />.</returns>
     public static ICodeNavigationService GetCodeNavigationService(this ITextView textView)
     {
-        Requires.NotNull(textView, nameof(textView));
+        Requires.NotNull(textView);
 
-        return textView.Properties!.GetOrCreateSingletonProperty(typeof(ICodeNavigationService),
+        return textView.Properties!.GetOrCreateSingletonProperty(
+            typeof(ICodeNavigationService),
             () => new CodeNavigationService(textView))!;
     }
 
@@ -53,9 +53,10 @@ internal static class TextViewExtensions
     /// <returns>The <see cref="ITextNavigationService" />.</returns>
     public static ITextNavigationService GetTextNavigationService(this ITextView textView)
     {
-        Requires.NotNull(textView, nameof(textView));
+        Requires.NotNull(textView);
 
-        return textView.Properties!.GetOrCreateSingletonProperty(typeof(ITextNavigationService),
+        return textView.Properties!.GetOrCreateSingletonProperty(
+            typeof(ITextNavigationService),
             () => new CodeNavigationService(textView))!;
     }
 }

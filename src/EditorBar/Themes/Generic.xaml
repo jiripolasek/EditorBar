@@ -16,7 +16,7 @@
         <ResourceDictionary Source="Generic.ChevronButton.xaml" />
 
         <ResourceDictionary>
-            <!-- control button on the right -->
+            <!--  control button on the right  -->
             <Style x:Key="CommandBarBorderStyle" TargetType="Border">
                 <Setter Property="Opacity" Value="0" />
                 <Style.Triggers>
@@ -30,14 +30,20 @@
                         <DataTrigger.EnterActions>
                             <BeginStoryboard>
                                 <Storyboard>
-                                    <DoubleAnimation To="1" Duration="0:0:0.2" Storyboard.TargetProperty="Opacity" />
+                                    <DoubleAnimation
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="1"
+                                        Duration="0:0:0.2" />
                                 </Storyboard>
                             </BeginStoryboard>
                         </DataTrigger.EnterActions>
                         <DataTrigger.ExitActions>
                             <BeginStoryboard>
                                 <Storyboard>
-                                    <DoubleAnimation To="0" Duration="0:0:0.4" Storyboard.TargetProperty="Opacity" />
+                                    <DoubleAnimation
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="0"
+                                        Duration="0:0:0.4" />
                                 </Storyboard>
                             </BeginStoryboard>
                         </DataTrigger.ExitActions>

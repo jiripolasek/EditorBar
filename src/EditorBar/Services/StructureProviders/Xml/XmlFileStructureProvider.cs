@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -22,13 +20,17 @@ namespace JPSoftworks.EditorBar.Services.StructureProviders.Xml;
 
 internal sealed class XmlFileStructureProvider : StructuredDocumentStructureProvider<XDocument>
 {
-    public XmlFileStructureProvider(ITextView textTextView) : base(textTextView) { }
+    public XmlFileStructureProvider(ITextView textTextView)
+        : base(textTextView)
+    {
+    }
 
     protected override Task<XDocument> ParseDocumentAsync(string text, CancellationToken cancellationToken)
     {
         try
         {
-            var parsedDocument = XDocument.Parse(text,
+            var parsedDocument = XDocument.Parse(
+                text,
                 LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo);
             return Task.FromResult(parsedDocument);
         }
@@ -38,22 +40,21 @@ internal sealed class XmlFileStructureProvider : StructuredDocumentStructureProv
         }
     }
 
-    protected override Task<(IEnumerable<BaseStructureModel> structure, bool rootHasChildren)>
-        GetFileStructureCoreAsync(
+    protected override Task<(IEnumerable<BaseStructureModel> Structure, bool RootHasChildren)> GetFileStructureCoreAsync(
             int caretPosition,
             XDocument document,
             ITextSnapshot textSnapshot,
             string filePath,
             CancellationToken cancellationToken)
     {
-        Requires.NotNull(textSnapshot, nameof(textSnapshot));
-        Requires.NotNull(document, nameof(document));
+        Requires.NotNull(textSnapshot);
+        Requires.NotNull(document);
 
         var xPathSegmentsArray = CalculateXPath(caretPosition, document, textSnapshot);
         var xPathSegments = xPathSegmentsArray!.AsSpan();
         if (xPathSegments == null)
         {
-            return Task.FromResult<(IEnumerable<BaseStructureModel> structure, bool rootHasChildren)>(([], false));
+            return Task.FromResult<(IEnumerable<BaseStructureModel> Structure, bool RootHasChildren)>(([], false));
         }
 
         var result = new BaseStructureModel[xPathSegments.Length];
@@ -63,12 +64,13 @@ internal sealed class XmlFileStructureProvider : StructuredDocumentStructureProv
             var segments = xPathSegments.Slice(0, index + 1);
             var xmlStructureModel = new XmlNodeStructureModel(filePath, segment.ToDisplayString(), segments)
             {
-                ImageMoniker = KnownMonikers.MarkupXML, CanHaveChildren = segment.CanHaveChildren
+                ImageMoniker = KnownMonikers.MarkupXML,
+                CanHaveChildren = segment.CanHaveChildren
             };
             result[index] = xmlStructureModel;
         }
 
-        return Task.FromResult<(IEnumerable<BaseStructureModel> structure, bool rootHasChildren)>((result, true));
+        return Task.FromResult<(IEnumerable<BaseStructureModel> Structure, bool RootHasChildren)>((result, true));
     }
 
     protected override async Task<ImmutableList<FileStructureElementModel>> GetChildItemsCoreAsync(
@@ -92,7 +94,6 @@ internal sealed class XmlFileStructureProvider : StructuredDocumentStructureProv
         try
         {
             // find element using parentXPath and return its children
-
             XContainer? parentContainer;
             if (path.Length == 0)
             {
@@ -121,16 +122,16 @@ internal sealed class XmlFileStructureProvider : StructuredDocumentStructureProv
                 }
 
                 // get all child elements of parentElement (across all namespaces)
-
                 var elements = parentContainer.Elements();
-                items.AddRange(elements.Select(e => new FileStructureElementModel
-                {
-                    ImageMoniker = KnownMonikers.MarkupXML,
-                    PrimaryName = e.Name.LocalName,
-                    SearchText = e.Name.LocalName,
-                    SecondaryName = GetFirstAttributeNameAndValue(e),
-                    NavigationAction = _ => this.NavigateTo(e)
-                }));
+                items.AddRange(
+                    elements.Select(e => new FileStructureElementModel
+                    {
+                        ImageMoniker = KnownMonikers.MarkupXML,
+                        PrimaryName = e.Name.LocalName,
+                        SearchText = e.Name.LocalName,
+                        SecondaryName = GetFirstAttributeNameAndValue(e),
+                        NavigationAction = _ => this.NavigateTo(e)
+                    }));
 
                 return items.ToImmutableList();
             }
@@ -174,7 +175,6 @@ internal sealed class XmlFileStructureProvider : StructuredDocumentStructureProv
 
         // wasting cycles :(
         // var index = parentElement.Elements(element.Name).ToList().IndexOf(element);
-
         var firstAttribute = element!.Attributes().First();
         return $"""
                 {firstAttribute.Name.LocalName}="{firstAttribute.Value.CropSafe(25)}"
@@ -192,7 +192,6 @@ internal sealed class XmlFileStructureProvider : StructuredDocumentStructureProv
         }
     }
 
-
     private static XPathSegment[]? CalculateXPath(int position, XDocument document, ITextSnapshot textSnapshot)
     {
         try
@@ -206,7 +205,7 @@ internal sealed class XmlFileStructureProvider : StructuredDocumentStructureProv
         }
     }
 
-    private static (int line, int column) GetLineColumnFromPosition(ITextSnapshot textSnapshot, int position)
+    private static (int Line, int Column) GetLineColumnFromPosition(ITextSnapshot textSnapshot, int position)
     {
         // Grab the line that contains 'position'
         var snapshotLine = textSnapshot.GetLineFromPosition(position);
@@ -224,7 +223,6 @@ internal sealed class XmlFileStructureProvider : StructuredDocumentStructureProv
 
         return (lineNumber, columnNumber);
     }
-
 
     private static XElement? FindElementAtPosition(
         XDocument document,
@@ -280,7 +278,6 @@ internal sealed class XmlFileStructureProvider : StructuredDocumentStructureProv
 
         return bestMatch;
     }
-
 
     private static XPathSegment[] GetXPath(XElement? element)
     {

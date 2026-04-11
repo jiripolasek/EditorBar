@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -26,7 +24,9 @@ internal class LegacyLabelViewModel : ObservableObject
     private FileLabel _style;
 
     public DispatchedDelegateCommand PrimaryCommand { get; }
+
     public DispatchedDelegateCommand SecondaryCommand { get; }
+
     public DispatchedDelegateCommand ContextMenuCommand { get; }
 
     public LocationNavModel? LocationNavModel
@@ -43,7 +43,7 @@ internal class LegacyLabelViewModel : ObservableObject
 
     public string Label
     {
-        get => this._label ?? "";
+        get => this._label ?? string.Empty;
         private set => this.SetProperty(ref this._label, value);
     }
 
@@ -61,11 +61,12 @@ internal class LegacyLabelViewModel : ObservableObject
 
     public LegacyLabelViewModel(ITextDocument textDocument)
     {
-        Requires.NotNull(textDocument, nameof(textDocument));
+        Requires.NotNull(textDocument);
 
-        this.PrimaryCommand = new(_ => this.ExecuteFileAction(false));
-        this.SecondaryCommand = new(_ => this.ExecuteFileAction(true));
-        this.ContextMenuCommand = new(_ => new FileActionMenuContext(textDocument).ShowMenu());
+        this.PrimaryCommand = new DispatchedDelegateCommand(_ => this.ExecuteFileAction(false));
+        this.SecondaryCommand = new DispatchedDelegateCommand(_ => this.ExecuteFileAction(true));
+        this.ContextMenuCommand
+            = new DispatchedDelegateCommand(_ => new FileActionMenuContext(textDocument).ShowMenu());
 
         GeneralOptionsModel.Saved += this.GeneralOptionsModelOnSaved;
         this.Style = GeneralOptionsModel.Instance.FileLabelStyle;
@@ -78,7 +79,8 @@ internal class LegacyLabelViewModel : ObservableObject
 
     private void UpdateLabel()
     {
-        this.Label = FormatFileNameLabel(this.LocationNavModel?.FilePath, this.LocationNavModel?.Project) ?? "";
+        this.Label = FormatFileNameLabel(this.LocationNavModel?.FilePath, this.LocationNavModel?.Project) ??
+                     string.Empty;
     }
 
     private static string? FormatFileNameLabel(string? fullFileName, IProjectInfo? projectInfo)
@@ -91,7 +93,7 @@ internal class LegacyLabelViewModel : ObservableObject
         return GeneralOptionsModel.Instance.FileLabelStyle switch
         {
             FileLabel.AbsolutePath => fullFileName,
-            FileLabel.RelativePathInProject => GetRelativePathToProject(fullFileName ?? "", projectInfo),
+            FileLabel.RelativePathInProject => GetRelativePathToProject(fullFileName ?? string.Empty, projectInfo),
             FileLabel.RelativePathInSolution => GetRelativePathToSolution(fullFileName),
             FileLabel.FileName => Path.GetFileName(fullFileName),
             FileLabel.Hidden => null,
@@ -119,7 +121,9 @@ internal class LegacyLabelViewModel : ObservableObject
 
     private static string? GetRelativePathToProject(string? path, IProjectInfo? project)
     {
-        return path == null || project == null ? path : PathUtils.GetRelativePath(project.DirectoryPath ?? "", path);
+        return path == null || project == null
+            ? path
+            : PathUtils.GetRelativePath(project.DirectoryPath ?? string.Empty, path);
     }
 
     private void ExecuteFileAction(bool isAlternative)

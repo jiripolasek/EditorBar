@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -14,7 +12,8 @@ namespace JPSoftworks.EditorBar.Commands;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
 internal abstract class BaseStructureMenuContextCommand<T>
-    : BaseMenuContextCommand<StructureBreadcrumbMenuContext, T> where T : class, new()
+    : BaseMenuContextCommand<StructureBreadcrumbMenuContext, T>
+    where T : class, new()
 {
     protected override Task ExecuteCoreAsync(StructureBreadcrumbMenuContext context)
     {

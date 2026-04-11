@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -16,7 +14,10 @@ internal class MenuIdAttribute : Attribute
 {
     public MenuId MenuId { get; }
 
-    public MenuIdAttribute(string packageGuidString, int commandId) : this(Guid.Parse(packageGuidString), commandId) { }
+    public MenuIdAttribute(string packageGuidString, int commandId)
+        : this(Guid.Parse(packageGuidString), commandId)
+    {
+    }
 
     public MenuIdAttribute(Guid packageGuid, int commandId)
     {

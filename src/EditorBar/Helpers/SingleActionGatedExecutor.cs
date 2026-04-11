@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -19,7 +17,7 @@ internal class SingleActionGatedExecutor
 
     public SingleActionGatedExecutor(Action action)
     {
-        Requires.NotNull(action, nameof(action));
+        Requires.NotNull(action);
 
         this._action = action;
     }

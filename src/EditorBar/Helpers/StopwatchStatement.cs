@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -20,7 +18,6 @@ internal readonly struct StopwatchStatement(string name) : IDisposable
     {
         return new StopwatchStatement(name);
     }
-
 
     public void Dispose()
     {

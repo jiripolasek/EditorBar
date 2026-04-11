@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -19,6 +17,10 @@ internal abstract class BaseFileActionMenuContextCommand<TCommand>
     : BaseMenuContextCommand<FileActionMenuContext, TCommand>
     where TCommand : class, new()
 {
+    protected BaseFileActionMenuContextCommand()
+    {
+    }
+
     /// <summary>
     /// Executes the core asynchronous operation using the provided context.
     /// </summary>

@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -13,7 +11,7 @@ using Microsoft.VisualStudio.Shell;
 namespace JPSoftworks.EditorBar.Commands.Abstractions;
 
 /// <summary>
-/// Base class for commands that use a specific context type
+/// Base class for commands that use a specific context type.
 /// </summary>
 [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
 internal abstract class BaseMenuContextCommand<TMenuContext, TCommand> : BaseCommand<TCommand>
@@ -37,7 +35,7 @@ internal abstract class BaseMenuContextCommand<TMenuContext, TCommand> : BaseCom
 
             var menuId = menuIdAttr.MenuId;
             var context = this._contextService?.GetActiveContext<TMenuContext>(menuId);
-            if (context == null || context.Validate() == false)
+            if (context == null || !context.Validate())
             {
                 return;
             }

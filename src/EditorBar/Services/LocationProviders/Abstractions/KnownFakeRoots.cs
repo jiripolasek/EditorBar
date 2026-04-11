@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -19,7 +17,8 @@ internal static class KnownFakeRoots
     {
         FakeRoots =
         [
-            new KnownFakeRoot(Strings.TempRootName ?? "", Path.GetTempPath())
+            new KnownFakeRoot(Strings.TempRootName ?? string.Empty, Path.GetTempPath())
+
             //new KnownFakeRoot("Roaming App Data", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)),
             //new KnownFakeRoot("Local AppData", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)),
             //new KnownFakeRoot("User Profile", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)),

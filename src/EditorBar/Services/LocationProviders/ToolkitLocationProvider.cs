@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -32,7 +30,7 @@ public class ToolkitLocationProvider : ILocationProvider
         IWpfTextView wpfTextView,
         CancellationToken cancellationToken = default)
     {
-        Requires.NotNull(wpfTextView, nameof(wpfTextView));
+        Requires.NotNull(wpfTextView);
 
         await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
 
@@ -53,7 +51,7 @@ public class ToolkitLocationProvider : ILocationProvider
 
     private static async Task<IProjectInfo> GetProjectWrapperAsync(ITextDocument document)
     {
-        Requires.NotNull(document, nameof(document));
+        Requires.NotNull(document);
 
         // find in other projects (e.g. misc files) that are not covered by Toolkit Project and thus not by PhysicalDocument.ContainingProject
         // handle solution root folder (for the files that are in solution folder, but not part of the solution or project itself)
@@ -77,7 +75,7 @@ public class ToolkitLocationProvider : ILocationProvider
         var displayName = PathUtils.IsNetworkPath(document.FilePath!)
             ? Strings.NetworkRootName
             : Strings.LocalDriveRootName; // network path
-        return new FileSystemProjectInfo(displayName ?? "", null);
+        return new FileSystemProjectInfo(displayName ?? string.Empty, null);
     }
 
     private static IProjectInfo? FindInKnownFakeRoots(ITextDocument document)
@@ -105,7 +103,7 @@ public class ToolkitLocationProvider : ILocationProvider
             return null;
         }
 
-        return new FileSystemProjectInfo(Strings.SolutionRootName ?? "", solutionPath);
+        return new FileSystemProjectInfo(Strings.SolutionRootName ?? string.Empty, solutionPath);
     }
 
     private static async Task<IProjectInfo?> CreateFromPhysicalDocumentOrDefaultAsync(ITextDocument document)
@@ -127,7 +125,7 @@ public class ToolkitLocationProvider : ILocationProvider
         }
         else
         {
-            var absolutePath = Path.GetDirectoryName(document.FilePath!) ?? "";
+            var absolutePath = Path.GetDirectoryName(document.FilePath!) ?? string.Empty;
             inProjectPathElements = absolutePath.Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
                 .Split(DirectorySeparators, StringSplitOptions.RemoveEmptyEntries);
         }

@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -25,36 +23,35 @@ namespace JPSoftworks.EditorBar.Services.LocationProviders;
 public class GenericProjectInfo : BaseSolutionProjectInfo, IHasSolutionFolders
 {
     /// <summary>
-    /// Represents a project in the solution.
+    /// Gets the project in the solution.
     /// </summary>
     public ToolkitProject Project { get; }
 
     /// <summary>
-    /// Represents the VS solution.
+    /// Gets the VS solution.
     /// </summary>
     public TookitSolution? Solution { get; }
 
     /// <summary>
-    /// Represents the IntelliSense contexts for a Code Analysis project. It can be null if no contexts are available.
+    /// Gets the IntelliSense contexts for a Code Analysis project.
     /// </summary>
     public CodeAnalysisProject? IntelliSenseContexts { get; private set; }
 
     /// <summary>
-    /// Represents the IntelliSense alternative contexts documents for a Code Analysis project. It can be null if no
-    /// alternative contexts are available.
+    /// Gets the IntelliSense alternative context documents for a Code Analysis project.
     /// </summary>
     public IReadOnlyList<Document> IntelliSenseAlternativeContextsDocuments { get; private set; } = [];
 
     /// <summary>
-    /// Provides a read-only list of solution folder names. This allows access to the names without modifying the list.
+    /// Gets the solution folder names.
     /// </summary>
     public IReadOnlyList<string> SolutionFolders { get; }
 
     private GenericProjectInfo(ToolkitProject project, TookitSolution? solution, IReadOnlyList<string> solutionFolders)
         : base(project.Name, Path.GetDirectoryName(project.FullPath!))
     {
-        Requires.NotNull(project, nameof(project));
-        Requires.NotNull(solutionFolders, nameof(solutionFolders));
+        Requires.NotNull(project);
+        Requires.NotNull(solutionFolders);
 
         this.Project = project;
         this.Solution = solution!;
@@ -64,11 +61,11 @@ public class GenericProjectInfo : BaseSolutionProjectInfo, IHasSolutionFolders
     /// <summary>
     /// Creates a project information object asynchronously from a given project.
     /// </summary>
-    /// <param name="project">The project to create information from must not be null.</param>
+    /// <param name="project">The project to create information from.</param>
     /// <returns>An object containing information about the specified project.</returns>
     public static async Task<IProjectInfo> CreateFromProjectAsync(ToolkitProject project)
     {
-        Requires.NotNull(project, nameof(project));
+        Requires.NotNull(project);
 
         var solution = await VS.Solutions.GetCurrentSolutionAsync();
         var solutionFolders = await GetSolutionFoldersAsync(project);
@@ -76,10 +73,9 @@ public class GenericProjectInfo : BaseSolutionProjectInfo, IHasSolutionFolders
     }
 
     /// <summary>
-    /// Updates the IntelliSense context based on the provided project information. It sets various properties depending
-    /// on the presence of project data.
+    /// Updates the IntelliSense context based on the provided project information.
     /// </summary>
-    /// <param name="projects">Contains information about the active project and alternative context documents for IntelliSense.</param>
+    /// <param name="projects">Information about the active project and alternative context documents for IntelliSense.</param>
     public void UpdateIntelliSenseContext(IntelliSenseProjectContextContainer? projects)
     {
         if (projects == null)

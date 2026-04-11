@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -16,7 +14,8 @@ using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace JPSoftworks.EditorBar.Commands;
 
-internal abstract class BaseFocusBreadcrumbCommand<T> : BaseCommand<T> where T : class, new()
+internal abstract class BaseFocusBreadcrumbCommand<T> : BaseCommand<T>
+    where T : class, new()
 {
     protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
     {
@@ -52,8 +51,9 @@ internal abstract class BaseFocusBreadcrumbCommand<T> : BaseCommand<T> where T :
 
     private static EditorBarControl? FindVisibleOne(IWpfTextViewHost? wpfTextViewHost)
     {
-        if (wpfTextViewHost.TextView.Properties.TryGetProperty(typeof(EditorBarControl),
-                out EditorBarControl editorBarControl))
+        if (wpfTextViewHost?.TextView?.Properties.TryGetProperty(
+                typeof(EditorBarControl),
+                out EditorBarControl editorBarControl) == true)
         {
             return editorBarControl;
         }

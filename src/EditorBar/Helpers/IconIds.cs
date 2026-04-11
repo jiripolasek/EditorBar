@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -337,7 +335,7 @@ internal static class IconIds
         return (overlayId & (1 << (OverlayShift - 1))) != 0;
     }
 
-    public static (int, int, bool) DeconstructIconOverlay(this int iconId)
+    public static (int BaseId, int OverlayId, bool IsFullOverlay) DeconstructIconOverlay(this int iconId)
     {
         return (iconId & ImageMask, (iconId >> OverlayShift) & OverlayMask, (iconId & FullOverlayMask) != 0);
     }

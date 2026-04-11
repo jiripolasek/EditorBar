@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -21,8 +19,7 @@ internal static class RatingService
 
     public static void RegisterSuccessfulUsage()
     {
-        var prompt = new RatingPrompt("jiripolasek.EditorBar", Vsix.Name, GeneralOptionsModel.Instance,
-            UsagesBeforeRatingPrompt);
+        var prompt = new RatingPrompt("jiripolasek.EditorBar", Vsix.Name, GeneralOptionsModel.Instance, UsagesBeforeRatingPrompt);
         prompt.RegisterSuccessfulUsage();
     }
 }

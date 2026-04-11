@@ -1,7 +1,5 @@
-﻿// ------------------------------------------------------------
-// 
+// ------------------------------------------------------------
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -27,9 +25,9 @@ internal static class VisualStudioHelper
     /// <summary>
     /// Converts to solution item asynchronous.
     /// </summary>
-    /// <param name="dteProject">The DTE project.</param>
+    /// <param name="dteProject">The DTE project to convert.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns></returns>
+    /// <returns>The converted project, or <c>null</c> if no match is found.</returns>
     /// <exception cref="System.ArgumentNullException">dteProject</exception>
     /// <exception cref="OperationCanceledException">
     /// Thrown back at the awaiting caller if <paramref name="cancellationToken" /> is canceled,
@@ -52,7 +50,6 @@ internal static class VisualStudioHelper
             return project.FullPath == dteProject.FullName;
         });
     }
-
 
     private static async Task<IEnumerable<Project>> GetAllProjectsAsync(
         ProjectStateFilter filter = ProjectStateFilter.Loaded)
@@ -93,7 +90,7 @@ internal static class VisualStudioHelper
         ITextDocument document,
         CancellationToken cancellationToken = default)
     {
-        Requires.NotNull(document, nameof(document));
+        Requires.NotNull(document);
         return await GetProjectFromPathAsync(cancellationToken, document.FilePath);
     }
 
@@ -133,9 +130,9 @@ internal static class VisualStudioHelper
     /// <summary>
     /// Gets the solution folder path asynchronous.
     /// </summary>
-    /// <param name="solutionItem">The project.</param>
+    /// <param name="solutionItem">The solution item.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns></returns>
+    /// <returns>The solution folder path.</returns>
     /// <exception cref="OperationCanceledException">
     /// Thrown back at the awaiting caller if <paramref name="cancellationToken" /> is canceled,
     /// even if the caller is already on the main thread.
@@ -144,7 +141,7 @@ internal static class VisualStudioHelper
         SolutionItem solutionItem,
         CancellationToken cancellationToken = default)
     {
-        Requires.NotNull(solutionItem, nameof(solutionItem));
+        Requires.NotNull(solutionItem);
 
         var folderPath = new List<string>();
 

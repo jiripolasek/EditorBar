@@ -1,7 +1,5 @@
-﻿// ------------------------------------------------------------
-// 
+// ------------------------------------------------------------
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -38,7 +36,7 @@ internal static class Launcher
 
         var command = GeneralOptionsModel.Instance.ExternalEditorCommand;
 
-        var commandArgs = GeneralOptionsModel.Instance.ExternalEditorCommandArguments ?? "";
+        var commandArgs = GeneralOptionsModel.Instance.ExternalEditorCommandArguments ?? string.Empty;
 
         // ensure file path as passed to the command arguments: if the arguments does not contain the placeholder, append it
         var hasPathPlaceholder =
@@ -207,7 +205,6 @@ internal static class Launcher
                 : filePath.Substring(slnDir.Length);
         }
     }
-
 
     private static string Quote(string fileName)
     {

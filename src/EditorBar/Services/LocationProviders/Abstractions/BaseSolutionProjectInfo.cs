@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -17,7 +15,7 @@ namespace JPSoftworks.EditorBar.Services.LocationProviders;
 public abstract class BaseSolutionProjectInfo : IProjectInfo
 {
     /// <summary>
-    /// Gets the display name of the project.
+    /// Gets or sets the display name of the project.
     /// </summary>
     public string DisplayName { get; protected set; }
 
@@ -38,7 +36,7 @@ public abstract class BaseSolutionProjectInfo : IProjectInfo
     /// <param name="directoryPath">The directory path of the project.</param>
     protected BaseSolutionProjectInfo(string displayName, string? directoryPath)
     {
-        Requires.NotNullOrEmpty(displayName, nameof(displayName));
+        Requires.NotNullOrEmpty(displayName);
 
         this.DisplayName = displayName;
         this.DirectoryPath = directoryPath;

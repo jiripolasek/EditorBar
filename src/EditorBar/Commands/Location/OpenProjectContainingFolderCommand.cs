@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -21,7 +19,6 @@ internal sealed class OpenProjectContainingFolderCommand
     {
         // If IProjectInfo is ProjectWrapper then we can extract the FullPath property to the project open containing folder and preselect the project file;
         // Otherwise just use project.DirectoryPath to open plain folder.
-
         if (project is GenericProjectInfo projectWrapper
             && !string.IsNullOrWhiteSpace(projectWrapper.Project.FullPath!))
         {

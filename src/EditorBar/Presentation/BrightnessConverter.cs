@@ -1,7 +1,5 @@
-﻿// ------------------------------------------------------------
-// 
+// ------------------------------------------------------------
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -25,7 +23,6 @@ public class BrightnessConverter : IValueConverter
 
             // check if new V is sufficiently different from the original; if the value is capped and near the original, then we have to change the direction (lighten/darken) to make the change more visible
             // let's say that 10 % is the threshold for "sufficiently different"; it the new value is within 10 % of the original, we will change the direction
-
             var newHsv = AdjustBrightness(originalHsv, this.Factor);
             var newColor = HsvToRgb(newHsv);
             return new SolidColorBrush(newColor);
@@ -64,7 +61,6 @@ public class BrightnessConverter : IValueConverter
         };
     }
 
-
     private static HsvColor RgbToHsv(Color color)
     {
         var r = color.R / 255.0;
@@ -80,7 +76,7 @@ public class BrightnessConverter : IValueConverter
         {
             if (max == r)
             {
-                hue = (g - b) / delta % 6;
+                hue = ((g - b) / delta) % 6;
             }
             else if (max == g)
             {
@@ -97,7 +93,6 @@ public class BrightnessConverter : IValueConverter
                 hue += 360;
             }
         }
-
 
         double saturation;
         if (color.R == color.G && color.R == color.B)
@@ -121,9 +116,8 @@ public class BrightnessConverter : IValueConverter
             return Color.FromRgb(v, v, v);
         }
 
-
         var c = hsv.V * hsv.S;
-        var x = c * (1 - Math.Abs((hsv.H / 60 % 2) - 1));
+        var x = c * (1 - Math.Abs(((hsv.H / 60) % 2) - 1));
         var m = hsv.V - c;
 
         double r = 0, g = 0, b = 0;
@@ -155,8 +149,7 @@ public class BrightnessConverter : IValueConverter
         return Color.FromRgb(
             (byte)((r + m) * 255),
             (byte)((g + m) * 255),
-            (byte)((b + m) * 255)
-        );
+            (byte)((b + m) * 255));
     }
 
     internal record struct HsvColor(double H, double S, double V)

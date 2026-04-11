@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 using System.Windows.Media;
@@ -15,7 +13,8 @@ public class PhysicalDirectoryBreadcrumbModel : BreadcrumbModel<PhysicalDirector
         PhysicalDirectoryModel model,
         string text,
         Brush background,
-        Brush foreground) : base(model, text, background, foreground)
+        Brush foreground)
+        : base(model, text, background, foreground)
     {
     }
 
@@ -23,7 +22,8 @@ public class PhysicalDirectoryBreadcrumbModel : BreadcrumbModel<PhysicalDirector
         PhysicalDirectoryModel model,
         string text,
         Color background,
-        Color foreground) : base(model, text, background, foreground)
+        Color foreground)
+        : base(model, text, background, foreground)
     {
     }
 }

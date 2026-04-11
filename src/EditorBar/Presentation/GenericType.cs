@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -18,7 +16,9 @@ internal class GenericType : MarkupExtension
 
     public Type[]? InnerTypes { get; set; }
 
-    public GenericType() { }
+    public GenericType()
+    {
+    }
 
     public GenericType(Type baseType, Type innerType)
     {

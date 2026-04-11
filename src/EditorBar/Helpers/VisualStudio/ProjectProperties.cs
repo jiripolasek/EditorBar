@@ -1,7 +1,5 @@
-﻿// ------------------------------------------------------------
-// 
+// ------------------------------------------------------------
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -77,7 +75,7 @@ public static class ProjectProperties
     /// <param name="path">A physical path to a file or folder in the solution.</param>
     public static async Task SelectInSolutionExplorerAsync(string path)
     {
-        Requires.NotNullOrWhiteSpace(path, nameof(path));
+        Requires.NotNullOrWhiteSpace(path);
 
         await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync();
 
@@ -102,7 +100,6 @@ public static class ProjectProperties
         await targetItem.SelectInSolutionExplorerAsync();
     }
 
-
     /// <summary>
     /// Recursively searches the solution for the first item whose FullPath
     /// matches the specified file or folder path. Returns null if not found.
@@ -110,7 +107,7 @@ public static class ProjectProperties
     /// <param name="path">Physical file or folder path to match.</param>
     private static async Task<SolutionItem?> FindItemByFullPathAsync(string path)
     {
-        Requires.NotNullOrWhiteSpace(path, nameof(path));
+        Requires.NotNullOrWhiteSpace(path);
 
         // Ensure we're on the main thread for solution operations
         await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync();
@@ -119,6 +116,7 @@ public static class ProjectProperties
         {
             // Retrieve all top-level projects and solution folders
             var rootItems = await VS.Solutions.GetAllProjectsAsync();
+
             // Check each root item (project/folder) recursively
             foreach (var rootItem in rootItems)
             {

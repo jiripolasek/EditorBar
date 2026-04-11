@@ -1,13 +1,10 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
 
 using Community.VisualStudio.Toolkit;
-using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Services.LocationProviders;
 using Microsoft.VisualStudio.Text.Editor;
 

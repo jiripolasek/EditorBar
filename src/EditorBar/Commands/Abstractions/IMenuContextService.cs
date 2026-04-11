@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -13,7 +11,8 @@ internal interface IMenuContextService
     /// <summary>
     /// Gets the active context for a specific menu
     /// </summary>
-    T? GetActiveContext<T>(MenuId menuId) where T : MenuContext;
+    T? GetActiveContext<T>(MenuId menuId)
+        where T : MenuContext;
 
     /// <summary>
     /// Shows a context menu

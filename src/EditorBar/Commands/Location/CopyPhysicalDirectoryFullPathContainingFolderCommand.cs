@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -18,7 +16,8 @@ internal sealed class CopyPhysicalDirectoryFullPathContainingFolderCommand :
 {
     protected override async Task ExecuteCoreAsync(PhysicalDirectoryModel physicalDirectory)
     {
-        await ClipboardHelper.SetTextAsync(physicalDirectory.FullPath ?? "",
+        await ClipboardHelper.SetTextAsync(
+            physicalDirectory.FullPath ?? string.Empty,
             "Physical directory full path copied to clipboard");
     }
 }

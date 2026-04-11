@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -27,8 +25,8 @@ public static class DisposableExtensions
     public static TDisposable AddTo<TDisposable>(this TDisposable disposable, CompositeDisposable composite)
         where TDisposable : IDisposable
     {
-        Requires.NotNullAllowStructs(disposable, nameof(disposable));
-        Requires.NotNull(composite, nameof(composite));
+        Requires.NotNullAllowStructs(disposable);
+        Requires.NotNull(composite);
 
         composite.Add(disposable);
         return disposable;

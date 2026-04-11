@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -81,7 +79,6 @@ public record SymbolFileStructureElementModel : FileStructureElementModel
                               SymbolDisplayMiscellaneousOptions.UseErrorTypeSymbolName |
                               SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
 
-
     public ISymbol? TargetSymbol { get; init; }
 
     public Location Location { get; init; }
@@ -110,10 +107,7 @@ public record SymbolFileStructureElementModel : FileStructureElementModel
                 "~" + destructorSymbol.ContainingType!.Name + " (finalizer)",
 
             // if method is top-level main method, return "Main" + parameters as a hint to developer
-            IMethodSymbol
-                {
-                    MethodKind: MethodKind.Ordinary, Name: FileStructureHelper.TopLevelStatementMainMethodName
-                } method
+            IMethodSymbol { MethodKind: MethodKind.Ordinary, Name: FileStructureHelper.TopLevelStatementMainMethodName } method
                 => Strings.TopLevelStatements! + FormatMethodParameters(method.Parameters),
 
             IMethodSymbol { ExplicitInterfaceImplementations: { Length: > 0 } explicitImplementations } =>
@@ -130,7 +124,6 @@ public record SymbolFileStructureElementModel : FileStructureElementModel
         // - parameter types for methods (in format "Type1, Type2, ...")
         // - type for properties & fields
         // - type for events
-
         this.SecondaryName ??= EvaluateSecondary(targetSymbol);
 
         // Search text: primary name + secondary name
@@ -156,8 +149,9 @@ public record SymbolFileStructureElementModel : FileStructureElementModel
         {
             return targetSymbol switch
             {
-                INamedTypeSymbol { TypeKind: TypeKind.Delegate } namedType => FormatMethodParameters(namedType
-                    .DelegateInvokeMethod?.Parameters) ?? "",
+                INamedTypeSymbol { TypeKind: TypeKind.Delegate } namedType => FormatMethodParameters(
+                    namedType
+                        .DelegateInvokeMethod?.Parameters) ?? string.Empty,
                 INamedTypeSymbol namedType => namedType.ContainingNamespace?.ToDisplayString(),
                 IMethodSymbol method => FormatMethodParameters(method.Parameters),
                 IPropertySymbol { IsIndexer: true } indexer => FormatMethodParameters(indexer.Parameters, true),
@@ -208,6 +202,7 @@ public record SymbolFileStructureElementModel : FileStructureElementModel
     {
         // Get the syntax references for the field
         var syntaxReference = fieldSymbol.DeclaringSyntaxReferences.FirstOrDefault();
+
         // Get the syntax node
         var syntaxNode = syntaxReference?.GetSyntax();
 
@@ -228,7 +223,6 @@ public record SymbolFileStructureElementModel : FileStructureElementModel
         // If the method has parameters, format them as a comma-separated list
         // Includes the parameter type and default value (if present), ignores parameter names
         // e.g., "(int, bool, string? = null)"
-
         if (parameterSymbols?.Count == 0)
         {
             return null;

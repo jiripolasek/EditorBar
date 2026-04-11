@@ -1,7 +1,5 @@
-﻿// ------------------------------------------------------------
-// 
+// ------------------------------------------------------------
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -22,7 +20,6 @@ public class TypeModel : BaseStructureModel, IEquatable<TypeModel>
     /// </returns>
     public string FullName { get; }
 
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TypeModel" /> class.
     /// </summary>
@@ -33,7 +30,7 @@ public class TypeModel : BaseStructureModel, IEquatable<TypeModel>
     public TypeModel(string displayName, StackedImageMoniker imageMoniker, AnchorPoint anchorPoint, string fullName)
         : base(displayName, imageMoniker, anchorPoint)
     {
-        Requires.NotNullOrWhiteSpace(fullName, nameof(fullName));
+        Requires.NotNullOrWhiteSpace(fullName);
 
         this.FullName = fullName;
     }

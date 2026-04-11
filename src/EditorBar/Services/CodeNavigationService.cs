@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-//
 // Copyright (c) Jiří Polášek. All rights reserved.
-//
 // ------------------------------------------------------------
 
 #nullable enable
@@ -30,7 +28,7 @@ internal class CodeNavigationService : ICodeNavigationService, ITextNavigationSe
 
     public CodeNavigationService(ITextView textView)
     {
-        this._textView = Requires.NotNull(textView, nameof(textView));
+        this._textView = Requires.NotNull(textView);
     }
 
     public async Task NavigateToSymbolDeclarationInCurrentViewAsync(ISymbol symbol, Location? location)
@@ -107,6 +105,7 @@ internal class CodeNavigationService : ICodeNavigationService, ITextNavigationSe
                 TypeDeclarationSyntax typeDecl => typeDecl.Identifier, // classes, structs, records
                 EnumDeclarationSyntax enumDecl => enumDecl.Identifier,
                 DelegateDeclarationSyntax delegateDecl => delegateDecl.Identifier,
+
                 // fallback: just pick the first token if none of the above
                 _ => syntaxNode.GetFirstToken()
             };
@@ -212,9 +211,7 @@ internal class CodeNavigationService : ICodeNavigationService, ITextNavigationSe
         // if the file path is for a generated file for Razor view, we have to unfuck it
         // for razor view  "<path>\something.razor" is the generated path "<path>\something.razor.<randomstring>.ide.g.<ext>"
         // <ext> is extension associated with the language, e.g. .cs for C# (it can be anything and we throw it away)
-
         // e.g. Index.razor.b4a-mOPQ32.ide.g.cs -> Index.razor
-
         razorView = file;
 
         if (string.IsNullOrEmpty(file) || !file.Contains("ide.g."))
@@ -242,7 +239,6 @@ internal class CodeNavigationService : ICodeNavigationService, ITextNavigationSe
         // If it doesn't match the Razor-generated pattern, just return as-is
         return false;
     }
-
 
     private bool IsInCurrentFile(SyntaxNode declarationSyntax)
     {

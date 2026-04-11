@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -24,12 +22,13 @@ internal sealed class RoslynObservableStructureProvider : BaseStructureProvider
     private readonly RoslynWorkspaceFileStructureProvider _legacyStructureProvider;
 
     /// <summary>
-    /// Initializes a structure provider for Roslyn, setting up a legacy structure provider and breadcrumbs source.
+    /// Initializes a new instance of the <see cref="RoslynObservableStructureProvider" /> class.
     /// </summary>
-    /// <param name="textView">The parameter is used to provide context for the structure provider's operations.</param>
-    public RoslynObservableStructureProvider(ITextView textView) : base(textView)
+    /// <param name="textView">The text view associated with the structure provider.</param>
+    public RoslynObservableStructureProvider(ITextView textView)
+        : base(textView)
     {
-        Requires.NotNull(textView, nameof(textView));
+        Requires.NotNull(textView);
 
         this._legacyStructureProvider = new RoslynWorkspaceFileStructureProvider(textView);
 

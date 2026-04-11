@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -15,23 +13,26 @@ namespace JPSoftworks.EditorBar.Services.StructureProviders.PlainText;
 
 internal class PlainTextFileStructureProvider : StructuredDocumentStructureProvider<object>
 {
-    public PlainTextFileStructureProvider(ITextView textView) : base(textView) { }
+    public PlainTextFileStructureProvider(ITextView textView)
+        : base(textView)
+    {
+    }
 
     protected override Task<object> ParseDocumentAsync(string text, CancellationToken cancellationToken)
     {
         return Task.FromResult<object>(null!);
     }
 
-    protected override Task<(IEnumerable<BaseStructureModel> structure, bool rootHasChildren)>
-        GetFileStructureCoreAsync(
+    protected override Task<(IEnumerable<BaseStructureModel> Structure, bool RootHasChildren)> GetFileStructureCoreAsync(
             int caretPosition,
             object? document,
             ITextSnapshot textSnapshot,
             string filePath,
             CancellationToken cancellationToken)
     {
-        return Task.FromResult<(IEnumerable<BaseStructureModel> structure, bool rootHasChildren)>((
-            ImmutableList<BaseStructureModel>.Empty, false));
+        return Task.FromResult<(IEnumerable<BaseStructureModel> Structure, bool RootHasChildren)>(
+            (
+                ImmutableList<BaseStructureModel>.Empty, false));
     }
 
     protected override Task<ImmutableList<FileStructureElementModel>> GetChildItemsCoreAsync(

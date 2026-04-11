@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -31,9 +29,9 @@ internal sealed class LocationBreadcrumbEventAggregator : IDisposable
         IWorkspaceMonitor workspaceMonitor,
         SolutionProjectChangeEventAggregator solutionProjectChangeEventAggregator)
     {
-        Requires.NotNull(textDocument, nameof(textDocument));
-        Requires.NotNull(workspaceMonitor, nameof(workspaceMonitor));
-        Requires.NotNull(solutionProjectChangeEventAggregator, nameof(solutionProjectChangeEventAggregator));
+        Requires.NotNull(textDocument);
+        Requires.NotNull(workspaceMonitor);
+        Requires.NotNull(solutionProjectChangeEventAggregator);
 
         this._workspaceMonitor = workspaceMonitor;
         this._solutionProjectChangeEventAggregator = solutionProjectChangeEventAggregator;

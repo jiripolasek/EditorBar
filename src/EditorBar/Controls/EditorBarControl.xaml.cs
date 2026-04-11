@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -46,10 +44,10 @@ internal partial class EditorBarControl : IDisposable
         JoinableTaskFactory joinableTaskFactory,
         IStructureProviderService structureProviderService)
     {
-        this._textView = Requires.NotNull(textView, nameof(textView));
-        this._joinableTaskFactory = Requires.NotNull(joinableTaskFactory, nameof(joinableTaskFactory));
-        Requires.NotNull(textDocument, nameof(textDocument));
-        Requires.NotNull(structureProviderService, nameof(structureProviderService));
+        this._textView = Requires.NotNull(textView);
+        this._joinableTaskFactory = Requires.NotNull(joinableTaskFactory);
+        Requires.NotNull(textDocument);
+        Requires.NotNull(structureProviderService);
 
         this.DataContext = this._viewModel =
             new EditorBarViewModel(textView, textDocument, joinableTaskFactory, structureProviderService);
@@ -59,12 +57,12 @@ internal partial class EditorBarControl : IDisposable
 
         this._textView.SetEditorBarControl(this);
 
-
         this._delayedSettingsApplicator = new SingleActionGatedExecutor(this.ApplySettings);
         this._delayedSettingsApplicator.RequestExecution();
 
         var settingsRefreshAggregator = new SettingsRefreshAggregator();
-        settingsRefreshAggregator.SettingsRefreshRequested += (_, _) => this._delayedSettingsApplicator.RequestExecution();
+        settingsRefreshAggregator.SettingsRefreshRequested
+            += (_, _) => this._delayedSettingsApplicator.RequestExecution();
         settingsRefreshAggregator.AddTo(this._disposables);
 
         this.IsVisibleChanged += this.OnIsVisibleChanged;
@@ -204,10 +202,12 @@ internal partial class EditorBarControl : IDisposable
         // Let's assume that we can accept focus changes from buttons that are before or after our button.
         if (e.OldFocus != null && e.OldFocus is not Button)
         {
-            _ = Dispatcher.BeginInvoke(() =>
-            {
-                this._textView.VisualElement?.Focus();
-            }, DispatcherPriority.Input);
+            _ = this.Dispatcher.BeginInvoke(
+                new Action(() =>
+                {
+                    this._textView.VisualElement?.Focus();
+                }),
+                DispatcherPriority.Input);
             e.Handled = true;
         }
     }

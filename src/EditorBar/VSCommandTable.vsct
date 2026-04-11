@@ -1,10 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-	<Extern href="stdidcmd.h"/>
-	<Extern href="vsshlids.h"/>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<Extern href="stdidcmd.h" />
+	<Extern href="vsshlids.h" />
 	<Include href="VSGlobals.vsct" />
-	<Include href="KnownImageIds.vsct"/>
+	<Include href="KnownImageIds.vsct" />
 
 	<Commands package="EditorBar">
 
@@ -163,7 +165,7 @@
 
 			<!-- Editor Bar Options -->
 			<Button guid="EditorBarCmdSet" id="EditorBarOptionsCommand" priority="0x0600" type="Button">
-				<Parent guid="EditorBarCmdSet" id="EditorBarViewSubMenuGroup"/>
+				<Parent guid="EditorBarCmdSet" id="EditorBarViewSubMenuGroup" />
 				<Icon guid="ImageCatalogGuid" id="Settings" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
 				<CommandFlag>TextChanges</CommandFlag>
@@ -177,7 +179,7 @@
 
 			<!-- Focus Editor Bar Projects Crumb -->
 			<Button guid="EditorBarCmdSet" id="FocusEditorBarProjectsCrumbCommand" priority="0x0100" type="Button">
-				<Parent guid="EditorBarCmdSet" id="EditorBarViewFocusGroup"/>
+				<Parent guid="EditorBarCmdSet" id="EditorBarViewFocusGroup" />
 				<Strings>
 					<ButtonText>Focus Project Breadcrumb</ButtonText>
 					<CommandName>Focus Project Breadcrumb</CommandName>
@@ -186,7 +188,7 @@
 				</Strings>
 			</Button>
 			<Button guid="EditorBarCmdSet" id="FocusEditorBarFileCrumbCommand" priority="0x0200" type="Button">
-				<Parent guid="EditorBarCmdSet" id="EditorBarViewFocusGroup"/>
+				<Parent guid="EditorBarCmdSet" id="EditorBarViewFocusGroup" />
 				<Strings>
 					<ButtonText>Focus Outermost Structure Breadcrumb</ButtonText>
 					<CommandName>Focus Outermost Structure Breadcrumb</CommandName>
@@ -195,7 +197,7 @@
 				</Strings>
 			</Button>
 			<Button guid="EditorBarCmdSet" id="FocusEditorBarInnermostTypeCrumbCommand" priority="0x0300" type="Button">
-				<Parent guid="EditorBarCmdSet" id="EditorBarViewFocusGroup"/>
+				<Parent guid="EditorBarCmdSet" id="EditorBarViewFocusGroup" />
 				<Strings>
 					<ButtonText>Focus Innermost Structure Breadcrumb</ButtonText>
 					<CommandName>Focus Innermost Structure Breadcrumb</CommandName>
@@ -233,7 +235,8 @@
 				</Strings>
 			</Button>
 
-			<Button guid="EditorBarCmdSet" id="EditorBarFileAction_OpenFileInDefaultEditorCommand" priority="0x0100" type="Button">
+			<Button guid="EditorBarCmdSet" id="EditorBarFileAction_OpenFileInDefaultEditorCommand" priority="0x0100"
+			        type="Button">
 				<Parent guid="EditorBarCmdSet" id="EditorBarFileActionMenuOpenFileGroup" />
 				<Icon guid="ImageCatalogGuid" id="3923" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
@@ -246,7 +249,8 @@
 					<LocCanonicalName>EditorBar.OpenInDefaultEditor</LocCanonicalName>
 				</Strings>
 			</Button>
-			<Button guid="EditorBarCmdSet" id="EditorBarFileAction_OpenFileInExternalEditorCommand" priority="0x0200" type="Button">
+			<Button guid="EditorBarCmdSet" id="EditorBarFileAction_OpenFileInExternalEditorCommand" priority="0x0200"
+			        type="Button">
 				<Parent guid="EditorBarCmdSet" id="EditorBarFileActionMenuOpenFileGroup" />
 				<Icon guid="ImageCatalogGuid" id="OpenFileDialog" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
@@ -290,7 +294,8 @@
 			<!-- Structure breadcrumb context menu -->
 
 			<!-- 1) Static / Navigate to the code element -->
-			<Button guid="EditorBarCmdSet" id="EditorBarStructureBreadcrumbMenuNavigateToCodeElementCommand" priority="0x0100" type="Button">
+			<Button guid="EditorBarCmdSet" id="EditorBarStructureBreadcrumbMenuNavigateToCodeElementCommand" priority="0x0100"
+			        type="Button">
 				<Icon guid="ImageCatalogGuid" id="GoToDefinition" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
 				<CommandFlag>NoKeyCustomize</CommandFlag>
@@ -304,7 +309,8 @@
 			</Button>
 
 			<!-- 2) Dynamic / Children elemenets -->
-			<Button guid="EditorBarCmdSet" id="EditorBarStructureBreadcrumbMenuChildrenElementsCommand" priority="0x0100" type="Button" fMoniker="true">
+			<Button guid="EditorBarCmdSet" id="EditorBarStructureBreadcrumbMenuChildrenElementsCommand" priority="0x0100"
+			        type="Button" fMoniker="true">
 				<Parent guid="EditorBarCmdSet" id="EditorBarStructureBreadcrumbMenuDynamicCommandsGroup" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
 				<CommandFlag>NoKeyCustomize</CommandFlag>
@@ -471,19 +477,18 @@
 		</Buttons>
 
 		<Bitmaps>
-			<Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpToggleEditorBar"/>
+			<Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpToggleEditorBar" />
 		</Bitmaps>
 	</Commands>
-
 
 
 	<CommandPlacements>
 		<!-- ToggleEditorBarCommand -->
 		<CommandPlacement guid="EditorBarCmdSet" id="ToggleEditorBarCommand" priority="0x0300">
-			<Parent guid="EditorBarCmdSet" id="EditorBarViewSubMenuGroup"/>
+			<Parent guid="EditorBarCmdSet" id="EditorBarViewSubMenuGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="EditorBarCmdSet" id="ToggleEditorBarCommand" priority="0x0300">
-			<Parent guid="EditorBarCmdSet" id="EditorBarTextEditorToolbarGroup"/>
+			<Parent guid="EditorBarCmdSet" id="EditorBarTextEditorToolbarGroup" />
 		</CommandPlacement>
 
 		<!-- 
@@ -497,13 +502,14 @@
 		+++++++
 		-->
 		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarStructureBreadcrumbMenuCopyDocIdCommand" priority="0x0200">
-			<Parent guid="EditorBarCmdSet" id="EditorBarTypeBreadcrumbMenu_PrimaryGroup"/>
+			<Parent guid="EditorBarCmdSet" id="EditorBarTypeBreadcrumbMenu_PrimaryGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarStructureBreadcrumbMenuCopyFullName" priority="0x0300">
-			<Parent guid="EditorBarCmdSet" id="EditorBarTypeBreadcrumbMenu_PrimaryGroup"/>
+			<Parent guid="EditorBarCmdSet" id="EditorBarTypeBreadcrumbMenu_PrimaryGroup" />
 		</CommandPlacement>
-		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarStructureBreadcrumbMenuNavigateToCodeElementCommand" priority="0x0100">
-			<Parent guid="EditorBarCmdSet" id="EditorBarTypeBreadcrumbMenu_GotoGroup"/>
+		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarStructureBreadcrumbMenuNavigateToCodeElementCommand"
+		                  priority="0x0100">
+			<Parent guid="EditorBarCmdSet" id="EditorBarTypeBreadcrumbMenu_GotoGroup" />
 		</CommandPlacement>
 
 		<!-- 
@@ -517,13 +523,14 @@
 		++++++++
 		-->
 		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarStructureBreadcrumbMenuCopyDocIdCommand" priority="0x0200">
-			<Parent guid="EditorBarCmdSet" id="EditorBarMemberBreadcrumbMenu_PrimaryGroup"/>
+			<Parent guid="EditorBarCmdSet" id="EditorBarMemberBreadcrumbMenu_PrimaryGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarStructureBreadcrumbMenuCopyFullName" priority="0x0300">
-			<Parent guid="EditorBarCmdSet" id="EditorBarMemberBreadcrumbMenu_PrimaryGroup"/>
+			<Parent guid="EditorBarCmdSet" id="EditorBarMemberBreadcrumbMenu_PrimaryGroup" />
 		</CommandPlacement>
-		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarStructureBreadcrumbMenuNavigateToCodeElementCommand" priority="0x0100">
-			<Parent guid="EditorBarCmdSet" id="EditorBarMemberBreadcrumbMenu_GotoGroup"/>
+		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarStructureBreadcrumbMenuNavigateToCodeElementCommand"
+		                  priority="0x0100">
+			<Parent guid="EditorBarCmdSet" id="EditorBarMemberBreadcrumbMenu_GotoGroup" />
 		</CommandPlacement>
 
 		<!--
@@ -538,14 +545,17 @@
 		- Properties
 		++++++++
 		-->
-		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_CopyProjectFullPathCommand" priority="0x0200">
-			<Parent guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_PrimaryGroup"/>
+		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_CopyProjectFullPathCommand"
+		                  priority="0x0200">
+			<Parent guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_PrimaryGroup" />
 		</CommandPlacement>
-		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_OpenContainingFolderCommand" priority="0x0100">
-			<Parent guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_ContainerGroup"/>
+		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_OpenContainingFolderCommand"
+		                  priority="0x0100">
+			<Parent guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_ContainerGroup" />
 		</CommandPlacement>
-		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_LocateInSolutionExplorerCommand" priority="0x0400">
-			<Parent guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_ContainerGroup"/>
+		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_LocateInSolutionExplorerCommand"
+		                  priority="0x0400">
+			<Parent guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_ContainerGroup" />
 		</CommandPlacement>
 		<!--<CommandPlacement guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_OpenPropertiesCommand" priority="0x0300">
 			<Parent guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_PropertyGroup"/>
@@ -562,17 +572,18 @@
 		++++++++
 		-->
 		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_CopyFullPathCommand" priority="0x0100">
-			<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_PrimaryGroup"/>
+			<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_PrimaryGroup" />
 		</CommandPlacement>
-		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_OpenContainingFolderCommand" priority="0x0200">
-			<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_ContainerGroup"/>
+		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_OpenContainingFolderCommand"
+		                  priority="0x0200">
+			<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_ContainerGroup" />
 		</CommandPlacement>
-		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_LocateInSolutionExplorerCommand" priority="0x0300">
-			<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_ContainerGroup"/>
+		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_LocateInSolutionExplorerCommand"
+		                  priority="0x0300">
+			<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_ContainerGroup" />
 		</CommandPlacement>
 
 	</CommandPlacements>
-
 
 
 	<Symbols>
@@ -659,11 +670,10 @@
 		</GuidSymbol>
 
 		<!-- Image Lists -->
-		<GuidSymbol name="guidImages" value="{8ec912c7-6f7f-457d-bbe8-318409383d92}" >
+		<GuidSymbol name="guidImages" value="{8ec912c7-6f7f-457d-bbe8-318409383d92}">
 			<IDSymbol name="bmpToggleEditorBar" value="1" />
 		</GuidSymbol>
 
 	</Symbols>
 
 </CommandTable>
-

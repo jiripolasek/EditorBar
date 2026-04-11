@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -23,7 +21,7 @@ public class GeneralOptionPage : UIElementDialogPage
     private GeneralOptionsControl? _control;
 
     /// <summary>
-    /// Gets or sets the child element of the options page.
+    /// Gets the child element of the options page.
     /// </summary>
     protected override UIElement Child
     {

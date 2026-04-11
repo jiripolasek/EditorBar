@@ -1,7 +1,5 @@
-﻿// ------------------------------------------------------------
-// 
+// ------------------------------------------------------------
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -56,7 +54,7 @@ internal class EditorBarMargin : IWpfTextViewMargin
     public double MarginSize => this.Enabled ? this._editorBarControl.ActualHeight : 0;
 
     /// <summary>
-    /// Determines whether the margin is enabled.
+    /// Gets a value indicating whether the margin is enabled.
     /// </summary>
     public bool Enabled { get; private set; }
 
@@ -70,8 +68,8 @@ internal class EditorBarMargin : IWpfTextViewMargin
     /// </summary>
     /// <param name="textView">The text view.</param>
     /// <param name="joinableTaskFactory">A factory for starting asynchronous tasks that can mitigate deadlocks.</param>
-    /// <param name="serviceProvider"></param>
-    /// <param name="structureProviderService"></param>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <param name="structureProviderService">The structure provider service.</param>
     /// <param name="position">The position.</param>
     public EditorBarMargin(
         IWpfTextView textView,
@@ -215,7 +213,8 @@ internal class EditorBarMargin : IWpfTextViewMargin
                 return false;
             }
 
-            if (this._textView.TextBuffer != null && !IsPullRequestEditor(this._textView.TextBuffer, isEditable, isDocument, isInteractive))
+            if (this._textView.TextBuffer != null &&
+                !IsPullRequestEditor(this._textView.TextBuffer, isEditable, isDocument, isInteractive))
             {
                 return false;
             }
@@ -253,7 +252,6 @@ internal class EditorBarMargin : IWpfTextViewMargin
         // roles are exactly: ANALYZABLE, DOCUMENT, EDITABLE, INTERACTIVE
         // Path: % temp %\tmpE8AE.tmp
         // Type name: vs-markdown
-
         if (!isEditable && !isDocument && !isInteractive)
         {
             return false;
@@ -352,14 +350,15 @@ internal class EditorBarMargin : IWpfTextViewMargin
         }
 
         // e.g. C:\Users\...\AppData\Local\JetBrains\Shared\vAny\DecompilerCache\ILViewer\82e7399e305a479b8f5b542013398b9f73400\78\8e72436b\02000028pdb136.il
-        if (filePath.IndexOf("JetBrains\\Shared\\vAny\\DecompilerCache\\ILViewer", StringComparison.OrdinalIgnoreCase) >= 0)
+        if (filePath.IndexOf(
+                "JetBrains\\Shared\\vAny\\DecompilerCache\\ILViewer",
+                StringComparison.OrdinalIgnoreCase) >= 0)
         {
             return true;
         }
 
         return false;
     }
-
 
     private static bool IsBufferReadOnly(ITextBuffer? textBuffer)
     {
@@ -413,7 +412,6 @@ internal class EditorBarMargin : IWpfTextViewMargin
         return false;
     }
 
-
     private static bool IsFullyReadOnly(ITextBuffer textBuffer)
     {
         // Get the current snapshot of the text buffer
@@ -436,8 +434,7 @@ internal class EditorBarMargin : IWpfTextViewMargin
         {
             combinedSpan = Span.FromBounds(
                 Math.Min(combinedSpan.Start, region.Start),
-                Math.Max(combinedSpan.End, region.End)
-            );
+                Math.Max(combinedSpan.End, region.End));
         }
 
         // Check if the combined read-only region covers the entire buffer

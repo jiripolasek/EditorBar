@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-//
 // Copyright (c) Jiří Polášek. All rights reserved.
-//
 // ------------------------------------------------------------
 
 #nullable enable
@@ -19,8 +17,8 @@ public static class IconProviderForCodeAnalysis
     /// <summary>
     /// Gets the image ID for a symbol based on its kind and accessibility.
     /// </summary>
-    /// <param name="symbol"></param>
-    /// <returns></returns>
+    /// <param name="symbol">The symbol to inspect.</param>
+    /// <returns>The corresponding image ID.</returns>
     public static int GetImageId(this ISymbol symbol)
     {
         return symbol.Kind switch
@@ -159,7 +157,8 @@ public static class IconProviderForCodeAnalysis
                     {
                         case Accessibility.Public:
                             {
-                                var implementsIDisposable = t.AllInterfaces.Any(static i => i.Name is "IDisposable" or "IAsyncDisposable");
+                                var implementsIDisposable = t.AllInterfaces.Any(static i =>
+                                    i.Name is "IDisposable" or "IAsyncDisposable");
                                 if (implementsIDisposable)
                                 {
                                     return IconIds.Disposable;
@@ -167,6 +166,7 @@ public static class IconProviderForCodeAnalysis
 
                                 return KnownImageIds.InterfacePublic;
                             }
+
                         case Accessibility.Protected:
                         case Accessibility.ProtectedOrInternal:
                             return KnownImageIds.InterfaceProtected;
@@ -175,6 +175,7 @@ public static class IconProviderForCodeAnalysis
                         case Accessibility.Internal: return KnownImageIds.InterfaceInternal;
                         default: return IconIds.Interface;
                     }
+
                 case TypeKind.Struct:
                     return t.DeclaredAccessibility switch
                     {

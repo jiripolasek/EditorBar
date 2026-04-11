@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -31,7 +29,7 @@ public class FileSystemProjectInfo : IProjectInfo
     /// <param name="path">The directory path of the project, if available.</param>
     public FileSystemProjectInfo(string displayName, string? path)
     {
-        Requires.NotNullOrWhiteSpace(displayName, nameof(displayName));
+        Requires.NotNullOrWhiteSpace(displayName);
 
         this.DisplayName = displayName;
         this.DirectoryPath = path;

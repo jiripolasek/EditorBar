@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -21,6 +19,7 @@ internal class CompositionEventAggregator : IEventAggregator
                 source.Changed += value;
             }
         }
+
         remove
         {
             foreach (var source in this._sources)
