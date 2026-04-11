@@ -60,29 +60,21 @@ public sealed class EditorBarPackage : AsyncPackage
         CancellationToken cancellationToken,
         IProgress<ServiceProgressData> progress)
     {
-        try
-        {
-            this.AddService(typeof(IMenuContextService), static (_, _, _) => Task.FromResult<object?>(new MenuContextService()), true);
+        this.AddService(typeof(IMenuContextService), static (_, _, _) => Task.FromResult<object?>(new MenuContextService()), true);
 
-            this.AddService(typeof(ILocationProvider), static (_, _, _) => Task.FromResult<object?>(new ToolkitLocationProvider()), true);
+        this.AddService(typeof(ILocationProvider), static (_, _, _) => Task.FromResult<object?>(new ToolkitLocationProvider()), true);
 
-            // When initialized asynchronously, the current thread may be a background thread at this point.
-            // Do any initialization that requires the UI thread after switching to the UI thread.
-            await this.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
+        // When initialized asynchronously, the current thread may be a background thread at this point.
+        // Do any initialization that requires the UI thread after switching to the UI thread.
+        await this.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
 
-            // upgrade settings from previous versions
-            var options = await GeneralOptionsModel.GetLiveInstanceAsync();
+        // upgrade settings from previous versions
+        var options = await GeneralOptionsModel.GetLiveInstanceAsync();
 
-            await options.UpgradeAsync();
+        await options.UpgradeAsync();
 
-            await this.RegisterCommandsAsync();
+        await this.RegisterCommandsAsync();
 
-            RatingService.RegisterSuccessfulUsage();
-        }
-        catch (Exception ex)
-        {
-            await ex.LogAsync();
-            throw;
-        }
+        RatingService.RegisterSuccessfulUsage();
     }
 }
