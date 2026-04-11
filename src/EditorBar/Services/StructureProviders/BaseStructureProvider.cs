@@ -17,12 +17,15 @@ internal abstract class BaseStructureProvider : StructureProvider
 {
     private readonly ITextBuffer _textBuffer;
 
-    protected readonly IObservable<SnapshotPoint> CaretPositionChanged;
-    protected readonly IObservable<SnapshotPoint> ContentChanged;
-    protected readonly IObservable<string> DocumentNameChanged;
+    protected IObservable<SnapshotPoint> CaretPositionChanged { get; }
 
-    protected readonly ITextView TextView;
-    protected readonly IObservable<SnapshotPoint> UnifiedSource;
+    protected IObservable<SnapshotPoint> ContentChanged { get; }
+
+    protected IObservable<string> DocumentNameChanged { get; }
+
+    protected ITextView TextView { get; }
+
+    protected IObservable<SnapshotPoint> UnifiedSource { get; }
 
     protected BaseStructureProvider(ITextView textView)
     {

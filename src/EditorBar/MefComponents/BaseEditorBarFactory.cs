@@ -22,13 +22,13 @@ internal abstract class BaseEditorBarFactory(BarPosition targetBarPosition) : IW
     private IWpfTextView? _textView;
 
     [Import]
-    internal JoinableTaskContext JoinableTaskContext = null!;
+    private JoinableTaskContext JoinableTaskContext { get; set; } = null!;
 
     [Import]
-    internal SVsServiceProvider ServiceProvider = null!;
+    private SVsServiceProvider ServiceProvider { get; set; } = null!;
 
     [Import]
-    internal IStructureProviderService StructureProviderService = null!;
+    private IStructureProviderService StructureProviderService { get; set; } = null!;
 
     /// <inheritdoc />
     public IWpfTextViewMargin? CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)

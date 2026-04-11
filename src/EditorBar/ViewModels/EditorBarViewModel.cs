@@ -31,7 +31,7 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
 
     private readonly IWpfTextView _textView;
     private readonly IWorkspaceMonitor _workspaceMonitor;
-    internal readonly BehaviorSubject<bool> SuspendedChanged = new(true);
+    private readonly BehaviorSubject<bool> _suspendedChanged = new(true);
 
     private bool _isDevelopmentModeEnabled;
     private bool _isUpdateSuspended = true;
@@ -41,6 +41,8 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
     public StructuralBreadcrumbsViewModel StructuralBreadcrumbs { get; }
 
     public BulkObservableCollection<BreadcrumbModel> Breadcrumbs { get; } = [];
+
+    internal IObservable<bool> SuspendedChanged => this._suspendedChanged;
 
     public ICommand ShowDebugInformationCommand { get; }
 
@@ -65,7 +67,7 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
         {
             if (this.SetProperty(ref this._isUpdateSuspended, value))
             {
-                this.SuspendedChanged.OnNext(this._isUpdateSuspended);
+                this._suspendedChanged.OnNext(this._isUpdateSuspended);
             }
         }
     }
@@ -128,6 +130,7 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         this._disposables.Dispose();
+        this._suspendedChanged.Dispose();
     }
 
     public void Suspend()
