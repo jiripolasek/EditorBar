@@ -109,14 +109,32 @@ public class SymbolChevronButton : ChevronButton, IDisposable
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
+
+        if (this._buttonElement != null)
+        {
+            this._buttonElement.Click -= this.ButtonElementOnClick;
+            this._buttonElement.MouseRightButtonUp -= this.ButtonElementOnMouseRightButtonUp;
+        }
+
         this._popup = this.Template?.FindName(
             PartPopupName,
             this) as MemberListPopup;
         this._buttonElement = this.Template?.FindName(
             PartButtonName,
             this) as Button;
-        this._buttonElement.Click += (sender, args) => this.OnClick();
+
+        if (this._buttonElement == null)
+        {
+            return;
+        }
+
+        this._buttonElement.Click += this.ButtonElementOnClick;
         this._buttonElement.MouseRightButtonUp += this.ButtonElementOnMouseRightButtonUp;
+    }
+
+    private void ButtonElementOnClick(object sender, RoutedEventArgs e)
+    {
+        this.OnClick();
     }
 
     private void ButtonElementOnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
@@ -136,8 +154,13 @@ public class SymbolChevronButton : ChevronButton, IDisposable
             return;
         }
 
-        this.EnsurePopupIsCreated(members);
-        this._popup.IsOpen = true;
+        var popup = this.EnsurePopupIsCreated(members);
+        if (popup == null)
+        {
+            return;
+        }
+
+        popup.IsOpen = true;
     }
 
     private async Task<IList<MemberListItemViewModel>> EvalMembersAsync()
@@ -156,6 +179,11 @@ public class SymbolChevronButton : ChevronButton, IDisposable
     {
         var memberList = new MemberList(members);
         memberList.ItemSelected += OnMemberListOnItemSelected;
+
+        if (this._popup == null)
+        {
+            return null;
+        }
 
         this._popup.Content = memberList;
         return this._popup;

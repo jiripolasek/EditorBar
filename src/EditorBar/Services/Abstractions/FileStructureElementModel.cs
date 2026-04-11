@@ -11,11 +11,11 @@ namespace JPSoftworks.EditorBar.Services;
 
 public record FileStructureElementModel
 {
-    public string PrimaryName { get; init; }
+    public required string PrimaryName { get; init; }
 
     public string? SecondaryName { get; init; }
 
-    public string SearchText { get; init; }
+    public required string SearchText { get; init; }
 
     public StackedImageMoniker? ImageMoniker { get; init; }
 

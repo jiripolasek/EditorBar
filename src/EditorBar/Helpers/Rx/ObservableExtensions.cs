@@ -60,7 +60,7 @@ public static class ObservableExtensions
                     // When becoming active, immediately emit the buffered value if one exists.
                     if (isActive && hasLatest)
                     {
-                        observer.OnNext(latestValue);
+                        observer.OnNext(latestValue!);
                     }
                 });
 

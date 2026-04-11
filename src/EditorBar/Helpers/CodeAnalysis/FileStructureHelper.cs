@@ -101,8 +101,13 @@ internal static class FileStructureHelper
 
     private static IEnumerable<SyntaxNode> GetNonTypeTypeContainers(SyntaxNode? root)
     {
+        if (root == null)
+        {
+            return [];
+        }
+
         // return descendants that are not types, but can contain types - root + namespaces
-        SyntaxNode[] roots = [root, .. root?.DescendantNodes().Where(static t => t is BaseNamespaceDeclarationSyntax)];
+        SyntaxNode[] roots = [root, .. root.DescendantNodes().Where(static t => t is BaseNamespaceDeclarationSyntax)];
         return roots.SelectMany(static t => t.ChildNodes().Where(static t => t is not BaseNamespaceDeclarationSyntax));
     }
 

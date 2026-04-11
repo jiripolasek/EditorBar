@@ -129,7 +129,7 @@ internal static class CodeAnalysisHelper
         return typeSymbol.Name == className && typeSymbol.MatchNamespaces(namespaces);
     }
 
-    public static ITypeSymbol GetReturnType(this ISymbol symbol)
+    public static ITypeSymbol? GetReturnType(this ISymbol symbol)
     {
         switch (symbol.Kind)
         {
@@ -142,15 +142,13 @@ internal static class CodeAnalysisHelper
             case SymbolKind.Property: return ((IPropertySymbol)symbol).Type;
             case SymbolKind.Alias: return ((IAliasSymbol)symbol).Target.GetReturnType();
             case SymbolKind.NamedType:
-                return (symbol = symbol.AsMethod()) != null
-                    ? ((IMethodSymbol)symbol).ReturnType
-                    : null;
+                return symbol.AsMethod()?.ReturnType;
         }
 
         return null;
     }
 
-    public static IMethodSymbol AsMethod(this ISymbol symbol)
+    public static IMethodSymbol? AsMethod(this ISymbol symbol)
     {
         switch (symbol.Kind)
         {
