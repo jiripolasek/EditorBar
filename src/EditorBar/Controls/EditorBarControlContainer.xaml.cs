@@ -61,17 +61,37 @@ internal partial class EditorBarControlContainer : IDisposable
             var textDocument = this._textView.GetTextDocumentFromDocumentBuffer();
             if (textDocument != null)
             {
-                this.Content = new EditorBarControl(
-                    this._textView,
-                    textDocument,
-                    this._joinableTaskFactory,
-                    this._structureProviderService);
-                return;
+                try
+                {
+                    this.Content = new EditorBarControl(
+                        this._textView,
+                        textDocument,
+                        this._joinableTaskFactory,
+                        this._structureProviderService);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    ex.Log();
+                    this.Content = CreateFallbackContent(textDocument.FilePath);
+                    return;
+                }
             }
         }
 
         this.DisposeCurrentContent();
         this.Content = null!;
+    }
+
+    private static UIElement CreateFallbackContent(string? filePath)
+    {
+        return new System.Windows.Controls.TextBlock
+        {
+            Text = filePath ?? "(unknown file)",
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(6, 2, 6, 2),
+            TextTrimming = TextTrimming.CharacterEllipsis
+        };
     }
 
     private void DisposeCurrentContent()
