@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -24,7 +22,8 @@ public static class Matchers
     /// <c>false</c>.
     /// </returns>
     /// <exception cref="ArgumentException">Thrown when <typeparamref name="T" /> is not an enum type.</exception>
-    public static bool MatchFlags<T>(this T usage, T flags) where T : struct
+    public static bool MatchFlags<T>(this T usage, T flags)
+        where T : struct
     {
         // Ensure the type parameter is indeed an enum
         if (!typeof(T).IsEnum)
@@ -51,7 +50,8 @@ public static class Matchers
     /// <c>false</c>.
     /// </returns>
     /// <exception cref="ArgumentException">Thrown when <typeparamref name="T" /> is not an enum type.</exception>
-    public static bool HasAnyFlag<T>(this T usage, T flags) where T : struct
+    public static bool HasAnyFlag<T>(this T usage, T flags)
+        where T : struct
     {
         // Ensure the type parameter is indeed an enum
         if (!typeof(T).IsEnum)

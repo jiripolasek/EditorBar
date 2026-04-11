@@ -26,7 +26,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <StackPanel Orientation="Horizontal">
-                        <!-- start triangle -->
+                        <!--  start triangle  -->
                         <Grid VerticalAlignment="Stretch">
                             <Grid.Visibility>
                                 <MultiBinding Converter="{StaticResource IsFirstItemConverter}">
@@ -35,44 +35,51 @@
                                     <Binding RelativeSource="{RelativeSource AncestorType={x:Type ItemsControl}}" />
                                 </MultiBinding>
                             </Grid.Visibility>
-                            <Path Data="M0,0 5,0 5,30 0,30 5,15"
-                                  Fill="{TemplateBinding Background}"
-                                  Stretch="Fill"
-                                  x:Name="PART_StartTriangle" />
+                            <Path
+                                x:Name="PART_StartTriangle"
+                                Data="M0,0 5,0 5,30 0,30 5,15"
+                                Fill="{TemplateBinding Background}"
+                                Stretch="Fill" />
                         </Grid>
-                        <!-- body -->
+                        <!--  body  -->
                         <Grid>
-                            <Rectangle Fill="{TemplateBinding Background}" x:Name="PART_CenterRectangle" />
+                            <Rectangle x:Name="PART_CenterRectangle" Fill="{TemplateBinding Background}" />
                             <Border Padding="6,0,6,0">
-                                <ContentPresenter x:Name="contentPresenter"
-                                                  ContentStringFormat="{TemplateBinding ContentStringFormat}"
-                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                  Content="{TemplateBinding Content}"
-                                                  ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
-                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                  IsHitTestVisible="false"
-                                                  Margin="{TemplateBinding Padding}"
-                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                  RecognizesAccessKey="False" />
+                                <ContentPresenter
+                                    x:Name="contentPresenter"
+                                    Margin="{TemplateBinding Padding}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    Content="{TemplateBinding Content}"
+                                    ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                    ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                    IsHitTestVisible="false"
+                                    RecognizesAccessKey="False"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                             </Border>
                         </Grid>
-                        <!-- end triangle -->
+                        <!--  end triangle  -->
                         <Grid>
-                            <Path Data="M0,0 5,15 0,30"
-                                  Fill="{TemplateBinding Background}"
-                                  Stretch="Fill"
-                                  x:Name="PART_EndTriangle"
-                                  VerticalAlignment="Stretch" />
-                            <!-- separator -->
-                            <Path x:Name="PART_Separator" Data="M0,0 5,15 0,30"
-                                  Visibility="{Binding ShowRightBorder, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:SymbolChevronButton}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                  Stroke="{Binding RightBorderBrush, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:SymbolChevronButton}}"
-                                  Fill="Transparent"
-                                  Stretch="Fill"
-                                  StrokeThickness="1"
-                                  VerticalAlignment="Stretch" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                  StrokeDashCap="Round" />
+                            <Path
+                                x:Name="PART_EndTriangle"
+                                VerticalAlignment="Stretch"
+                                Data="M0,0 5,15 0,30"
+                                Fill="{TemplateBinding Background}"
+                                Stretch="Fill" />
+                            <!--  separator  -->
+                            <Path
+                                x:Name="PART_Separator"
+                                VerticalAlignment="Stretch"
+                                Data="M0,0 5,15 0,30"
+                                Fill="Transparent"
+                                Stretch="Fill"
+                                Stroke="{Binding RightBorderBrush, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:SymbolChevronButton}}"
+                                StrokeDashCap="Round"
+                                StrokeEndLineCap="Round"
+                                StrokeStartLineCap="Round"
+                                StrokeThickness="1"
+                                Visibility="{Binding ShowRightBorder, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:SymbolChevronButton}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         </Grid>
                     </StackPanel>
                 </ControlTemplate>
@@ -93,11 +100,13 @@
 
     <ControlTemplate x:Key="SymbolChevronButtonControlTemplate" TargetType="controls:SymbolChevronButton">
         <Grid Focusable="False">
-            <Button x:Name="PART_Button" Margin="0,0,-5,0"
-                    Height="{TemplateBinding Height}"
-                    Tag="{Binding RelativeSource={RelativeSource TemplatedParent}}"
-                    Style="{StaticResource ButtonInChevron}"
-                    Content="{TemplateBinding Content}" />
+            <Button
+                x:Name="PART_Button"
+                Height="{TemplateBinding Height}"
+                Margin="0,0,-5,0"
+                Content="{TemplateBinding Content}"
+                Style="{StaticResource ButtonInChevron}"
+                Tag="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
             <controls:MemberListPopup x:Name="PART_Popup" />
         </Grid>
 
@@ -108,6 +117,6 @@
         <Setter Property="Focusable" Value="False" />
     </Style>
 
-    <Style TargetType="{x:Type controls:SymbolChevronButton}" BasedOn="{StaticResource DefaultSymbolChevronButton}" />
+    <Style BasedOn="{StaticResource DefaultSymbolChevronButton}" TargetType="{x:Type controls:SymbolChevronButton}" />
 
 </ResourceDictionary>

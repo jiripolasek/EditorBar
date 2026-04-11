@@ -9,6 +9,8 @@
     <File Path="CHANGELOG.md" />
     <File Path="LICENSE.txt" />
     <File Path="README.md" />
+    <File Path="Settings.XamlStyler" />
+    <File Path="StyleCop.json" />
   </Folder>
   <Project Path="src/EditorBar/JPSoftworks.EditorBar.csproj" Id="097e6f5a-f198-49f5-b4cc-28128e82fe43">
     <Platform Solution="*|arm64" Project="arm64" />

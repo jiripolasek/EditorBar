@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -28,7 +26,7 @@ internal abstract class BaseStructureProvider : StructureProvider
 
     protected BaseStructureProvider(ITextView textView)
     {
-        Requires.NotNull(textView, nameof(textView));
+        Requires.NotNull(textView);
 
         this.TextView = textView;
         this._textBuffer = textView.TextBuffer!;
@@ -65,7 +63,7 @@ internal abstract class BaseStructureProvider : StructureProvider
 
         this.UnifiedSource = this.CaretPositionChanged
             .Merge(this.ContentChanged)
-            .StartWith(this.TextView.Caret?.Position.BufferPosition ?? new SnapshotPoint())
+            .StartWith(this.TextView.Caret?.Position.BufferPosition ?? default)
             .LogAndRetry("UnifiedSource");
     }
 }

@@ -1,15 +1,15 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 // This was copied from https://github.com/dotnet/coreclr/blob/60f1e6265bd1039f023a82e0643b524d6aaf7845/src/System.Private.CoreLib/shared/System/Diagnostics/CodeAnalysis/NullableAttributes.cs
 // and updated to have the scope of the attributes be internal.
 
 // ReSharper disable All
-
 #pragma warning disable CA1019 // Define accessors for attribute arguments
+#pragma warning disable SA1642
+#pragma warning disable SA1649
+#pragma warning disable SA1402 // File may only contain a single type
 #nullable enable
 
 namespace System.Diagnostics.CodeAnalysis;
@@ -28,15 +28,17 @@ internal sealed class DisallowNullAttribute : Attribute
 }
 
 /// <summary>Specifies that an output may be null even if the corresponding type disallows it.</summary>
-[AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property |
-                AttributeTargets.ReturnValue)]
+[AttributeUsage(
+    AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property |
+    AttributeTargets.ReturnValue)]
 internal sealed class MaybeNullAttribute : Attribute
 {
 }
 
 /// <summary>Specifies that an output will not be null even if the corresponding type allows it.</summary>
-[AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property |
-                AttributeTargets.ReturnValue)]
+[AttributeUsage(
+    AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property |
+    AttributeTargets.ReturnValue)]
 internal sealed class NotNullAttribute : Attribute
 {
 }
@@ -48,7 +50,7 @@ internal sealed class NotNullAttribute : Attribute
 [AttributeUsage(AttributeTargets.Parameter)]
 internal sealed class MaybeNullWhenAttribute : Attribute
 {
-    /// <summary>Gets the return value condition.</summary>
+    /// <summary>Gets a value indicating whether the return value condition is met.</summary>
     public bool ReturnValue { get; }
 
     /// <summary>Initializes the attribute with the specified return value condition.</summary>
@@ -68,7 +70,7 @@ internal sealed class MaybeNullWhenAttribute : Attribute
 [AttributeUsage(AttributeTargets.Parameter)]
 internal sealed class NotNullWhenAttribute : Attribute
 {
-    /// <summary>Gets the return value condition.</summary>
+    /// <summary>Gets a value indicating whether the return value condition is met.</summary>
     public bool ReturnValue { get; }
 
     /// <summary>Initializes the attribute with the specified return value condition.</summary>
@@ -82,7 +84,8 @@ internal sealed class NotNullWhenAttribute : Attribute
 }
 
 /// <summary>Specifies that the output will be non-null if the named parameter is non-null.</summary>
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue,
+[AttributeUsage(
+    AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue,
     AllowMultiple = true)]
 internal sealed class NotNullIfNotNullAttribute : Attribute
 {
@@ -109,7 +112,7 @@ internal sealed class DoesNotReturnAttribute : Attribute
 [AttributeUsage(AttributeTargets.Parameter)]
 internal sealed class DoesNotReturnIfAttribute : Attribute
 {
-    /// <summary>Gets the condition parameter value.</summary>
+    /// <summary>Gets a value indicating whether the condition parameter value.</summary>
     public bool ParameterValue { get; }
 
     /// <summary>Initializes the attribute with the specified parameter value.</summary>
@@ -163,7 +166,7 @@ internal sealed class MemberNotNullAttribute : Attribute
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
 internal sealed class MemberNotNullWhenAttribute : Attribute
 {
-    /// <summary>Gets the return value condition.</summary>
+    /// <summary>Gets a value indicating whether the return value condition is met.</summary>
     public bool ReturnValue { get; }
 
     /// <summary>Gets field or property member names.</summary>

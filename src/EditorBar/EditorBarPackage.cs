@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -45,8 +43,7 @@ namespace JPSoftworks.EditorBar;
 [ProvideService(typeof(ILocationProvider), IsAsyncQueryable = true)]
 [ProvideAutoLoad(PackageGuids.EditorBarAutoloadUIContextGuidString, PackageAutoLoadFlags.BackgroundLoad)]
 [ProvideUIContextRule(
-    // we've to load the package to provide Checked status for the ToggleEditorBarCommand
-    PackageGuids.EditorBarAutoloadUIContextGuidString,
+    PackageGuids.EditorBarAutoloadUIContextGuidString, // we've to load the package to provide Checked status for the ToggleEditorBarCommand
     "Auto load when Editor Bar is Enabled",
     "editorBarEnabled",
     ["editorBarEnabled"],
@@ -65,11 +62,9 @@ public sealed class EditorBarPackage : AsyncPackage
     {
         try
         {
-            this.AddService(typeof(IMenuContextService),
-                static (_, _, _) => Task.FromResult<object?>(new MenuContextService()), true);
+            this.AddService(typeof(IMenuContextService), static (_, _, _) => Task.FromResult<object?>(new MenuContextService()), true);
 
-            this.AddService(typeof(ILocationProvider),
-                static (_, _, _) => Task.FromResult<object?>(new ToolkitLocationProvider()), true);
+            this.AddService(typeof(ILocationProvider), static (_, _, _) => Task.FromResult<object?>(new ToolkitLocationProvider()), true);
 
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.

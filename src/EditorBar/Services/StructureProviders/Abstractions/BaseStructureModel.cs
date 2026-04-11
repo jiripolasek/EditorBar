@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -44,8 +42,8 @@ public abstract class BaseStructureModel : IEquatable<BaseStructureModel>
     /// <param name="anchorPoint">The anchor point.</param>
     protected BaseStructureModel(string displayName, StackedImageMoniker imageMoniker, AnchorPoint anchorPoint)
     {
-        Requires.NotNullOrWhiteSpace(displayName, nameof(displayName));
-        Requires.NotNull(anchorPoint, nameof(anchorPoint));
+        Requires.NotNullOrWhiteSpace(displayName);
+        Requires.NotNull(anchorPoint);
 
         this.DisplayName = displayName;
         this.ImageMoniker = imageMoniker;

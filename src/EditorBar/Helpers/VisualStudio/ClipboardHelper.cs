@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -31,6 +29,7 @@ internal static class ClipboardHelper
         {
             await VS.StatusBar.ShowMessageAsync("Nothing to copy to Clipboard");
             return;
+
             // return Task.CompletedTask;
         }
 

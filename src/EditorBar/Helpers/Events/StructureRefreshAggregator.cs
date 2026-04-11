@@ -1,7 +1,5 @@
-﻿// ------------------------------------------------------------
-// 
+// ------------------------------------------------------------
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -17,6 +15,7 @@ namespace JPSoftworks.EditorBar.Helpers.Events;
 internal sealed class StructureRefreshAggregator : IStructureRefreshAggregator
 {
     public event EventHandler? RefreshRequested;
+
     private readonly IWpfTextView _textView;
     private readonly IWorkspaceMonitor _workspaceMonitor;
 

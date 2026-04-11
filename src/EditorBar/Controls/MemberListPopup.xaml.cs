@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -61,11 +59,13 @@ public partial class MemberListPopup : Popup
             var symbolChevronButton = this.FindAncestor<SymbolChevronButton>();
             if (symbolChevronButton != null)
             {
-                _ = this.Dispatcher!.BeginInvoke(() =>
-                {
-                    //symbolChevronButton.AcquireWin32Focus(out _);
-                    symbolChevronButton.FocusButton();
-                }, DispatcherPriority.ApplicationIdle);
+                _ = this.Dispatcher!.BeginInvoke(
+                    new Action(() =>
+                    {
+                        //symbolChevronButton.AcquireWin32Focus(out _);
+                        symbolChevronButton.FocusButton();
+                    }),
+                    DispatcherPriority.ApplicationIdle);
             }
 
             e.Handled = true;

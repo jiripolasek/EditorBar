@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -40,8 +38,8 @@ internal static class CodeAnalysisHelper
 
     private static bool MatchNamespaces(this ITypeSymbol typeSymbol, params string[] namespaceSegments)
     {
-        Requires.NotNull(typeSymbol, nameof(typeSymbol));
-        Requires.NotNull(namespaceSegments, nameof(namespaceSegments));
+        Requires.NotNull(typeSymbol);
+        Requires.NotNull(namespaceSegments);
 
         var ns = typeSymbol.ContainingNamespace;
         if (ns == null && namespaceSegments.Length == 0)
@@ -52,7 +50,7 @@ internal static class CodeAnalysisHelper
         for (var i = namespaceSegments.Length - 1; i >= 0; i--)
         {
             var item = namespaceSegments[i];
-            if (ns == null || ns.IsExplicitNamespace() == false || ns.Name != item)
+            if (ns == null || !ns.IsExplicitNamespace() || ns.Name != item)
             {
                 return false;
             }
@@ -60,12 +58,12 @@ internal static class CodeAnalysisHelper
             ns = ns.ContainingNamespace;
         }
 
-        return ns != null && ns.IsExplicitNamespace() == false;
+        return ns != null && !ns.IsExplicitNamespace();
     }
 
     private static bool IsExplicitNamespace(this INamespaceSymbol ns)
     {
-        return ns.IsGlobalNamespace == false;
+        return !ns.IsGlobalNamespace;
     }
 
     private static bool IsCustomAwaiter(ITypeSymbol type)
@@ -102,7 +100,7 @@ internal static class CodeAnalysisHelper
                             if (m.ReturnsVoid
                                 && mp.Length == 1
                                 && mp[0].Type is INamedTypeSymbol pt
-                                && pt.IsGenericType == false
+                                && !pt.IsGenericType
                                 && pt.MatchTypeName("Action", "System"))
                             {
                                 f |= HAS_ON_COMPLETED;
@@ -128,7 +126,7 @@ internal static class CodeAnalysisHelper
 
     public static bool MatchTypeName(this ITypeSymbol typeSymbol, string className, params string[] namespaces)
     {
-        return typeSymbol.Name == className && MatchNamespaces(typeSymbol, namespaces);
+        return typeSymbol.Name == className && typeSymbol.MatchNamespaces(namespaces);
     }
 
     public static ITypeSymbol GetReturnType(this ISymbol symbol)
@@ -142,7 +140,7 @@ internal static class CodeAnalysisHelper
                 return m.MethodKind == MethodKind.Constructor ? m.ContainingType : m.ReturnType;
             case SymbolKind.Parameter: return ((IParameterSymbol)symbol).Type;
             case SymbolKind.Property: return ((IPropertySymbol)symbol).Type;
-            case SymbolKind.Alias: return GetReturnType(((IAliasSymbol)symbol).Target);
+            case SymbolKind.Alias: return ((IAliasSymbol)symbol).Target.GetReturnType();
             case SymbolKind.NamedType:
                 return (symbol = symbol.AsMethod()) != null
                     ? ((IMethodSymbol)symbol).ReturnType

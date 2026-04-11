@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -53,40 +51,45 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
         IStructureProviderService structureProviderService,
         SettingsRefreshAggregator settingsRefreshAggregator)
     {
-        this._textView = Requires.NotNull(textView, nameof(textView));
-        this._workspaceMonitor = Requires.NotNull(workspaceMonitor, nameof(workspaceMonitor));
-        this._structureProviderService = Requires.NotNull(structureProviderService, nameof(structureProviderService));
-        Requires.NotNull(settingsRefreshAggregator, nameof(settingsRefreshAggregator));
+        this._textView = Requires.NotNull(textView);
+        this._workspaceMonitor = Requires.NotNull(workspaceMonitor);
+        this._structureProviderService = Requires.NotNull(structureProviderService);
+        Requires.NotNull(settingsRefreshAggregator);
 
         this._document = this._textView.GetTextDocumentFromDocumentBuffer()!;
         this._pathChangesStream = Observable
             .Defer(() => Observable.Return(this._document.FilePath))
-            .Concat(Observable
-                .FromEventPattern<TextDocumentFileActionEventArgs>(this._document,
-                    nameof(this._document.FileActionOccurred))
-                .Select(static e => e.EventArgs.FilePath))
+            .Concat(
+                Observable
+                    .FromEventPattern<TextDocumentFileActionEventArgs>(
+                        this._document,
+                        nameof(this._document.FileActionOccurred))
+                    .Select(static e => e.EventArgs.FilePath))
             .DistinctUntilChanged();
 
         var settingsChangesStream = Observable
             .Defer(static () => Observable.FromAsync(static () => GeneralOptionsModel.GetLiveInstanceAsync()))
-            .Concat(Observable.FromEventPattern(
-                    settingsRefreshAggregator,
-                    nameof(ISettingsRefreshAggregator.SettingsRefreshRequested))
-                .SelectMany(static _ => Observable.FromAsync(static () => GeneralOptionsModel.GetLiveInstanceAsync())));
+            .Concat(
+                Observable.FromEventPattern(
+                        settingsRefreshAggregator,
+                        nameof(ISettingsRefreshAggregator.SettingsRefreshRequested))
+                    .SelectMany(static _ =>
+                        Observable.FromAsync(static () => GeneralOptionsModel.GetLiveInstanceAsync())));
 
         var structureRefreshAggregator = new StructureRefreshAggregator(this._textView, this._workspaceMonitor);
         structureRefreshAggregator.AddTo(this._disposables);
 
         _ = Observable
-            .FromEventPattern<EventArgs>(structureRefreshAggregator, nameof(IStructureRefreshAggregator.RefreshRequested))
+            .FromEventPattern<EventArgs>(
+                structureRefreshAggregator,
+                nameof(IStructureRefreshAggregator.RefreshRequested))
             .CombineLatest(settingsChangesStream)
             .Replay(1)
             .RefCount()
             .Subscribe(_ => this.UpdateFileStructureProvider())
             .AddTo(this._disposables);
 
-        _ = Observable.CombineLatest(
-                this._activeBreadcrumbsProviderStream,
+        _ = this._activeBreadcrumbsProviderStream.CombineLatest(
                 settingsChangesStream,
                 static (structureProvider, settings) => structureProvider.Select(state => (state, settings)))
             .LogAndRetry("Combine active structure provider and settings")
@@ -118,8 +121,7 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
         currentProvider?.Dispose();
         this._textView.SetCurrentFileStructureProvider(provider);
 
-        var newBreadcrumbsSource = Observable.CombineLatest(
-                provider.BreadcrumbsChanged,
+        var newBreadcrumbsSource = provider.BreadcrumbsChanged.CombineLatest(
                 this._pathChangesStream,
                 static (breadcrumbs, filePath) => new BreadcrumbState(breadcrumbs, filePath))
             .LogAndRetry("newBreadcrumbsSource");
@@ -138,7 +140,7 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
         if (options.ShowFileNameBreadcrumb)
         {
             var fileCrumb = FileModel.Create(
-                state.FilePath ?? "",
+                state.FilePath ?? string.Empty,
                 state.Breadcrumbs?.CanRootHaveChildren ?? false);
             currentBreadcrumbs.Add(fileCrumb);
         }
@@ -164,33 +166,44 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
     {
         var crumb = baseStructureModel switch
         {
-            FileModel fileModel => new StructureBreadcrumbViewModel(fileModel, fileModel.DisplayName,
-                options.FileBreadcrumbBackground, options.FileBreadcrumbForeground)
+            FileModel fileModel => new StructureBreadcrumbViewModel(
+                fileModel,
+                fileModel.DisplayName,
+                options.FileBreadcrumbBackground,
+                options.FileBreadcrumbForeground)
             {
                 ItemsProvider = fileModel.CanHaveChildren ? () => this.GetChildrenItemsAsync(fileModel) : null,
                 ImageMoniker = GetMonikerForFile(fileModel),
                 ContextCommand = new DispatchedDelegateCommand(this.OpenContextMenuOnFileCrumb)
             },
-            TypeModel typeModel => new StructureBreadcrumbViewModel(typeModel, typeModel.DisplayName,
+            TypeModel typeModel => new StructureBreadcrumbViewModel(
+                typeModel,
+                typeModel.DisplayName,
                 options.StructureBreadcrumbBackground,
                 options.StructureBreadcrumbForeground)
             {
                 ItemsProvider = typeModel.CanHaveChildren ? () => this.GetChildrenItemsAsync(typeModel) : null,
                 ContextCommand = new DispatchedDelegateCommand(this.OpenContextMenuOnTypeCrumb)
             },
-            FunctionModel methodModel => new StructureBreadcrumbViewModel(methodModel, methodModel.DisplayName,
+            FunctionModel methodModel => new StructureBreadcrumbViewModel(
+                methodModel,
+                methodModel.DisplayName,
                 options.StructureBreadcrumbBackground,
                 options.StructureBreadcrumbForeground)
             {
                 ContextCommand = new DispatchedDelegateCommand(this.OpenContextMenuOnMemberCrumb)
             },
-            TypeMemberModel memberModel => new StructureBreadcrumbViewModel(memberModel, memberModel.DisplayName,
+            TypeMemberModel memberModel => new StructureBreadcrumbViewModel(
+                memberModel,
+                memberModel.DisplayName,
                 options.StructureBreadcrumbBackground,
                 options.StructureBreadcrumbForeground)
             {
                 ContextCommand = new DispatchedDelegateCommand(this.OpenContextMenuOnMemberCrumb)
             },
-            { } model => new StructureBreadcrumbViewModel(baseStructureModel, baseStructureModel.DisplayName,
+            { } model => new StructureBreadcrumbViewModel(
+                baseStructureModel,
+                baseStructureModel.DisplayName,
                 options.StructureBreadcrumbBackground,
                 options.StructureBreadcrumbForeground)
             {

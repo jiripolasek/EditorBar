@@ -1,7 +1,5 @@
-﻿// ------------------------------------------------------------
-// 
+// ------------------------------------------------------------
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -44,12 +42,12 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
     private readonly DispatchedDelegateCommand _openMenuOnPhysicalCrumb;
     private readonly DispatchedDelegateCommand _openMenuOnProjectCrumb;
     private readonly EditorBarViewModel _parent;
+    private readonly SettingsRefreshAggregator _settingsRefreshAggregator;
 
     private readonly DispatchedDelegateCommand _switchProjectCommand;
 
     private readonly IWpfTextView _textView;
     private readonly IWorkspaceMonitor _workspaceMonitor;
-    private readonly SettingsRefreshAggregator _settingsRefreshAggregator;
 
     public BulkObservableCollection<BreadcrumbModel> LocationBreadcrumbs { get; } = [];
 
@@ -63,13 +61,13 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
         JoinableTaskFactory joinableTaskFactory,
         SettingsRefreshAggregator settingsRefreshAggregator)
     {
-        this._parent = Requires.NotNull(parent, nameof(parent));
-        this._textView = Requires.NotNull(textView, nameof(textView));
-        Requires.NotNull(textDocument, nameof(textDocument));
-        this._joinableTaskFactory = Requires.NotNull(joinableTaskFactory, nameof(joinableTaskFactory));
-        this._workspaceMonitor = Requires.NotNull(workspaceMonitor, nameof(workspaceMonitor));
+        this._parent = Requires.NotNull(parent);
+        this._textView = Requires.NotNull(textView);
+        Requires.NotNull(textDocument);
+        this._joinableTaskFactory = Requires.NotNull(joinableTaskFactory);
+        this._workspaceMonitor = Requires.NotNull(workspaceMonitor);
         this._settingsRefreshAggregator = settingsRefreshAggregator;
-        
+
         this.LegacyLabelModel = new LegacyLabelViewModel(textDocument);
 
         this._settingsRefreshAggregator.SettingsRefreshRequested += this.HandleSettingsChanged;
@@ -82,9 +80,9 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
         this._locationBreadcrumbEventAggregator.AddTo(this._disposables);
 
         CreateObservableForLocationChanges()
-         .ObserveOnDispatcher()
-         .Subscribe()
-         .AddTo(this._disposables);
+            .ObserveOnDispatcher()
+            .Subscribe()
+            .AddTo(this._disposables);
 
         this._switchProjectCommand = new DispatchedDelegateCommand(this.SwitchProject);
         this._openMenuOnProjectCrumb = new DispatchedDelegateCommand(this.OpenContextMenuOnProjectCrumb);
@@ -197,8 +195,8 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
         GeneralOptionsModel options,
         LocationNavModel locationModel)
     {
-        Requires.NotNull(options, nameof(options));
-        Requires.NotNull(locationModel, nameof(locationModel));
+        Requires.NotNull(options);
+        Requires.NotNull(locationModel);
 
         var project = locationModel.Project;
 
@@ -213,14 +211,12 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                 BaseSolutionProjectInfo s => new BreadcrumbModel(
                     "\\",
                     options.SolutionBackground,
-                    options.SolutionForeground)
-                { AssociatedFile = s.DirectoryPath },
+                    options.SolutionForeground) { AssociatedFile = s.DirectoryPath },
 
                 FileSystemProjectInfo fsProject => new BreadcrumbModel(
                     fsProject.DisplayName,
                     options.NonSolutionRootBackground,
-                    options.NonSolutionRootForeground)
-                { AssociatedDirectory = fsProject.DirectoryPath },
+                    options.NonSolutionRootForeground) { AssociatedDirectory = fsProject.DirectoryPath },
 
                 NullProjectInfo => new BreadcrumbModel(
                     Strings.CodeFragment!,
@@ -235,8 +231,9 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
         // 2) Solution folders
         if (options.ShowSolutionFolders && project is IHasSolutionFolders hasSolutionFolders)
         {
-            breadcrumbs.AddRange(hasSolutionFolders.SolutionFolders.Select(folder =>
-                new BreadcrumbModel(folder, options.SolutionFolderBackground, options.SolutionFolderForeground)));
+            breadcrumbs.AddRange(
+                hasSolutionFolders.SolutionFolders.Select(folder =>
+                    new BreadcrumbModel(folder, options.SolutionFolderBackground, options.SolutionFolderForeground)));
         }
 
         // 3) Project
@@ -247,27 +244,33 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                 var crumb = project switch
                 {
                     GenericProjectInfo { IntelliSenseAlternativeContextsDocuments.Count: > 1 } p => new
-                        ProjectContainerBreadcrumbModel(p, p.DisplayName, options.ProjectBackground,
+                        ProjectContainerBreadcrumbModel(
+                            p,
+                            p.DisplayName,
+                            options.ProjectBackground,
                             options.ProjectForeground)
-                    {
-                        AssociatedDirectory = p.DirectoryPath,
-                        ItemsProvider = () => Task.FromResult<IList<MemberListItemViewModel>>(
-                            p.IntelliSenseAlternativeContextsDocuments
-                                .Select(alternativeContextDocument =>
-                                    new MemberListItemViewModel
-                                    {
-                                        PrimaryName = alternativeContextDocument.Project.Name,
-                                        SearchText = alternativeContextDocument.Project.Name,
-                                        Command = this._switchProjectCommand,
-                                        CommandParameter = alternativeContextDocument
-                                    })
-                                .OrderBy(static t => t.PrimaryName)
-                                .ToList()),
-                        ContextCommand = this._openMenuOnProjectCrumb
-                    },
+                        {
+                            AssociatedDirectory = p.DirectoryPath,
+                            ItemsProvider = () => Task.FromResult<IList<MemberListItemViewModel>>(
+                                p.IntelliSenseAlternativeContextsDocuments
+                                    .Select(alternativeContextDocument =>
+                                        new MemberListItemViewModel
+                                        {
+                                            PrimaryName = alternativeContextDocument.Project.Name,
+                                            SearchText = alternativeContextDocument.Project.Name,
+                                            Command = this._switchProjectCommand,
+                                            CommandParameter = alternativeContextDocument
+                                        })
+                                    .OrderBy(static t => t.PrimaryName)
+                                    .ToList()),
+                            ContextCommand = this._openMenuOnProjectCrumb
+                        },
 
-                    BaseSolutionProjectInfo => new ProjectContainerBreadcrumbModel(project, project.DisplayName,
-                        options.ProjectBackground, options.ProjectForeground)
+                    BaseSolutionProjectInfo => new ProjectContainerBreadcrumbModel(
+                        project,
+                        project.DisplayName,
+                        options.ProjectBackground,
+                        options.ProjectForeground)
                     {
                         AssociatedDirectory = project.DirectoryPath,
                         ItemsProvider = null,
@@ -284,11 +287,10 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
             }
         }
 
-
         // 4) project folders + parent folder
         if (options.ShowProjectFolders && locationModel.ProjectFolders.Length > 0)
         {
-            var partialPath = locationModel.Project.DirectoryPath ?? "";
+            var partialPath = locationModel.Project.DirectoryPath ?? string.Empty;
 
             var projectFoldersBackground = new SolidColorBrush(options.ProjectFoldersBackground.ToMediaColor());
             projectFoldersBackground.Freeze();
@@ -306,13 +308,15 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                 partialPath = Path.Combine(partialPath, pathSegment);
                 var model = new PhysicalDirectoryModel { FullPath = partialPath, Name = pathSegment };
                 breadcrumbs.Add(
-                    new PhysicalDirectoryBreadcrumbModel(model, pathSegment, projectFoldersBackground,
-                        projectFoldersForeground)
-                    { ContextCommand = this._openMenuOnPhysicalCrumb });
+                    new PhysicalDirectoryBreadcrumbModel(
+                        model,
+                        pathSegment,
+                        projectFoldersBackground,
+                        projectFoldersForeground) { ContextCommand = this._openMenuOnPhysicalCrumb });
             }
         }
 
-        // 5) immediate parent folder (if enabled explicitly, to be displayed as a breadcrumb with a different color or without 
+        // 5) immediate parent folder (if enabled explicitly, to be displayed as a breadcrumb with a different color or without
         if (options.ShowParentFolder && locationModel.ProjectFolders.Length > 0)
         {
             var parentFolder = Path.GetDirectoryName(locationModel.FilePath)!;
@@ -320,8 +324,11 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
 
             var model = new PhysicalDirectoryModel { FullPath = parentFolder, Name = parentFolderName };
             breadcrumbs.Add(
-                new PhysicalDirectoryBreadcrumbModel(model, locationModel.ProjectFolders.Last(),
-                    options.ParentFolderBackground, options.ParentFolderForeground)
+                new PhysicalDirectoryBreadcrumbModel(
+                    model,
+                    locationModel.ProjectFolders.Last(),
+                    options.ParentFolderBackground,
+                    options.ParentFolderForeground)
                 {
                     ContextCommand = this._openMenuOnPhysicalCrumb
                 });
@@ -330,6 +337,7 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
         for (var index = 0; index < breadcrumbs.Count; index++)
         {
             var breadcrumbModel = breadcrumbs[index]!;
+
             // set IsFirst, IsLast, PreviousBreadcrumb and LastBreadcrumb
             breadcrumbModel.IsFirst = index == 0;
             breadcrumbModel.IsLast = index == breadcrumbs.Count - 1;
@@ -339,7 +347,6 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
 
         return breadcrumbs;
     }
-
 
     private void SwitchProject(object parameter)
     {

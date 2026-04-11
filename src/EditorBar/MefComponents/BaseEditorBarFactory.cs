@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -23,11 +21,14 @@ internal abstract class BaseEditorBarFactory(BarPosition targetBarPosition) : IW
 {
     private IWpfTextView? _textView;
 
-    [Import] internal JoinableTaskContext JoinableTaskContext = null!;
+    [Import]
+    internal JoinableTaskContext JoinableTaskContext = null!;
 
-    [Import] internal SVsServiceProvider ServiceProvider = null!;
+    [Import]
+    internal SVsServiceProvider ServiceProvider = null!;
 
-    [Import] internal IStructureProviderService StructureProviderService = null!;
+    [Import]
+    internal IStructureProviderService StructureProviderService = null!;
 
     /// <inheritdoc />
     public IWpfTextViewMargin? CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)

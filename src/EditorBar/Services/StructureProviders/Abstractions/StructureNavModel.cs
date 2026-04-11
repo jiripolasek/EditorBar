@@ -1,12 +1,8 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
-
-using System.Diagnostics.CodeAnalysis;
 
 namespace JPSoftworks.EditorBar.Services.StructureProviders;
 
@@ -16,7 +12,7 @@ namespace JPSoftworks.EditorBar.Services.StructureProviders;
 public sealed class StructureNavModel
 {
     /// <summary>
-    /// Indicates whether a root element can have child elements.
+    /// Gets a value indicating whether a root element can have child elements.
     /// </summary>
     public bool CanRootHaveChildren { get; }
 
@@ -30,9 +26,8 @@ public sealed class StructureNavModel
     /// <summary>
     /// Initializes a new instance of the <see cref="StructureNavModel" /> class.
     /// </summary>
-    /// <param name="canRootHaveChildren"></param>
-    /// <param name="structure"></param>
-    [SetsRequiredMembers]
+    /// <param name="canRootHaveChildren">Whether a root element can have child elements.</param>
+    /// <param name="structure">The structural elements forming the breadcrumb path.</param>
     public StructureNavModel(bool canRootHaveChildren, IEnumerable<BaseStructureModel> structure)
     {
         this.CanRootHaveChildren = canRootHaveChildren;

@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -21,8 +19,7 @@ namespace JPSoftworks.EditorBar.Options;
 /// </summary>
 /// <seealso cref="BaseOptionModel{GeneralPage}" />
 [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global", Justification = "Used implicitly.")]
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global",
-    Justification = "Setters are used implicitly by PropertyGrid.")]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Setters are used implicitly by PropertyGrid.")]
 public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRatingConfig
 {
     private const int CurrentConfigVersion = 3;
@@ -37,13 +34,13 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     internal const string PathToEnabledProperty = RegistryCollectionName + @"\" + nameof(Enabled);
 
     // keep legacy name to  keep settings for existing users intact
+
     /// <inheritdoc />
     protected override string CollectionName => RegistryCollectionName;
 
-    // -------------------------------------------  
+    // -------------------------------------------
     // Appearance category
     // -------------------------------------------
-
     [Category(AppearanceCategoryName)]
     [DisplayName("Bar position")]
     [Description("Position of the Editor Bar.")]
@@ -123,7 +120,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     // -------------------------------------------
     // General category
     // -------------------------------------------
-
     [Category(GeneralCategoryName)]
     [DisplayName("Enable Editor Bar")]
     [Description("Determines if the Editor Bar is visible.")]
@@ -133,7 +129,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     // -------------------------------------------
     // External Editor category
     // -------------------------------------------
-
     [Category(ExternalEditorCategoryName)]
     [DisplayName("External editor executable")]
     [Description("Path to external editor or command.")]
@@ -142,15 +137,15 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
 
     [Category(ExternalEditorCategoryName)]
     [DisplayName("External editor executable arguments")]
-    [Description("Path to external editor or command. " + Launcher.FileNamePlaceholderConstant +
-                 " represents the file name.")]
+    [Description(
+        "Path to external editor or command. " + Launcher.FileNamePlaceholderConstant +
+        " represents the file name.")]
     [DefaultValue(Launcher.FileNamePlaceholderConstant)]
     public string? ExternalEditorCommandArguments { get; set; } = Launcher.FileNamePlaceholderConstant;
 
     // -------------------------------------------
     // Activation rules category
     // -------------------------------------------
-
     [Category(GeneralCategoryName)]
     [DisplayName("Display in diff views")]
     [Description("Determines if the Editor Bar is visible in diff views.")]
@@ -186,7 +181,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     // -------------------------------------------
     // Additional Actions category
     // -------------------------------------------
-
     [Category(AdditionalActionCategoryName)]
     [DisplayName("Double-click action")]
     [Description("Action to be performed when double-clicking on the file path.")]
@@ -201,7 +195,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     [TypeConverter(typeof(EnumToDescriptionConverter))]
     public FileAction AlternateFileAction { get; set; } = FileAction.OpenInExternalEditor;
 
-
     // -------------------------------------------
     // Debug category
     // -------------------------------------------
@@ -214,13 +207,14 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     // -------------------------------------------
     // Meta
     // -------------------------------------------
+    [Browsable(false)]
+    public int Version { get; set; }
 
-    [Browsable(false)] public int Version { get; set; }
+    [Browsable(false)]
+    public string? VsixVersion { get; set; }
 
-    [Browsable(false)] public string? VsixVersion { get; set; }
-
-    [Browsable(false)] public int RatingRequests { get; set; }
-
+    [Browsable(false)]
+    public int RatingRequests { get; set; }
 
     private static bool EqualColor(Color left, Color right)
     {
@@ -230,7 +224,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     // -------------------------------------------
     // Methods
     // -------------------------------------------
-
     public async Task UpgradeAsync()
     {
         var changed = false;
@@ -285,7 +278,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
 
     // Comparison of System.Drawing.Colors is little bit funny: Color.Black != Color.FromArgb(0, 0, 0)
     // So let's do comparison by ARGB values. See ColorEquality method below.
-
     #region Solution Background
 
     private static readonly Color SolutionBackgroundDefault = Color.Purple;
@@ -307,7 +299,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     }
 
     #endregion
-
 
     #region Solution Foreground
 
@@ -331,7 +322,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
 
     #endregion
 
-
     #region NonSolutionRoot Background
 
     private static readonly Color NonSolutionRootBackgroundDefault = Color.Silver;
@@ -353,7 +343,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     }
 
     #endregion
-
 
     #region NonSolutionRoot Foreground
 
@@ -377,7 +366,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
 
     #endregion
 
-
     #region Project Background
 
     private static readonly Color ProjectBackgroundDefault = Color.LightSkyBlue;
@@ -399,7 +387,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     }
 
     #endregion
-
 
     #region Project Foreground
 
@@ -423,7 +410,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
 
     #endregion
 
-
     #region Solution Folder Background
 
     private static readonly Color SolutionFolderBackgroundDefault = Color.Gold;
@@ -445,7 +431,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     }
 
     #endregion
-
 
     #region Solution Folder Foreground
 
@@ -469,7 +454,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
 
     #endregion
 
-
     #region Parent Folder Background
 
     private static readonly Color ParentFolderBackgroundDefault = Color.YellowGreen;
@@ -491,7 +475,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     }
 
     #endregion
-
 
     #region Parent Folder Foreground
 
@@ -515,7 +498,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
 
     #endregion
 
-
     #region Project Folders Background
 
     private static readonly Color ProjectFoldersBackgroundDefault = Color.FromArgb(192, 218, 138);
@@ -537,7 +519,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     }
 
     #endregion
-
 
     #region Project Folders Foreground
 
@@ -561,7 +542,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
 
     #endregion
 
-
     #region File Background
 
     private static readonly Color FileBreadcrumbBackgroundDefault = Color.FromArgb(0, 255, 255, 255);
@@ -583,7 +563,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     }
 
     #endregion
-
 
     #region File Foreground
 
@@ -607,7 +586,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
 
     #endregion
 
-
     #region Structure Background
 
     private static readonly Color StructureBreadcrumbBackgroundDefault = Color.FromArgb(0, 255, 255, 255);
@@ -629,7 +607,6 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     }
 
     #endregion
-
 
     #region Structure Foreground
 

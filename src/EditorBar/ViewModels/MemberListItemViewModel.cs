@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -27,7 +25,8 @@ public record MemberListItemViewModel
 
     public object? CommandParameter { get; set; }
 
-    [Obsolete] public UIElement? Icon { get; set; }
+    [Obsolete]
+    public UIElement? Icon { get; set; }
 
     public static MemberListItemViewModel FromModel(FileStructureElementModel model)
     {

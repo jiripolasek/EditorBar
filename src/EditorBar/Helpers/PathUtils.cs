@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -105,6 +103,6 @@ internal static class PathUtils
     internal static string GetRelativePath(string relativeTo, string path)
     {
         var result = MicrosoftPath.GetRelativePath(relativeTo, path);
-        return result == "." ? "" : result;
+        return result == "." ? string.Empty : result;
     }
 }

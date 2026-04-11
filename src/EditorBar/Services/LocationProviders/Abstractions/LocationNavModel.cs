@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -39,9 +37,9 @@ public sealed class LocationNavModel
     /// <param name="filePath">Full file path.</param>
     public LocationNavModel(IProjectInfo project, string[] projectFolders, string filePath)
     {
-        Requires.NotNull(project, nameof(project));
-        Requires.NotNull(projectFolders, nameof(projectFolders));
-        Requires.NotNull(filePath, nameof(filePath));
+        Requires.NotNull(project);
+        Requires.NotNull(projectFolders);
+        Requires.NotNull(filePath);
 
         this.Project = project;
         this.ProjectFolders = projectFolders;

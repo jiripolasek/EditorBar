@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -25,7 +23,7 @@ internal static class BulkObservableCollectionExtensions
     /// <param name="collection">The new set of items to be added to the collection after clearing it.</param>
     internal static void SetRange<T>(this BulkObservableCollection<T> bulkCollection, IEnumerable<T>? collection)
     {
-        Requires.NotNull(bulkCollection, nameof(bulkCollection));
+        Requires.NotNull(bulkCollection);
 
         bulkCollection.BeginBulkOperation();
         bulkCollection.Clear();

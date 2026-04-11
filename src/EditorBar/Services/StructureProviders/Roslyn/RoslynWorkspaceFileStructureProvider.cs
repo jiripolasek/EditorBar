@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-//
 // Copyright (c) Jiří Polášek. All rights reserved.
-//
 // ------------------------------------------------------------
 
 #nullable enable
@@ -28,12 +26,13 @@ internal class RoslynWorkspaceFileStructureProvider
     private readonly ITextView _textView;
 
     /// <summary>
-    /// Initializes a new instance of the file structure provider for Roslyn workspaces.
+    /// Initializes a new instance of the <see cref="RoslynWorkspaceFileStructureProvider" />
+    /// class.
     /// </summary>
-    /// <param name="textView">Represents the text view associated with the workspace, used for displaying and editing code.</param>
+    /// <param name="textView">The text view associated with the workspace.</param>
     public RoslynWorkspaceFileStructureProvider(ITextView textView)
     {
-        Requires.NotNull(textView, nameof(textView));
+        Requires.NotNull(textView);
 
         this._textView = textView;
     }
@@ -48,7 +47,6 @@ internal class RoslynWorkspaceFileStructureProvider
 
         // DocumentId can be tied to Document (which is of type Document) or to AdditionalDocument or AnalyzerConfigDocument (both are of type TextDocument)
         // Only Document can be parsed and analyzed by Roslyn, so we need to find the right type of document to work with
-
         var documentId = workspace.GetDocumentIdInCurrentContext(sourceTextContainer);
         var textDocument = workspace.CurrentSolution.GetDocument(documentId)
                            ?? workspace.CurrentSolution.GetAdditionalDocument(documentId)
@@ -104,7 +102,6 @@ internal class RoslynWorkspaceFileStructureProvider
     {
         // filter out locations in the another file; we still can get multiple instances of the same symbol in the same file
         // this is different from how members are filtered, but until I have better UI for partial types it's the best solution
-
         var types = (await GetAllTypesInDocumentAsync(workspace, documentId))
             .Distinct(SymbolEqualityComparer.Default)
             .Where(FilterSourceMembers)
@@ -141,7 +138,6 @@ internal class RoslynWorkspaceFileStructureProvider
         //     - __RazorDirectiveTokenHelpers__
         //     - __o
         //     - BuildRenderTree
-
         if (symbol is IMethodSymbol or IFieldSymbol && symbol.Locations.Length == 1 &&
             symbol.Locations[0].SourceTree?.FilePath.Contains("ide.g.") == true)
         {
@@ -208,6 +204,7 @@ internal class RoslynWorkspaceFileStructureProvider
             .Cast<FileStructureElementModel>()
             .ToImmutableList();
     }
+
     private static async Task<INamedTypeSymbol?> TryResolveTypeSymbolByAnchorAsync(
         TypeModel typeModel,
         Workspace workspace,
@@ -322,7 +319,8 @@ internal class RoslynWorkspaceFileStructureProvider
                         compilationUnit.Members.FirstOrDefault() is GlobalStatementSyntax firstGlobalStatementSyntax)
                     {
                         // this is top level statements file, we don't want to show types here, only method
-                        return semanticModel.GetEnclosingSymbol(firstGlobalStatementSyntax.SpanStart) is not IMethodSymbol
+                        return semanticModel.GetEnclosingSymbol(firstGlobalStatementSyntax.SpanStart) is not
+                            IMethodSymbol
                             topLevelMainMethodSymbol
                             ? []
                             : [topLevelMainMethodSymbol];
@@ -331,11 +329,13 @@ internal class RoslynWorkspaceFileStructureProvider
                     // get document types
                     var types = GetNonTypeTypeContainers(root).Where(static syntaxNode =>
                         syntaxNode is BaseTypeDeclarationSyntax or DelegateDeclarationSyntax);
-                    var symbols = types.Select(syntaxNode => semanticModel.GetDeclaredSymbol(syntaxNode)).OfType<ISymbol>()
+                    var symbols = types.Select(syntaxNode => semanticModel.GetDeclaredSymbol(syntaxNode))
+                        .OfType<ISymbol>()
                         .ToList();
 
                     return symbols;
                 }
+
             case LanguageNames.VisualBasic:
                 {
                     // Ensure the document is a VB.NET file by trying to cast the root.
@@ -356,6 +356,7 @@ internal class RoslynWorkspaceFileStructureProvider
 
                     return symbols;
                 }
+
             default:
                 return [];
         }

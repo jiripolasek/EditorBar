@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -24,24 +22,24 @@ public record AnchorPoint
     public AnchorPointTextSpan TextSpan { get; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AnchorPoint" /> record.
+    /// Initializes a new instance of the <see cref="AnchorPoint"/> class.
     /// </summary>
-    /// <param name="FilePath">The file path of the anchor point.</param>
-    /// <param name="TextSpan">The text span of the anchor point.</param>
-    public AnchorPoint(string FilePath, AnchorPointTextSpan TextSpan = default)
+    /// <param name="filePath">The file path of the anchor point.</param>
+    /// <param name="textSpan">The text span of the anchor point.</param>
+    public AnchorPoint(string filePath, AnchorPointTextSpan textSpan = default)
     {
-        this.FilePath = FilePath;
-        this.TextSpan = TextSpan;
+        this.FilePath = filePath;
+        this.TextSpan = textSpan;
     }
 
     /// <summary>
     /// Deconstructs the <see cref="AnchorPoint" /> record into its components.
     /// </summary>
-    /// <param name="FilePath">The file path of the anchor point.</param>
-    /// <param name="TextSpan">The text span of the anchor point.</param>
-    public void Deconstruct(out string FilePath, out AnchorPointTextSpan TextSpan)
+    /// <param name="filePath">The file path of the anchor point.</param>
+    /// <param name="textSpan">The text span of the anchor point.</param>
+    public void Deconstruct(out string filePath, out AnchorPointTextSpan textSpan)
     {
-        FilePath = this.FilePath;
-        TextSpan = this.TextSpan;
+        filePath = this.FilePath;
+        textSpan = this.TextSpan;
     }
 }

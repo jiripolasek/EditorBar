@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -17,25 +15,40 @@ namespace JPSoftworks.EditorBar.Controls;
 public partial class ColorSelector
 {
     public static readonly DependencyProperty IsCheckedProperty = DependencyProperty.Register(
-        nameof(IsChecked), typeof(bool), typeof(ColorSelector),
-        new FrameworkPropertyMetadata(default(bool),
+        nameof(IsChecked),
+        typeof(bool),
+        typeof(ColorSelector),
+        new FrameworkPropertyMetadata(
+            default(bool),
             FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
     public static readonly DependencyProperty ForegroundColorProperty = DependencyProperty.Register(
-        nameof(ForegroundColor), typeof(Color), typeof(ColorSelector),
-        new FrameworkPropertyMetadata(default(Color),
+        nameof(ForegroundColor),
+        typeof(Color),
+        typeof(ColorSelector),
+        new FrameworkPropertyMetadata(
+            default(Color),
             FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
     public static readonly DependencyProperty BackgroundColorProperty = DependencyProperty.Register(
-        nameof(BackgroundColor), typeof(Color), typeof(ColorSelector),
-        new FrameworkPropertyMetadata(default(Color),
+        nameof(BackgroundColor),
+        typeof(Color),
+        typeof(ColorSelector),
+        new FrameworkPropertyMetadata(
+            default(Color),
             FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-    public static readonly DependencyProperty IsCheckableProperty = DependencyProperty.Register(nameof(IsCheckable),
-        typeof(bool), typeof(ColorSelector), new PropertyMetadata(true));
+    public static readonly DependencyProperty IsCheckableProperty = DependencyProperty.Register(
+        nameof(IsCheckable),
+        typeof(bool),
+        typeof(ColorSelector),
+        new PropertyMetadata(true));
 
-    public static readonly DependencyProperty LabelContentProperty = DependencyProperty.Register(nameof(LabelContent),
-        typeof(object), typeof(ColorSelector), new PropertyMetadata(default(object)!));
+    public static readonly DependencyProperty LabelContentProperty = DependencyProperty.Register(
+        nameof(LabelContent),
+        typeof(object),
+        typeof(ColorSelector),
+        new PropertyMetadata(default(object)!));
 
     public bool IsChecked
     {

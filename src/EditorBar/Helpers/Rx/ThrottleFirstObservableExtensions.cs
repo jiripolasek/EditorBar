@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -21,7 +19,7 @@ internal static class ThrottleFirstObservableExtensions
     /// <inheritdoc cref="ThrottleFirst{T}(IObservable{T}, TimeSpan, IScheduler)" />
     public static IObservable<T> ThrottleFirst<T>(this IObservable<T> source, TimeSpan suppressionPeriod)
     {
-        return ThrottleFirst(source, suppressionPeriod, Scheduler.Default);
+        return source.ThrottleFirst(suppressionPeriod, Scheduler.Default);
     }
 
     /// <summary>
@@ -32,8 +30,8 @@ internal static class ThrottleFirstObservableExtensions
     /// <typeparam name="T">Type of the items in <paramref name="source" /></typeparam>
     /// <param name="source">The source Observable</param>
     /// <param name="suppressionPeriod">The duration for which subsequent items are skipped</param>
-    /// <param name="scheduler"></param>
-    /// <returns>The throttled source</returns>
+    /// <param name="scheduler">The scheduler used to time the suppression period.</param>
+    /// <returns>The throttled source.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="source" /> is null.</exception>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="suppressionPeriod" /> is zero or negative number.</exception>
     public static IObservable<T> ThrottleFirst<T>(
@@ -41,11 +39,13 @@ internal static class ThrottleFirstObservableExtensions
         TimeSpan suppressionPeriod,
         IScheduler scheduler)
     {
-        Requires.Argument(suppressionPeriod > TimeSpan.Zero, nameof(suppressionPeriod),
+        Requires.Argument(
+            suppressionPeriod > TimeSpan.Zero,
+            nameof(suppressionPeriod),
             "Suppression period can't be negative or zero.");
-        Requires.NotNull(scheduler, nameof(scheduler));
+        Requires.NotNull(scheduler);
 
-        return ThrottleFirst(source, _ => Observable.Timer(suppressionPeriod, scheduler));
+        return source.ThrottleFirst(_ => Observable.Timer(suppressionPeriod, scheduler));
     }
 
     /// <summary>
@@ -68,8 +68,8 @@ internal static class ThrottleFirstObservableExtensions
         this IObservable<T> source,
         Func<T, IObservable<TThrottle>> suppressionPeriodSelector)
     {
-        Requires.NotNull(source, nameof(source));
-        Requires.NotNull(suppressionPeriodSelector, nameof(suppressionPeriodSelector));
+        _ = Requires.NotNull(source);
+        _ = Requires.NotNull(suppressionPeriodSelector);
 
         return Observable.Create<T>(observer =>
         {
@@ -85,13 +85,12 @@ internal static class ThrottleFirstObservableExtensions
                     }
                 },
                 observer.OnError,
-                observer.OnCompleted
-            );
+                observer.OnCompleted);
 
             // NOTE: If the outer observable completes or ends with an error, the correct disposal
             // of the inner observable depends on the fact that the outer subscription is
-            // automatically unsubscribed. Within Rx.Net this should be the case for all well formed observables.
-
+            // automatically unsubscribed. Within Rx.Net this should be the case for all well formed
+            // observables.
             return Disposable.Create(() =>
             {
                 subscription.Dispose();

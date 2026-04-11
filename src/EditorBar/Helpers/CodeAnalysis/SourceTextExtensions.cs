@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -24,8 +22,8 @@ internal static class SourceTextExtensions
         this SourceTextContainer sourceTextContainer,
         Workspace workspace)
     {
-        Requires.NotNull(sourceTextContainer, nameof(sourceTextContainer));
-        Requires.NotNull(workspace, nameof(workspace));
+        Requires.NotNull(sourceTextContainer);
+        Requires.NotNull(workspace);
 
         var relatedDocumentsTemp = sourceTextContainer.GetRelatedDocuments();
         switch (relatedDocumentsTemp.Length)
@@ -48,6 +46,7 @@ internal static class SourceTextExtensions
 
                     return new IntelliSenseProjectContextContainer(relatedDocuments, selectedProjectItem?.Project);
                 }
+
             default:
                 throw new InvalidOperationException("Invalid case.");
         }
@@ -61,8 +60,8 @@ internal static class SourceTextExtensions
     /// <returns>Returns the project associated with the document, or null if no project is found.</returns>
     public static Project? GetProjectForDocument(this SourceTextContainer sourceTextContainer, Workspace workspace)
     {
-        Requires.NotNull(sourceTextContainer, nameof(sourceTextContainer));
-        Requires.NotNull(workspace, nameof(workspace));
+        Requires.NotNull(sourceTextContainer);
+        Requires.NotNull(workspace);
 
         var id = workspace.GetDocumentIdInCurrentContext(sourceTextContainer);
         var document = workspace.CurrentSolution.GetDocument(id);
@@ -92,13 +91,12 @@ internal static class SourceTextExtensions
     public static IntelliSenseProjectContextContainer GetProjectsAssociatedWithDocument(
         this SourceTextContainer sourceTextContainer)
     {
-        Requires.NotNull(sourceTextContainer, nameof(sourceTextContainer));
+        Requires.NotNull(sourceTextContainer);
 
         return !Workspace.TryGetWorkspace(sourceTextContainer, out var workspace)
             ? IntelliSenseProjectContextContainer.Empty
-            : GetProjectsAssociatedWithDocument(sourceTextContainer, workspace);
+            : sourceTextContainer.GetProjectsAssociatedWithDocument(workspace);
     }
-
 
     private static Document? GetOpenDocumentInCurrentContext(this SourceTextContainer sourceTextContainer)
     {

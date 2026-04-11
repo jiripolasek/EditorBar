@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -38,7 +36,7 @@ public class OptionsPageViewModel : ObservableObject
     private VisualStyle _visualStyle;
 
     /// <summary>
-    /// Contains available options for the bar position.
+    /// Gets the available options for the bar position.
     /// </summary>
     public ObservableCollection<EnumViewModel<BarPosition>> BarPositions { get; } =
     [
@@ -47,7 +45,7 @@ public class OptionsPageViewModel : ObservableObject
     ];
 
     /// <summary>
-    /// Contains available options for the display style.
+    /// Gets the available options for the display style.
     /// </summary>
     public ObservableCollection<EnumViewModel<DisplayStyle>> DisplayStyles { get; } =
     [
@@ -56,7 +54,7 @@ public class OptionsPageViewModel : ObservableObject
     ];
 
     /// <summary>
-    /// Contains available options for the visual style.
+    /// Gets the available options for the visual style.
     /// </summary>
     public ObservableCollection<EnumViewModel<VisualStyle>> VisualStyles { get; } =
     [
@@ -66,7 +64,7 @@ public class OptionsPageViewModel : ObservableObject
     ];
 
     /// <summary>
-    /// Contains available options for the path style.
+    /// Gets the available options for the path style.
     /// </summary>
     public ObservableCollection<EnumViewModel<FileLabel>> PathStyles { get; } =
     [
@@ -78,7 +76,7 @@ public class OptionsPageViewModel : ObservableObject
     ];
 
     /// <summary>
-    /// Contains available options for the double-click action.
+    /// Gets the available options for the double-click action.
     /// </summary>
     public ObservableCollection<EnumViewModel<FileAction>> DoubleClickActions { get; } =
     [
@@ -91,14 +89,12 @@ public class OptionsPageViewModel : ObservableObject
     ];
 
     /// <summary>
-    /// Represents a command to browse for an external editor. It allows users to select an external editing
-    /// application.
+    /// Gets the command to browse for an external editor.
     /// </summary>
     public ICommand BrowseForExternalEditorCommand { get; }
 
     /// <summary>
-    /// Indicates whether a feature is enabled or not. It provides a getter and a setter to access and modify the
-    /// enabled state.
+    /// Gets or sets a value indicating whether a feature is enabled.
     /// </summary>
     public bool IsEnabled
     {
@@ -346,8 +342,8 @@ public class OptionsPageViewModel : ObservableObject
             this.CodeStructureSegment.ForegroundColor = model.StructureBreadcrumbForeground.ToMediaColor();
             this.CodeStructureSegment.BackgroundColor = model.StructureBreadcrumbBackground.ToMediaColor();
 
-            this.ExternalEditorPath = model.ExternalEditorCommand ?? "";
-            this.ExternalEditorArguments = model.ExternalEditorCommandArguments ?? "";
+            this.ExternalEditorPath = model.ExternalEditorCommand ?? string.Empty;
+            this.ExternalEditorArguments = model.ExternalEditorCommandArguments ?? string.Empty;
 
             this.IsDebugModeEnabled = model.DebugMode;
         }
@@ -410,8 +406,8 @@ public class OptionsPageViewModel : ObservableObject
             model.StructureBreadcrumbForeground = this.CodeStructureSegment.ForegroundColor.ToDrawingColor();
             model.StructureBreadcrumbBackground = this.CodeStructureSegment.BackgroundColor.ToDrawingColor();
 
-            model.ExternalEditorCommand = (this.ExternalEditorPath ?? "").Trim();
-            model.ExternalEditorCommandArguments = (this.ExternalEditorArguments ?? "").Trim();
+            model.ExternalEditorCommand = (this.ExternalEditorPath ?? string.Empty).Trim();
+            model.ExternalEditorCommandArguments = (this.ExternalEditorArguments ?? string.Empty).Trim();
 
             model.DebugMode = this.IsDebugModeEnabled;
 

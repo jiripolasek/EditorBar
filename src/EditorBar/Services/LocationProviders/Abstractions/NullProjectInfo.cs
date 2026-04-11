@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -14,7 +12,7 @@ namespace JPSoftworks.EditorBar.Services.LocationProviders;
 internal sealed class NullProjectInfo : IProjectInfo
 {
     /// <inheritdoc />
-    public string DisplayName => "";
+    public string DisplayName => string.Empty;
 
     /// <inheritdoc />
     public string? DirectoryPath => null;

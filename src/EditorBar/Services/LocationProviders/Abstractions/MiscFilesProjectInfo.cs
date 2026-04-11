@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -20,12 +18,12 @@ public class MiscFilesProjectInfo : BaseSolutionProjectInfo
     public override bool ImplicitProject => false;
 
     /// <summary>
-    /// Initializes a new instance of the MiscFilesWrapper class, setting the name and directory based on the provided
-    /// path.
+    /// Initializes a new instance of the <see cref="MiscFilesProjectInfo" /> class, setting the
+    /// name and directory based on the provided path.
     /// </summary>
-    /// <param name="solutionPath">Specifies the path to the solution, which is used to determine the directory for miscellaneous files.</param>
+    /// <param name="solutionPath">The path to the solution, used to determine the directory for miscellaneous files.</param>
     public MiscFilesProjectInfo(string? solutionPath)
-        : base(Strings.MiscellaneousFilesName!, Path.GetDirectoryName(solutionPath ?? ""))
+        : base(Strings.MiscellaneousFilesName!, Path.GetDirectoryName(solutionPath ?? string.Empty))
     {
     }
 }

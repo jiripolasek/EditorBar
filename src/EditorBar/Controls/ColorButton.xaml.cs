@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -19,9 +17,12 @@ namespace JPSoftworks.EditorBar.Controls;
 /// </summary>
 public partial class ColorButton
 {
-    public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register(nameof(SelectedColor),
-        typeof(Color), typeof(ColorButton),
-        new FrameworkPropertyMetadata(default(Color),
+    public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register(
+        nameof(SelectedColor),
+        typeof(Color),
+        typeof(ColorButton),
+        new FrameworkPropertyMetadata(
+            default(Color),
             FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
     public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(
@@ -48,7 +49,9 @@ public partial class ColorButton
     {
         var colorDialog = new ColorDialog
         {
-            Color = this.SelectedColor.ToDrawingColor(), FullOpen = true, AllowFullOpen = true
+            Color = this.SelectedColor.ToDrawingColor(),
+            FullOpen = true,
+            AllowFullOpen = true
         };
         if (colorDialog.ShowDialog() == DialogResult.OK)
         {

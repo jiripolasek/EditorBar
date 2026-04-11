@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -19,7 +17,7 @@ public class WorkspaceLocationProvider : ILocationProvider
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="wpfTextView" /> is <see langword="null" />.</exception>
     public Task<LocationNavModel?> CreateAsync(IWpfTextView wpfTextView, CancellationToken cancellationToken = default)
     {
-        Requires.NotNull(wpfTextView, nameof(wpfTextView));
+        Requires.NotNull(wpfTextView);
 
         var textContainer = wpfTextView.TextBuffer!.AsTextContainer();
 
@@ -28,10 +26,9 @@ public class WorkspaceLocationProvider : ILocationProvider
             : Task.FromResult<LocationNavModel?>(null);
     }
 
-
     private static LocationNavModel? CreateFromWorkspace(Workspace workspace, SourceTextContainer sourceTextContainer)
     {
-        Requires.NotNull(workspace, nameof(workspace));
+        Requires.NotNull(workspace);
 
         var documentId = workspace.GetDocumentIdInCurrentContext(sourceTextContainer);
 
@@ -42,6 +39,7 @@ public class WorkspaceLocationProvider : ILocationProvider
         }
 
         var relatedDocumentIds = workspace.GetRelatedDocumentIds(sourceTextContainer).ToList();
+
         // if there's more that one related document, we probably have multiple target frameworks
         // let's check if all documents have same file path (just to be sure) and different project ids
         if (relatedDocumentIds.Count > 1)

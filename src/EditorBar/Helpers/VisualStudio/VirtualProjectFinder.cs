@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -28,7 +26,7 @@ internal static class VirtualProjectFinder
     /// <returns>A <see cref="SolutionItem" /> if the file is found; otherwise, null.</returns>
     public static async Task<SolutionItem?> FindItemsInVirtualProjectsByPathAsync(string path)
     {
-        Requires.NotNullOrWhiteSpace(path, nameof(path));
+        Requires.NotNullOrWhiteSpace(path);
 
         await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync();
 
@@ -56,6 +54,7 @@ internal static class VirtualProjectFinder
             }
 
             var candidate = hierarchy[0];
+
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (candidate != null)
             {
@@ -85,8 +84,8 @@ internal static class VirtualProjectFinder
             return VSConstants.VSITEMID_NIL;
         }
 
-        // If that didn't work, we could do a more manual walk over children, but 
-        // typically "Misc Files" does implement ParseCanonicalName for open files. 
+        // If that didn't work, we could do a more manual walk over children, but
+        // typically "Misc Files" does implement ParseCanonicalName for open files.
         return itemId;
     }
 }

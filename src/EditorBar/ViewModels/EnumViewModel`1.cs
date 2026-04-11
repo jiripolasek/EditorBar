@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -17,13 +15,13 @@ namespace JPSoftworks.EditorBar.ViewModels;
 public class EnumViewModel<TValue>
 {
     /// <summary>
-    /// Gets or sets the display name of the enumeration value.
+    /// Gets the display name of the enumeration value.
     /// </summary>
     [UsedImplicitly]
     public required string DisplayName { get; init; }
 
     /// <summary>
-    /// Gets or sets the value of the enumeration.
+    /// Gets the value of the enumeration.
     /// </summary>
     [UsedImplicitly]
     public required TValue? Value { get; init; }

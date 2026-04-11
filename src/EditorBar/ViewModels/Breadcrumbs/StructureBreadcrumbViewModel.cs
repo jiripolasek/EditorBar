@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -17,8 +15,9 @@ public class StructureBreadcrumbViewModel : BreadcrumbModel<BaseStructureModel>
         BaseStructureModel model,
         string text,
         Color background,
-        Color foreground) : base(
-        model, text, background, foreground)
+        Color foreground)
+        : base(
+            model, text, background, foreground)
     {
     }
 }

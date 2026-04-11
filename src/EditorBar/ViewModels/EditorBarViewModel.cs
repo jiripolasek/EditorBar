@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -39,13 +37,19 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
     private bool _isUpdateSuspended = true;
 
     public LocationBreadcrumbsViewModel LocationBreadcrumbs { get; }
+
     public StructuralBreadcrumbsViewModel StructuralBreadcrumbs { get; }
+
     public BulkObservableCollection<BreadcrumbModel> Breadcrumbs { get; } = [];
 
     public ICommand ShowDebugInformationCommand { get; }
+
     public ICommand OpenContainingFolderCommand { get; }
+
     public ICommand OpenSettingsCommand { get; }
+
     public ICommand OpenExternalEditorCommand { get; }
+
     public ICommand OpenDefaultEditorCommand { get; }
 
     public bool IsDevelopmentModeEnabled
@@ -72,10 +76,10 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
         JoinableTaskFactory joinableTaskFactory,
         IStructureProviderService structureProviderService)
     {
-        this._textView = Requires.NotNull(textView, nameof(textView));
-        Requires.NotNull(textDocument, nameof(textDocument));
-        Requires.NotNull(joinableTaskFactory, nameof(joinableTaskFactory));
-        Requires.NotNull(structureProviderService, nameof(structureProviderService));
+        this._textView = Requires.NotNull(textView);
+        Requires.NotNull(textDocument);
+        Requires.NotNull(joinableTaskFactory);
+        Requires.NotNull(structureProviderService);
 
         this._workspaceMonitor = new WorkspaceMonitor(this._textView);
         this._workspaceMonitor.AddTo(this._disposables);
@@ -168,8 +172,9 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
         }
 
         // show message box:
-        VS.MessageBox.Show(sb.ToString(),
-            "",
+        VS.MessageBox.Show(
+            sb.ToString(),
+            string.Empty,
             OLEMSGICON.OLEMSGICON_INFO,
             OLEMSGBUTTON.OLEMSGBUTTON_OK);
     }
@@ -177,7 +182,8 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
     private async Task CombineBreadcrumbsAsync()
     {
         await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync();
-        BreadcrumbModel[] breadcrumbs = [
+        BreadcrumbModel[] breadcrumbs =
+        [
             .. this.LocationBreadcrumbs.LocationBreadcrumbs,
             .. this.StructuralBreadcrumbs.StructuralBreadcrumbs
         ];

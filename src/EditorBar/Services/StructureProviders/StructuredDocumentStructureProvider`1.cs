@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -18,7 +16,7 @@ namespace JPSoftworks.EditorBar.Services.StructureProviders;
 /// <summary>
 /// Provides base functionality for structure providers for structured documents.
 /// </summary>
-/// <typeparam name="TParsedDocument"></typeparam>
+/// <typeparam name="TParsedDocument">Structured objected represeting the parsed document.</typeparam>
 internal abstract class StructuredDocumentStructureProvider<TParsedDocument> : BaseStructureProvider
     where TParsedDocument : class
 {
@@ -27,7 +25,8 @@ internal abstract class StructuredDocumentStructureProvider<TParsedDocument> : B
     private TParsedDocument? _latestParsedDocument;
     private ITextSnapshot? _latestSnapshot;
 
-    protected StructuredDocumentStructureProvider(ITextView textView) : base(textView)
+    protected StructuredDocumentStructureProvider(ITextView textView)
+        : base(textView)
     {
         var parsedObservable = this.UnifiedSource
             .Select(static snap => snap.Snapshot)
@@ -49,13 +48,14 @@ internal abstract class StructuredDocumentStructureProvider<TParsedDocument> : B
             })
             .AddTo(this._disposables);
 
-
         var combined = this.UnifiedSource.Throttle(TimeSpan.FromMilliseconds(100)).CombineLatest(
             this.DocumentNameChanged,
             parsedObservable,
             static (snapshotPoint, documentName, parsedDocument) => new
             {
-                CaretSnapshot = snapshotPoint, Path = documentName, ParsedDoc = parsedDocument
+                CaretSnapshot = snapshotPoint,
+                Path = documentName,
+                ParsedDoc = parsedDocument
             });
 
         _ = combined
@@ -76,7 +76,7 @@ internal abstract class StructuredDocumentStructureProvider<TParsedDocument> : B
 
     private async Task<TParsedDocument> ParseFuncAsync(ITextSnapshot snapshot, CancellationToken cancellationToken)
     {
-        return await this.ParseDocumentAsync(snapshot.GetText() ?? "", cancellationToken);
+        return await this.ParseDocumentAsync(snapshot.GetText() ?? string.Empty, cancellationToken);
     }
 
     private async Task<StructureNavModel> GetUpdatedBreadcrumbsAsync(
@@ -91,7 +91,7 @@ internal abstract class StructuredDocumentStructureProvider<TParsedDocument> : B
             = await this.GetFileStructureCoreAsync(caretPosition, parsedDocument, snapshot, path, cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
 
-        return new StructureNavModel(true, breadcrumbsData.structure);
+        return new StructureNavModel(true, breadcrumbsData.Structure);
     }
 
     public override Task<ImmutableList<FileStructureElementModel>> GetChildItemsAsync(
@@ -101,8 +101,7 @@ internal abstract class StructuredDocumentStructureProvider<TParsedDocument> : B
         if (this._latestSnapshot != null && this._latestParsedDocument != null)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return this.GetChildItemsCoreAsync(parentModel, this._latestParsedDocument, this._latestSnapshot,
-                cancellationToken);
+            return this.GetChildItemsCoreAsync(parentModel, this._latestParsedDocument, this._latestSnapshot, cancellationToken);
         }
 
         return Task.FromResult(ImmutableList<FileStructureElementModel>.Empty);
@@ -128,8 +127,7 @@ internal abstract class StructuredDocumentStructureProvider<TParsedDocument> : B
     /// A task that represents the asynchronous operation. The task result contains a tuple with the file structure
     /// and a boolean indicating if the root has children.
     /// </returns>
-    protected abstract Task<(IEnumerable<BaseStructureModel> structure, bool rootHasChildren)>
-        GetFileStructureCoreAsync(
+    protected abstract Task<(IEnumerable<BaseStructureModel> Structure, bool RootHasChildren)> GetFileStructureCoreAsync(
             int caretPosition,
             TParsedDocument document,
             ITextSnapshot textSnapshot,

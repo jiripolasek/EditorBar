@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -19,6 +17,7 @@ namespace JPSoftworks.EditorBar.Services;
 internal class WorkspaceMonitor : IWorkspaceMonitor
 {
     public event EventHandler<DocumentActiveContextChangedEventArgs>? DocumentActiveContextChanged;
+
     public event EventHandler<Workspace?>? WorkspaceChanged;
 
     private readonly object _workspaceLock = new();
@@ -28,7 +27,7 @@ internal class WorkspaceMonitor : IWorkspaceMonitor
 
     public WorkspaceMonitor(IWpfTextView textView)
     {
-        Requires.NotNull(textView, nameof(textView));
+        Requires.NotNull(textView);
 
         this._workspaceRegistration = Workspace.GetWorkspaceRegistration(textView.TextBuffer!.AsTextContainer());
         this._workspaceRegistration.WorkspaceChanged += this.OnWorkspaceRegistrationChanged;

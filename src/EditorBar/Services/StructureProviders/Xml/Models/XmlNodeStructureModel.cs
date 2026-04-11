@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -16,16 +14,17 @@ namespace JPSoftworks.EditorBar.Services.StructureProviders.Xml.Models;
 public class XmlNodeStructureModel : BaseStructureModel, IEquatable<XmlNodeStructureModel>
 {
     /// <summary>
-    /// Path from this the document root to this segment.
+    /// Gets the path from the document root to this segment.
     /// </summary>
     public XPathSegment[]? Path { get; }
 
     /// <summary>
-    /// Initializes an instance of XmlNodeStructureModel with a file path, display name, and a span of XPath segments.
+    /// Initializes a new instance of the <see cref="XmlNodeStructureModel" /> class with a file
+    /// path, display name, and a span of XPath segments.
     /// </summary>
-    /// <param name="filePath">Specifies the location of the XML file to be processed.</param>
-    /// <param name="displayName">Provides a user-friendly name for the XML structure.</param>
-    /// <param name="path">Defines the sequence of XPath segments for navigating the XML structure.</param>
+    /// <param name="filePath">The location of the XML file to be processed.</param>
+    /// <param name="displayName">The user-friendly name for the XML structure.</param>
+    /// <param name="path">The sequence of XPath segments for navigating the XML structure.</param>
     public XmlNodeStructureModel(string filePath, string displayName, Span<XPathSegment> path)
         : base(displayName, KnownMonikers.MarkupXML, new AnchorPoint(filePath))
     {

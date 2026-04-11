@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-//
 // Copyright (c) Jiří Polášek. All rights reserved.
-//
 // ------------------------------------------------------------
 
 #nullable enable
@@ -170,8 +168,6 @@ internal static class FileStructureHelper
             return ImmutableList<BaseStructureModel>.Empty;
         }
 
-        ;
-
         // Determine which symbol we’re on
         var declarationsAncherPoints =
             FindDeclarationsUnderPosition(semanticModel, syntaxRoot, position, cancellationToken);
@@ -179,8 +175,6 @@ internal static class FileStructureHelper
         {
             return ImmutableList<BaseStructureModel>.Empty;
         }
-
-        ;
 
         // Manual reverse iteration for better performance
         var result = new List<BaseStructureModel>(declarationsAncherPoints.Length);
@@ -227,17 +221,14 @@ internal static class FileStructureHelper
             case INamedTypeSymbol typeSymbol:
                 {
                     var canHaveChildren = typeSymbol.TypeKind is TypeKind.Class or TypeKind.Interface or TypeKind.Struct
-                        or TypeKind.Enum or TypeKind.Module
-                        || typeSymbol.IsExtensionType();
+                                              or TypeKind.Enum or TypeKind.Module
+                                          || typeSymbol.IsExtensionType();
 
                     return new TypeModel(
                         typeSymbol.ToDisplayString(SymbolFileStructureElementModel.SymbolDisplayFormat),
                         VsImageHelper.GetImageMonikers(anchorPoint.Symbol.GetImageId()),
                         anchorPoint,
-                        typeSymbol.GetFullMetadataName())
-                    {
-                        CanHaveChildren = canHaveChildren
-                    };
+                        typeSymbol.GetFullMetadataName()) { CanHaveChildren = canHaveChildren };
                 }
 
             default:

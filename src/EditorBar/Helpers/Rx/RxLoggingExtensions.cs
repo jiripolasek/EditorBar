@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -23,20 +21,19 @@ internal static class RxLoggingExtensions
         this IObservable<T> source,
         Action<Exception> logger)
     {
-        Requires.NotNull(source, nameof(source));
-        Requires.NotNull(logger, nameof(logger));
+        _ = Requires.NotNull(source);
+        _ = Requires.NotNull(logger);
 
         return Observable.Create<T>(observer =>
         {
             return source.Subscribe(
-                onNext: observer.OnNext,
-                onError: ex =>
+                observer.OnNext,
+                ex =>
                 {
                     logger(ex);
                     observer.OnError(ex);
                 },
-                onCompleted: observer.OnCompleted
-            );
+                observer.OnCompleted);
         });
     }
 
@@ -47,15 +44,14 @@ internal static class RxLoggingExtensions
         this IObservable<T> source,
         Action<Exception> logger)
     {
-        Requires.NotNull(source, nameof(source));
-        Requires.NotNull(logger, nameof(logger));
+        _ = Requires.NotNull(source);
+        _ = Requires.NotNull(logger);
 
         return source
             .Do(
-                onNext: static _ => { },
-                onError: logger,
-                onCompleted: static () => { }
-            )
+                static _ => { },
+                logger,
+                static () => { })
             .Retry();
     }
 
@@ -66,14 +62,13 @@ internal static class RxLoggingExtensions
         this IObservable<T> source,
         string? message = null)
     {
-        Requires.NotNull(source, nameof(source));
+        _ = Requires.NotNull(source);
 
         return source
             .Do(
-                onNext: static _ => { },
-                onError: ex => ex.Log(message ?? ""),
-                onCompleted: static () => { }
-            )
+                static _ => { },
+                ex => ex.Log(message ?? string.Empty),
+                static () => { })
             .Retry();
     }
 }

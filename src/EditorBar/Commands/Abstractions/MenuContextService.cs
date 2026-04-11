@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -25,7 +23,8 @@ internal class MenuContextService : IMenuContextService
     /// <summary>
     /// Gets the active context for a specific menu
     /// </summary>
-    public T? GetActiveContext<T>(MenuId menuId) where T : MenuContext
+    public T? GetActiveContext<T>(MenuId menuId)
+        where T : MenuContext
     {
         if (this._activeContexts.TryGetValue(menuId, out var context) && context is T typedContext)
         {
@@ -40,7 +39,7 @@ internal class MenuContextService : IMenuContextService
     /// </summary>
     public async Task ShowMenuAsync(MenuContext context)
     {
-        Requires.NotNull(context, nameof(context));
+        Requires.NotNull(context);
 
         await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync();
 

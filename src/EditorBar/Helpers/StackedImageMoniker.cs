@@ -1,24 +1,17 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
+#pragma warning disable SA1124 // Do not use regions
 
 using Microsoft.VisualStudio.Imaging.Interop;
 
 namespace JPSoftworks.EditorBar.Helpers;
 
 /// <summary>
-/// Represents either a single <see cref="ImageMoniker" /> or
-/// an array of stacked <see cref="ImageMoniker" /> instances.
-/// </summary>
-/// <summary>
-/// Represents either:
-/// - A single <see cref="ImageMoniker" />
-/// - A pair (2) <see cref="ImageMoniker" /> objects
-/// - Or an array of 3 or more <see cref="ImageMoniker" /> objects
+/// Represents either a single <see cref="ImageMoniker" />, a pair of <see cref="ImageMoniker" />
+/// objects, or an array of three or more <see cref="ImageMoniker" /> objects.
 /// </summary>
 public readonly struct StackedImageMoniker : IEquatable<StackedImageMoniker>
 {
@@ -49,7 +42,8 @@ public readonly struct StackedImageMoniker : IEquatable<StackedImageMoniker>
     #region Constructors
 
     /// <summary>
-    /// Initializes a <see cref="StackedImageMoniker" /> with a single moniker.
+    /// Initializes a new instance of the <see cref="StackedImageMoniker" /> struct with a single
+    /// moniker.
     /// </summary>
     public StackedImageMoniker(ImageMoniker moniker)
     {
@@ -60,7 +54,8 @@ public readonly struct StackedImageMoniker : IEquatable<StackedImageMoniker>
     }
 
     /// <summary>
-    /// Initializes a <see cref="StackedImageMoniker" /> with exactly two monikers.
+    /// Initializes a new instance of the <see cref="StackedImageMoniker" /> struct with exactly two
+    /// monikers.
     /// </summary>
     public StackedImageMoniker(ImageMoniker moniker1, ImageMoniker moniker2)
     {
@@ -71,12 +66,11 @@ public readonly struct StackedImageMoniker : IEquatable<StackedImageMoniker>
     }
 
     /// <summary>
-    /// Initializes a <see cref="StackedImageMoniker" /> with an array of monikers.
-    /// If the array length is 1 or 2, we automatically store them in the optimized fields.
+    /// Initializes a new instance of the <see cref="StackedImageMoniker" /> struct with an array
+    /// of monikers. If the array length is 1 or 2, the values are stored in the optimized fields.
     /// </summary>
-    /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="monikers" /> is null or empty.
-    /// </exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="monikers" /> is null or
+    /// empty.</exception>
     public StackedImageMoniker(ImageMoniker[] monikers)
     {
         if (monikers is null || monikers.Length == 0)
@@ -112,29 +106,33 @@ public readonly struct StackedImageMoniker : IEquatable<StackedImageMoniker>
     #region Properties
 
     /// <summary>
-    /// True if this <see cref="StackedImageMoniker" /> contains exactly one moniker.
+    /// Gets a value indicating whether this <see cref="StackedImageMoniker" /> contains exactly one
+    /// moniker.
     /// </summary>
     public bool IsSingle => this._mode == StorageMode.Single;
 
     /// <summary>
-    /// True if this <see cref="StackedImageMoniker" /> contains exactly two monikers.
+    /// Gets a value indicating whether this <see cref="StackedImageMoniker" /> contains exactly two
+    /// monikers.
     /// </summary>
     public bool IsPair => this._mode == StorageMode.Pair;
 
     /// <summary>
-    /// True if this <see cref="StackedImageMoniker" /> contains an array of three or more monikers.
+    /// Gets a value indicating whether this <see cref="StackedImageMoniker" /> contains an array of
+    /// three or more monikers.
     /// </summary>
     public bool IsArray => this._mode == StorageMode.Array;
 
     /// <summary>
-    /// Indicates whether the current storage mode is empty. Returns true if the storage mode is set to Empty.
+    /// Gets a value indicating whether the current storage mode is empty.
     /// </summary>
     public bool IsEmpty => this._mode == StorageMode.Empty;
 
     /// <summary>
     /// Gets the single moniker (if <see cref="IsSingle" /> is true); otherwise throws.
     /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="InvalidOperationException">Thrown when the instance does not contain a
+    /// single moniker.</exception>
     public ImageMoniker Single
     {
         get
@@ -152,7 +150,8 @@ public readonly struct StackedImageMoniker : IEquatable<StackedImageMoniker>
     /// <summary>
     /// Gets the first moniker in the pair (if <see cref="IsPair" /> is true); otherwise throws.
     /// </summary>
-    /// <exception cref="InvalidOperationException">This image moniker stack doesn't contain a pair of image monikers.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the instance does not contain a pair
+    /// of monikers.</exception>
     public ImageMoniker First
     {
         get
@@ -169,7 +168,8 @@ public readonly struct StackedImageMoniker : IEquatable<StackedImageMoniker>
     /// <summary>
     /// Gets the second moniker in the pair (if <see cref="IsPair" /> is true); otherwise throws.
     /// </summary>
-    /// <exception cref="InvalidOperationException">This image moniker stack doesn't contain a pair of image monikers.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the instance does not contain a pair
+    /// of monikers.</exception>
     public ImageMoniker Second
     {
         get
@@ -213,9 +213,9 @@ public readonly struct StackedImageMoniker : IEquatable<StackedImageMoniker>
     /// <summary>
     /// Implicitly converts a pair of <see cref="ImageMoniker" /> into a <see cref="StackedImageMoniker" />.
     /// </summary>
-    public static implicit operator StackedImageMoniker((ImageMoniker, ImageMoniker) pair)
+    public static implicit operator StackedImageMoniker((ImageMoniker Moniker1, ImageMoniker Moniker2) pair)
     {
-        return new StackedImageMoniker(pair.Item1, pair.Item2);
+        return new StackedImageMoniker(pair.Moniker1, pair.Moniker2);
     }
 
     /// <summary>
@@ -300,7 +300,7 @@ public readonly struct StackedImageMoniker : IEquatable<StackedImageMoniker>
         };
     }
 
-    class ImageMonikerEqualityComparer : IEqualityComparer<ImageMoniker>
+    private class ImageMonikerEqualityComparer : IEqualityComparer<ImageMoniker>
     {
         public bool Equals(ImageMoniker x, ImageMoniker y)
         {

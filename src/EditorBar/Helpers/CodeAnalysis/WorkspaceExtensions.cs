@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -21,7 +19,8 @@ internal static class WorkspaceExtensions
             // property `bool CanChangeActiveContextDocument` on Workspace
 
             // Can we change context?
-            var propertyInfo = workspace.GetType().GetProperty("CanChangeActiveContextDocument",
+            var propertyInfo = workspace.GetType().GetProperty(
+                "CanChangeActiveContextDocument",
                 BindingFlags.NonPublic | BindingFlags.Instance);
             if (propertyInfo == null)
             {

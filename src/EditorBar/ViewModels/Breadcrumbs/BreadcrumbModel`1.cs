@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 using System.Windows.Media;
@@ -27,8 +25,8 @@ public class BreadcrumbModel<TModel> : BreadcrumbModel
     /// <param name="text">The text of the breadcrumb.</param>
     /// <param name="background">The background brush of the breadcrumb.</param>
     /// <param name="foreground">The foreground brush of the breadcrumb.</param>
-    public BreadcrumbModel(TModel model, string text, Brush background, Brush foreground) : base(text, background,
-        foreground)
+    public BreadcrumbModel(TModel model, string text, Brush background, Brush foreground)
+        : base(text, background, foreground)
     {
         this.Model = model;
     }
@@ -40,8 +38,8 @@ public class BreadcrumbModel<TModel> : BreadcrumbModel
     /// <param name="text">The text of the breadcrumb.</param>
     /// <param name="background">The background color of the breadcrumb.</param>
     /// <param name="foreground">The foreground color of the breadcrumb.</param>
-    public BreadcrumbModel(TModel model, string text, Color background, Color foreground) : base(text, background,
-        foreground)
+    public BreadcrumbModel(TModel model, string text, Color background, Color foreground)
+        : base(text, background, foreground)
     {
         this.Model = model;
     }

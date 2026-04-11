@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -21,11 +19,12 @@ namespace JPSoftworks.EditorBar.Services.StructureProviders;
 public class FileModel : BaseStructureModel
 {
     /// <summary>
-    /// Constructs a FileModel instance using a name, an image representation, and a specific anchor point.
+    /// Initializes a new instance of the <see cref="FileModel" /> class using a name, an image
+    /// representation, and a specific anchor point.
     /// </summary>
-    /// <param name="displayName">Specifies the name associated with the file model.</param>
-    /// <param name="imageMoniker">Represents the visual icon or image linked to the file model.</param>
-    /// <param name="anchorPoint">Defines the reference point for positioning the file model.</param>
+    /// <param name="displayName">The name associated with the file model.</param>
+    /// <param name="imageMoniker">The visual icon or image linked to the file model.</param>
+    /// <param name="anchorPoint">The reference point for positioning the file model.</param>
     private FileModel(string displayName, StackedImageMoniker imageMoniker, AnchorPoint anchorPoint)
         : base(displayName, imageMoniker, anchorPoint)
     {
@@ -39,9 +38,9 @@ public class FileModel : BaseStructureModel
     /// <exception cref="ArgumentException">Thrown when <paramref name="path" /> is null or whitespace.</exception>
     public static FileModel Create(string path, bool canHaveChildren)
     {
-        Requires.NotNullOrWhiteSpace(path, nameof(path));
+        Requires.NotNullOrWhiteSpace(path);
         string name = Path.GetFileName(path);
-        Requires.NotNullOrWhiteSpace(name, nameof(name));
+        Requires.NotNullOrWhiteSpace(name);
 
         return new FileModel(name, GetImageMonikerForFile(path), new AnchorPoint(path))
         {
@@ -65,7 +64,6 @@ public class FileModel : BaseStructureModel
         {
             // TODO: smell, should be refactored to lazy init (?)
             //       does really getting the moniker needs to run on the UI thread as well... leaking, leaking
-
 #pragma warning disable VSTHRD010 // Invoke single-threaded types on Main thread
             return Package.GetGlobalService(typeof(SVsImageService)) is IVsImageService2 imageService
                 ? imageService.GetImageMonikerForFile(value)

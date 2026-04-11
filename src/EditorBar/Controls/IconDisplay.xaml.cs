@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -42,10 +40,10 @@ public partial class IconDisplay : UserControl
     /// A simple static cache of UI for given monikers.
     /// Key = StackedImageMoniker, Value = the constructed UIElement.
     /// </summary>
-    private static readonly Dictionary<StackedImageMoniker, UIElement> s_monikerCache = [];
+    private static readonly Dictionary<StackedImageMoniker, UIElement> MonikerCache = [];
 
     /// <summary>
-    /// If this is set, we show it directly. Otherwise, we fall back to ImageMoniker.
+    /// Gets or sets the content to display directly.
     /// </summary>
     public UIElement? Icon
     {
@@ -54,8 +52,7 @@ public partial class IconDisplay : UserControl
     }
 
     /// <summary>
-    /// If <see cref="Icon" /> is null, we create CrispImage or a grid of CrispImage
-    /// for the monikers.
+    /// Gets or sets the stacked image moniker used when <see cref="Icon" /> is null.
     /// </summary>
     public StackedImageMoniker? ImageMoniker
     {

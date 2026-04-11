@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -16,7 +14,7 @@ public readonly record struct AnchorPointTextSpan
     /// <summary>
     /// A text span that represents an empty span.
     /// </summary>
-    public static readonly AnchorPointTextSpan Zero = new();
+    public static readonly AnchorPointTextSpan Zero = default;
 
     /// <summary>
     /// Gets the starting position of the text span.
@@ -49,9 +47,14 @@ public readonly record struct AnchorPointTextSpan
     public AnchorPointTextSpan(int start, int length)
     {
         if (start < 0)
+        {
             throw new ArgumentOutOfRangeException(nameof(start), start, "Start must be non-negative.");
+        }
+
         if (length < 0)
+        {
             throw new ArgumentOutOfRangeException(nameof(length), length, "Length must be non-negative.");
+        }
 
         this.Start = start;
         this.Length = length;
@@ -64,13 +67,11 @@ public readonly record struct AnchorPointTextSpan
     /// <returns><c>true</c> if the position is within the span; otherwise, <c>false</c>.</returns>
     public bool Contains(int position) => position >= this.Start && position < this.End;
 
-
     /// <summary>
     /// Returns a string that represents the current text span.
     /// </summary>
     /// <returns>A string in the format [Start..End).</returns>
     public override string ToString() => $"[{this.Start}..{this.End})";
-
 
     /// <summary>
     /// Deconstructs the text span into its start and length components.

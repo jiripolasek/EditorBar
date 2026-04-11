@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -42,7 +40,6 @@ internal static class SymbolExtensions
         //   [NestedClass`1, OuterClass`2, ... up to top-level type]
         // We'll join them with '+' but first we need the namespace.
         // Once we hit a top-level type, we look at the namespace chain.
-
         var topLevelType = typeSymbol;
         while (topLevelType.ContainingType != null)
         {

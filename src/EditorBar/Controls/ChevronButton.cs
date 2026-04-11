@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -44,7 +42,8 @@ public class ChevronButton : ContentControl
 
     static ChevronButton()
     {
-        DefaultStyleKeyProperty!.OverrideMetadata(typeof(ChevronButton),
+        DefaultStyleKeyProperty!.OverrideMetadata(
+            typeof(ChevronButton),
             new FrameworkPropertyMetadata(typeof(ChevronButton)));
     }
 }

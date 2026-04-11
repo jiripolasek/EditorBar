@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -28,7 +26,7 @@ internal class CodeNavigationDecorator : IWpfTextViewCreationListener
     /// <param name="textView">The newly created text view.</param>
     public void TextViewCreated(IWpfTextView textView)
     {
-        Requires.NotNull(textView, nameof(textView));
+        Requires.NotNull(textView);
 
         var codeNavigationService = new CodeNavigationService(textView);
         textView.Properties![typeof(ICodeNavigationService)] = codeNavigationService;

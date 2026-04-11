@@ -1,7 +1,5 @@
 ﻿// ------------------------------------------------------------
-// 
 // Copyright (c) Jiří Polášek. All rights reserved.
-// 
 // ------------------------------------------------------------
 
 #nullable enable
@@ -24,20 +22,34 @@ public class SymbolChevronButton : ChevronButton, IDisposable
     private const string PartPopupName = "PART_Popup";
 
     public static readonly DependencyProperty ModelsAccessorProperty = DependencyProperty.Register(
-        nameof(ModelsAccessor), typeof(Func<Task<IList<MemberListItemViewModel>>>), typeof(SymbolChevronButton),
+        nameof(ModelsAccessor),
+        typeof(Func<Task<IList<MemberListItemViewModel>>>),
+        typeof(SymbolChevronButton),
         new PropertyMetadata(null!));
 
     public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(
-        nameof(Command), typeof(ICommand), typeof(SymbolChevronButton), new PropertyMetadata(null!));
+        nameof(Command),
+        typeof(ICommand),
+        typeof(SymbolChevronButton),
+        new PropertyMetadata(null!));
 
     public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(
-        nameof(CommandParameter), typeof(object), typeof(SymbolChevronButton), new PropertyMetadata(null!));
+        nameof(CommandParameter),
+        typeof(object),
+        typeof(SymbolChevronButton),
+        new PropertyMetadata(null!));
 
     public static readonly DependencyProperty CustomBackgroundProperty = DependencyProperty.Register(
-        nameof(CustomBackground), typeof(Brush), typeof(SymbolChevronButton), new PropertyMetadata(default(Brush)));
+        nameof(CustomBackground),
+        typeof(Brush),
+        typeof(SymbolChevronButton),
+        new PropertyMetadata(default(Brush)));
 
     public static readonly DependencyProperty CustomForegroundProperty = DependencyProperty.Register(
-        nameof(CustomForeground), typeof(Brush), typeof(SymbolChevronButton), new PropertyMetadata(default(Brush)));
+        nameof(CustomForeground),
+        typeof(Brush),
+        typeof(SymbolChevronButton),
+        new PropertyMetadata(default(Brush)));
 
     private Button? _buttonElement;
 
@@ -75,7 +87,8 @@ public class SymbolChevronButton : ChevronButton, IDisposable
 
     static SymbolChevronButton()
     {
-        DefaultStyleKeyProperty!.OverrideMetadata(typeof(SymbolChevronButton),
+        DefaultStyleKeyProperty!.OverrideMetadata(
+            typeof(SymbolChevronButton),
             new FrameworkPropertyMetadata(typeof(SymbolChevronButton)));
     }
 
@@ -96,8 +109,12 @@ public class SymbolChevronButton : ChevronButton, IDisposable
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
-        this._popup = this.Template?.FindName(PartPopupName, this) as MemberListPopup;
-        this._buttonElement = this.Template?.FindName(PartButtonName, this) as Button;
+        this._popup = this.Template?.FindName(
+            PartPopupName,
+            this) as MemberListPopup;
+        this._buttonElement = this.Template?.FindName(
+            PartButtonName,
+            this) as Button;
         this._buttonElement.Click += (sender, args) => this.OnClick();
         this._buttonElement.MouseRightButtonUp += this.ButtonElementOnMouseRightButtonUp;
     }
@@ -161,11 +178,9 @@ public class SymbolChevronButton : ChevronButton, IDisposable
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
         base.OnPreviewKeyDown(e);
-        if (e.Key == Key.Down && this._buttonElement != null && this._buttonElement.IsFocused &&
-            this._popup?.IsOpen != true)
+        if (e.Key == Key.Down && this._buttonElement is { IsFocused: true } && this._popup?.IsOpen != true)
         {
             this.ShowPopupAsync().FireAndForget();
-            ;
             e.Handled = true;
         }
     }
