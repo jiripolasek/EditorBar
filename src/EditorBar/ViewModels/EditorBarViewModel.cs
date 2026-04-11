@@ -38,7 +38,7 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
 
     public LocationBreadcrumbsViewModel LocationBreadcrumbs { get; }
 
-    public StructuralBreadcrumbsViewModel StructuralBreadcrumbs { get; }
+    public StructuralBreadcrumbsViewModel? StructuralBreadcrumbs { get; }
 
     public BulkObservableCollection<BreadcrumbModel> Breadcrumbs { get; } = [];
 
@@ -100,14 +100,21 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
             += (_, _) => this.CombineBreadcrumbsAsync().FireAndForget();
         this.LocationBreadcrumbs.AddTo(this._disposables);
 
-        this.StructuralBreadcrumbs = new StructuralBreadcrumbsViewModel(
-            textView,
-            this._workspaceMonitor,
-            structureProviderService,
-            settingsRefreshAggregator);
-        this.StructuralBreadcrumbs.StructuralBreadcrumbs.CollectionChanged
-            += (_, _) => this.CombineBreadcrumbsAsync().FireAndForget();
-        this.StructuralBreadcrumbs.AddTo(this._disposables);
+        try
+        {
+            this.StructuralBreadcrumbs = new StructuralBreadcrumbsViewModel(
+                textView,
+                this._workspaceMonitor,
+                structureProviderService,
+                settingsRefreshAggregator);
+            this.StructuralBreadcrumbs.StructuralBreadcrumbs.CollectionChanged
+                += (_, _) => this.CombineBreadcrumbsAsync().FireAndForget();
+            this.StructuralBreadcrumbs.AddTo(this._disposables);
+        }
+        catch (Exception ex)
+        {
+            ex.Log();
+        }
 
         this.ShowDebugInformationCommand = new DispatchedDelegateCommand(this.ExecuteShowDebugInfo);
         this.OpenContainingFolderCommand
@@ -122,8 +129,26 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
 
     public async Task InitializeAsync()
     {
-        await this.LocationBreadcrumbs.InitializeAsync();
-        await this.StructuralBreadcrumbs.InitializeAsync();
+        try
+        {
+            await this.LocationBreadcrumbs.InitializeAsync();
+        }
+        catch (Exception ex)
+        {
+            await ex.LogAsync();
+        }
+
+        try
+        {
+            if (this.StructuralBreadcrumbs != null)
+            {
+                await this.StructuralBreadcrumbs.InitializeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            await ex.LogAsync();
+        }
     }
 
     /// <inheritdoc />
@@ -188,7 +213,7 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
         BreadcrumbModel[] breadcrumbs =
         [
             .. this.LocationBreadcrumbs.LocationBreadcrumbs,
-            .. this.StructuralBreadcrumbs.StructuralBreadcrumbs
+            .. this.StructuralBreadcrumbs?.StructuralBreadcrumbs ?? []
         ];
         this.Breadcrumbs.SetRange(breadcrumbs);
     }

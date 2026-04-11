@@ -56,7 +56,8 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
         this._structureProviderService = Requires.NotNull(structureProviderService);
         Requires.NotNull(settingsRefreshAggregator);
 
-        this._document = this._textView.GetTextDocumentFromDocumentBuffer()!;
+        this._document = this._textView.GetTextDocumentFromDocumentBuffer()
+            ?? throw new InvalidOperationException("Text view has no associated text document.");
         this._pathChangesStream = Observable
             .Defer(() => Observable.Return(this._document.FilePath))
             .Concat(
