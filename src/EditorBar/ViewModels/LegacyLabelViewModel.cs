@@ -17,7 +17,7 @@ using Microsoft.VisualStudio.Text;
 
 namespace JPSoftworks.EditorBar.ViewModels;
 
-internal class LegacyLabelViewModel : ObservableObject
+internal class LegacyLabelViewModel : ObservableObject, IDisposable
 {
     private string? _label;
     private LocationNavModel? _locationNavModel;
@@ -70,6 +70,11 @@ internal class LegacyLabelViewModel : ObservableObject
 
         GeneralOptionsModel.Saved += this.GeneralOptionsModelOnSaved;
         this.Style = GeneralOptionsModel.Instance.FileLabelStyle;
+    }
+
+    public void Dispose()
+    {
+        GeneralOptionsModel.Saved -= this.GeneralOptionsModelOnSaved;
     }
 
     private void GeneralOptionsModelOnSaved(GeneralOptionsModel obj)

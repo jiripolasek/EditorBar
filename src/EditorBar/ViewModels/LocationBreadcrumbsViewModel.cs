@@ -121,7 +121,8 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
-        this._settingsRefreshAggregator.Dispose();
+        this._settingsRefreshAggregator.SettingsRefreshRequested -= this.HandleSettingsChanged;
+        this.LegacyLabelModel.Dispose();
         this._disposables.Dispose();
     }
 
