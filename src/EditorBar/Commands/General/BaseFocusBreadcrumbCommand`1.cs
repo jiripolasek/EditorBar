@@ -34,6 +34,11 @@ internal abstract class BaseFocusBreadcrumbCommand<T> : BaseCommand<T>
 
         // get host
         var componentModel = await this.Package.GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
+        if (componentModel == null)
+        {
+            return;
+        }
+
         var vsEditorAdaptersFactoryService = componentModel.GetService<IVsEditorAdaptersFactoryService>();
         var wpfTextViewHost = vsEditorAdaptersFactoryService.GetWpfTextViewHost(vsTextView);
 

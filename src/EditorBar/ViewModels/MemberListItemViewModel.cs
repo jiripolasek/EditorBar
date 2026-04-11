@@ -15,11 +15,11 @@ public record MemberListItemViewModel
 {
     public StackedImageMoniker? ImageMoniker { get; init; }
 
-    public string PrimaryName { get; init; }
+    public required string PrimaryName { get; init; }
 
     public string? SecondaryName { get; init; }
 
-    public string SearchText { get; init; }
+    public required string SearchText { get; init; }
 
     public ICommand? Command { get; set; }
 

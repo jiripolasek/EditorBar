@@ -4,6 +4,7 @@
 
 #nullable enable
 
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using JPSoftworks.EditorBar.Helpers;
@@ -83,6 +84,7 @@ public record SymbolFileStructureElementModel : FileStructureElementModel
 
     public Location Location { get; init; }
 
+    [SetsRequiredMembers]
     public SymbolFileStructureElementModel(ISymbol targetSymbol, Location location, string? secondaryName = null)
     {
         this.TargetSymbol = targetSymbol;
