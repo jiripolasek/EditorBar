@@ -138,8 +138,16 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
             return;
         }
 
-        var locationProvider = await VS.GetRequiredServiceAsync<ILocationProvider, ILocationProvider>();
-        var locationModel = await locationProvider.CreateAsync(this._textView, CancellationToken.None);
+        LocationNavModel? locationModel = null;
+        try
+        {
+            var locationProvider = await VS.GetRequiredServiceAsync<ILocationProvider, ILocationProvider>();
+            locationModel = await locationProvider.CreateAsync(this._textView, CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            await ex.LogAsync();
+        }
 
         try
         {
