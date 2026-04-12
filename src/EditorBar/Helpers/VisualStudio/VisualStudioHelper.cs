@@ -115,7 +115,15 @@ internal static class VisualStudioHelper
         var projectFile = projects.FirstOrDefault(t =>
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            return string.Equals(t.FullName!, filePath, StringComparison.OrdinalIgnoreCase);
+            try
+            {
+                return string.Equals(t.FullName!, filePath, StringComparison.OrdinalIgnoreCase);
+            }
+            catch (NotImplementedException)
+            {
+                // Some project types (e.g. DteGenericProject) don't implement GetFileName()
+                return false;
+            }
         });
 
         if (projectFile != null)
