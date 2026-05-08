@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using JPSoftworks.EditorBar.Options;
 using JPSoftworks.EditorBar.ViewModels;
 
 namespace JPSoftworks.EditorBar.Controls;
@@ -21,12 +22,15 @@ public partial class MemberList : UserControl
     public event EventHandler? ItemSelected;
 
     private readonly CollectionViewSource _collectionViewSource;
+    private readonly bool _showFilterBoxWhenEmpty;
 
     public MemberList()
     {
         this.InitializeComponent();
+        this._showFilterBoxWhenEmpty = GeneralOptionsModel.Instance.ShowMemberListFilterBoxWhenEmpty;
         this._collectionViewSource = new CollectionViewSource();
         this.ListBox!.ItemsSource = this._collectionViewSource.View;
+        this.ApplyEmptyFilterVisibilityPreference();
         this.UpdateFilterPredicate();
     }
 
@@ -43,6 +47,10 @@ public partial class MemberList : UserControl
         if (e.Key is Key.Escape)
         {
             this.HandleEscape(e);
+        }
+        else if (this.ShouldIgnoreHiddenEmptyFilterDeletion(e))
+        {
+            e.Handled = true;
         }
         else if (e.Key is Key.Enter or Key.Space)
         {
@@ -84,6 +92,11 @@ public partial class MemberList : UserControl
 
     private void ShowFilterAndForwardKey(KeyEventArgs e)
     {
+        if (this.ShouldIgnoreHiddenEmptyFilterDeletion(e))
+        {
+            return;
+        }
+
         if (this.FilterTextBox!.Visibility != Visibility.Visible)
         {
             this.FilterTextBox.Visibility = Visibility.Visible;
@@ -115,7 +128,7 @@ public partial class MemberList : UserControl
 
         if (string.IsNullOrEmpty(this.FilterTextBox!.Text))
         {
-            this.FilterTextBox.Visibility = Visibility.Collapsed;
+            this.ApplyEmptyFilterVisibilityPreference();
 
             // Return focus to list so user can continue navigating immediately
             this.ListBox!.Focus();
@@ -348,5 +361,24 @@ public partial class MemberList : UserControl
         }
 
         return true;
+    }
+
+    private bool ShouldIgnoreHiddenEmptyFilterDeletion(KeyEventArgs e)
+    {
+        return this.FilterTextBox!.Visibility != Visibility.Visible &&
+               string.IsNullOrEmpty(this.FilterTextBox.Text) &&
+               e.Key is Key.Back or Key.Delete;
+    }
+
+    private void ApplyEmptyFilterVisibilityPreference()
+    {
+        if (this.FilterTextBox == null)
+        {
+            return;
+        }
+
+        this.FilterTextBox.Visibility = this._showFilterBoxWhenEmpty
+            ? Visibility.Visible
+            : Visibility.Collapsed;
     }
 }

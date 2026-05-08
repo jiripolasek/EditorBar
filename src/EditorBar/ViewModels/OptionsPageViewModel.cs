@@ -26,6 +26,7 @@ public class OptionsPageViewModel : ObservableObject
     private bool _displayInDiffViews;
     private bool _displayInNonEditableDocuments;
     private bool _displayInTemp;
+    private bool _displayMemberListFilterBoxWhenEmpty;
     private bool _displayOpenContainingFolderButton;
     private bool _displayOpenDefaultEditorButton;
     private bool _displayOpenExternalEditorButton;
@@ -213,6 +214,15 @@ public class OptionsPageViewModel : ObservableObject
     {
         get => this._displayInTemp;
         set => this.SetProperty(ref this._displayInTemp, value);
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the member list filter box stays visible when empty.
+    /// </summary>
+    public bool DisplayMemberListFilterBoxWhenEmpty
+    {
+        get => this._displayMemberListFilterBoxWhenEmpty;
+        set => this.SetProperty(ref this._displayMemberListFilterBoxWhenEmpty, value);
     }
 
     /// <summary>
@@ -494,6 +504,7 @@ public class OptionsPageViewModel : ObservableObject
             this.DisplayInDiffViews = model.DisplayInDiffViews;
             this.DisplayInBlame = model.DisplayInBlame;
             this.DisplayInTemp = model.DisplayInTempFiles;
+            this.DisplayMemberListFilterBoxWhenEmpty = model.ShowMemberListFilterBoxWhenEmpty;
             this.DisplayOpenDefaultEditorButton = model.ShowOpenDefaultEditorButton;
             this.DisplayOpenExternalEditorButton = model.ShowOpenExternalEditorButton;
             this.DisplayOpenContainingFolderButton = model.ShowOpenContainingFolderButton;
@@ -565,6 +576,7 @@ public class OptionsPageViewModel : ObservableObject
             model.DisplayInDiffViews = this.DisplayInDiffViews;
             model.DisplayInBlame = this.DisplayInBlame;
             model.DisplayInTempFiles = this.DisplayInTemp;
+            model.ShowMemberListFilterBoxWhenEmpty = this.DisplayMemberListFilterBoxWhenEmpty;
             model.ShowOpenDefaultEditorButton = this.DisplayOpenDefaultEditorButton;
             model.ShowOpenExternalEditorButton = this.DisplayOpenExternalEditorButton;
             model.ShowOpenContainingFolderButton = this.DisplayOpenContainingFolderButton;

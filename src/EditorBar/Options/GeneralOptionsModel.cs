@@ -22,12 +22,13 @@ namespace JPSoftworks.EditorBar.Options;
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Setters are used implicitly by PropertyGrid.")]
 public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRatingConfig
 {
-    private const int CurrentConfigVersion = 5;
+    private const int CurrentConfigVersion = 6;
 
     private const string AppearanceCategoryName = "Appearance";
     private const string GeneralCategoryName = "General";
     private const string ColorsCategoryName = "Colors";
     private const string AdditionalActionCategoryName = "Actions";
+    private const string MemberListCategoryName = "Member List";
     private const string ToolbarCategoryName = "Toolbar";
     private const string ExternalEditorCategoryName = "External Editor";
     private const string TerminalCategoryName = "Terminal";
@@ -246,6 +247,12 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     [TypeConverter(typeof(EnumToDescriptionConverter))]
     public FileAction AlternateFileAction { get; set; } = FileAction.OpenInExternalEditor;
 
+    [Category(MemberListCategoryName)]
+    [DisplayName("Show filter box when empty")]
+    [Description("Determines if the member list filter box stays visible even when it does not contain any text.")]
+    [DefaultValue(false)]
+    public bool ShowMemberListFilterBoxWhenEmpty { get; set; } = false;
+
     // -------------------------------------------
     // Debug category
     // -------------------------------------------
@@ -333,6 +340,11 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
                     this.TerminalCommandArguments)
                     ? TerminalProfile.WindowsTerminal
                     : TerminalProfile.Custom;
+            }
+
+            if (this.Version < 6)
+            {
+                this.ShowMemberListFilterBoxWhenEmpty = false;
             }
 
             this.Version = CurrentConfigVersion;
