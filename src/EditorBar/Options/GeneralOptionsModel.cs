@@ -28,6 +28,7 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     private const string GeneralCategoryName = "General";
     private const string ColorsCategoryName = "Colors";
     private const string AdditionalActionCategoryName = "Actions";
+    private const string ToolbarCategoryName = "Toolbar";
     private const string ExternalEditorCategoryName = "External Editor";
     private const string TerminalCategoryName = "Terminal";
 
@@ -126,6 +127,30 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     [Description("Determines if the Editor Bar is visible.")]
     [DefaultValue(true)]
     public bool Enabled { get; set; } = true;
+
+    [Category(ToolbarCategoryName)]
+    [DisplayName("Show open in default editor button")]
+    [Description("Determines if the Open in Default Editor button is visible on the Editor Bar toolbar.")]
+    [DefaultValue(true)]
+    public bool ShowOpenDefaultEditorButton { get; set; } = true;
+
+    [Category(ToolbarCategoryName)]
+    [DisplayName("Show open in external editor button")]
+    [Description("Determines if the Open in External Editor button is visible on the Editor Bar toolbar.")]
+    [DefaultValue(true)]
+    public bool ShowOpenExternalEditorButton { get; set; } = true;
+
+    [Category(ToolbarCategoryName)]
+    [DisplayName("Show open containing folder button")]
+    [Description("Determines if the Open Containing Folder button is visible on the Editor Bar toolbar.")]
+    [DefaultValue(true)]
+    public bool ShowOpenContainingFolderButton { get; set; } = true;
+
+    [Category(ToolbarCategoryName)]
+    [DisplayName("Show open in terminal button")]
+    [Description("Determines if the Open in Terminal button is visible on the Editor Bar toolbar.")]
+    [DefaultValue(true)]
+    public bool ShowOpenTerminalButton { get; set; } = true;
 
     // -------------------------------------------
     // External Editor category

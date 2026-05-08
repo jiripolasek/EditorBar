@@ -290,6 +290,30 @@
                 </StackPanel>
             </GroupBox>
 
+            <GroupBox Header="Toolbar">
+                <StackPanel>
+                    <CheckBox
+                        Margin="{StaticResource UIElementMargin}"
+                        Content="Show _Open in Default Editor button"
+                        IsChecked="{Binding ViewModel.DisplayOpenDefaultEditorButton}" />
+                    <CheckBox
+                        Margin="{StaticResource UIElementMargin}"
+                        Content="Show Open in E_xternal Editor button"
+                        IsChecked="{Binding ViewModel.DisplayOpenExternalEditorButton}" />
+                    <CheckBox
+                        Margin="{StaticResource UIElementMargin}"
+                        Content="Show Open _Containing Folder button"
+                        IsChecked="{Binding ViewModel.DisplayOpenContainingFolderButton}" />
+                    <CheckBox
+                        Margin="{StaticResource UIElementMargin}"
+                        Content="Show Open in _Terminal button"
+                        IsChecked="{Binding ViewModel.DisplayOpenTerminalButton}" />
+                    <TextBlock Style="{StaticResource HintTextBlockStyle}">
+                        The Options button is always shown. The external editor button also requires an external editor executable to be configured.
+                    </TextBlock>
+                </StackPanel>
+            </GroupBox>
+
             <GroupBox Header="Path Label">
                 <Grid>
                     <Grid.ColumnDefinitions>

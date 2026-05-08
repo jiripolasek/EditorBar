@@ -83,9 +83,22 @@ internal partial class EditorBarControl : IDisposable
     {
         var options = GeneralOptionsModel.Instance;
 
-        this.OpenExternalEditorButton!.Visibility = StringHelper.IsNullOrWhiteSpace(options.ExternalEditorCommand)
-            ? Visibility.Collapsed
-            : Visibility.Visible;
+        this.OpenDefaultEditorButton!.Visibility = options.ShowOpenDefaultEditorButton
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
+        this.OpenExternalEditorButton!.Visibility = options.ShowOpenExternalEditorButton &&
+                                                    !StringHelper.IsNullOrWhiteSpace(options.ExternalEditorCommand)
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
+        this.OpenContainingFolderButton!.Visibility = options.ShowOpenContainingFolderButton
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
+        this.OpenTerminalButton!.Visibility = options.ShowOpenTerminalButton
+            ? Visibility.Visible
+            : Visibility.Collapsed;
 
         this._viewModel.IsDevelopmentModeEnabled = options.DebugMode;
 

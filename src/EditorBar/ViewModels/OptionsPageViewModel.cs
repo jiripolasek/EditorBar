@@ -26,6 +26,10 @@ public class OptionsPageViewModel : ObservableObject
     private bool _displayInDiffViews;
     private bool _displayInNonEditableDocuments;
     private bool _displayInTemp;
+    private bool _displayOpenContainingFolderButton;
+    private bool _displayOpenDefaultEditorButton;
+    private bool _displayOpenExternalEditorButton;
+    private bool _displayOpenTerminalButton;
     private DisplayStyle _displayStyle;
     private FileAction _doubleClickActionOnFileLabel;
     private FileAction _doubleClickCtrlActionOnFileLabel;
@@ -209,6 +213,42 @@ public class OptionsPageViewModel : ObservableObject
     {
         get => this._displayInTemp;
         set => this.SetProperty(ref this._displayInTemp, value);
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the default editor toolbar button is visible.
+    /// </summary>
+    public bool DisplayOpenDefaultEditorButton
+    {
+        get => this._displayOpenDefaultEditorButton;
+        set => this.SetProperty(ref this._displayOpenDefaultEditorButton, value);
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the external editor toolbar button is visible.
+    /// </summary>
+    public bool DisplayOpenExternalEditorButton
+    {
+        get => this._displayOpenExternalEditorButton;
+        set => this.SetProperty(ref this._displayOpenExternalEditorButton, value);
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the containing folder toolbar button is visible.
+    /// </summary>
+    public bool DisplayOpenContainingFolderButton
+    {
+        get => this._displayOpenContainingFolderButton;
+        set => this.SetProperty(ref this._displayOpenContainingFolderButton, value);
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the terminal toolbar button is visible.
+    /// </summary>
+    public bool DisplayOpenTerminalButton
+    {
+        get => this._displayOpenTerminalButton;
+        set => this.SetProperty(ref this._displayOpenTerminalButton, value);
     }
 
     /// <summary>
@@ -454,6 +494,10 @@ public class OptionsPageViewModel : ObservableObject
             this.DisplayInDiffViews = model.DisplayInDiffViews;
             this.DisplayInBlame = model.DisplayInBlame;
             this.DisplayInTemp = model.DisplayInTempFiles;
+            this.DisplayOpenDefaultEditorButton = model.ShowOpenDefaultEditorButton;
+            this.DisplayOpenExternalEditorButton = model.ShowOpenExternalEditorButton;
+            this.DisplayOpenContainingFolderButton = model.ShowOpenContainingFolderButton;
+            this.DisplayOpenTerminalButton = model.ShowOpenTerminalButton;
 
             this.DoubleClickActionOnFileLabel = model.FileAction;
             this.DoubleClickCtrlActionOnFileLabel = model.AlternateFileAction;
@@ -521,6 +565,10 @@ public class OptionsPageViewModel : ObservableObject
             model.DisplayInDiffViews = this.DisplayInDiffViews;
             model.DisplayInBlame = this.DisplayInBlame;
             model.DisplayInTempFiles = this.DisplayInTemp;
+            model.ShowOpenDefaultEditorButton = this.DisplayOpenDefaultEditorButton;
+            model.ShowOpenExternalEditorButton = this.DisplayOpenExternalEditorButton;
+            model.ShowOpenContainingFolderButton = this.DisplayOpenContainingFolderButton;
+            model.ShowOpenTerminalButton = this.DisplayOpenTerminalButton;
 
             model.FileAction = this.DoubleClickActionOnFileLabel;
             model.AlternateFileAction = this.DoubleClickCtrlActionOnFileLabel;
