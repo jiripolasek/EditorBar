@@ -45,6 +45,7 @@
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" />
                         </Button>
                         <Button
+                            x:Name="OpenDefaultEditorButton"
                             Command="{Binding OpenDefaultEditorCommand}"
                             PreviewGotKeyboardFocus="UIElement_OnPreviewGotKeyboardFocus"
                             Style="{DynamicResource NoBorderButtonStyle}"
@@ -60,12 +61,14 @@
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.OpenFile}" />
                         </Button>
                         <Button
+                            x:Name="OpenContainingFolderButton"
                             Command="{Binding OpenContainingFolderCommand}"
                             Style="{DynamicResource NoBorderButtonStyle}"
                             ToolTip="Open Containing Folder">
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.OpenFolder}" />
                         </Button>
                         <Button
+                            x:Name="OpenTerminalButton"
                             Command="{Binding OpenTerminalCommand}"
                             Style="{DynamicResource NoBorderButtonStyle}"
                             ToolTip="Open in Terminal">
