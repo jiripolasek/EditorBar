@@ -48,8 +48,6 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
 
     public ICommand OpenContainingFolderCommand { get; }
 
-    public ICommand OpenSettingsCommand { get; }
-
     public ICommand OpenExternalEditorCommand { get; }
 
     public ICommand OpenDefaultEditorCommand { get; }
@@ -119,8 +117,6 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
         this.ShowDebugInformationCommand = new DispatchedDelegateCommand(this.ExecuteShowDebugInfo);
         this.OpenContainingFolderCommand
             = new DispatchedDelegateCommand(_ => Launcher.OpenContaingFolder(textDocument.FilePath));
-        this.OpenSettingsCommand
-            = new DispatchedDelegateCommand(static _ => VS.Settings.OpenAsync<GeneralOptionPage>().FireAndForget());
         this.OpenExternalEditorCommand
             = new DispatchedDelegateCommand(_ => Launcher.OpenInExternalEditor(textDocument.FilePath));
         this.OpenDefaultEditorCommand

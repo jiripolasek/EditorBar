@@ -66,9 +66,10 @@
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.OpenFolder}" />
                         </Button>
                         <Button
-                            Command="{Binding OpenSettingsCommand}"
+                            x:Name="SettingsMenuButton"
+                            Click="SettingsMenuButton_OnClick"
                             Style="{DynamicResource NoBorderButtonStyle}"
-                            ToolTip="Options...">
+                            ToolTip="Options">
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.Settings}" />
                         </Button>
                     </StackPanel>

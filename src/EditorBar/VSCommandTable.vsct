@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable"
               xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -61,6 +61,29 @@
 				</Strings>
 			</Menu>
 
+
+			<!-- Settings context menu -->
+			<Menu guid="EditorBarCmdSet" id="EditorBarSettingsMenu" type="Context">
+				<Strings>
+					<ButtonText>Editor Bar Settings Menu</ButtonText>
+				</Strings>
+			</Menu>
+
+			<!-- Settings / Position submenu -->
+			<Menu guid="EditorBarCmdSet" id="EditorBarSettingsMenu_PositionSubMenu" priority="0x0100" type="Menu">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_LayoutGroup" />
+				<Strings>
+					<ButtonText>Position</ButtonText>
+				</Strings>
+			</Menu>
+
+			<!-- Settings / Display Mode submenu -->
+			<Menu guid="EditorBarCmdSet" id="EditorBarSettingsMenu_DisplayModeSubMenu" priority="0x0200" type="Menu">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_LayoutGroup" />
+				<Strings>
+					<ButtonText>Display Mode</ButtonText>
+				</Strings>
+			</Menu>
 		</Menus>
 
 		<Groups>
@@ -147,6 +170,23 @@
 				<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu" />
 			</Group>
 
+
+			<!-- Settings context menu -->
+			<Group guid="EditorBarCmdSet" id="EditorBarSettingsMenu_ToggleGroup" priority="0x0100">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu" />
+			</Group>
+			<Group guid="EditorBarCmdSet" id="EditorBarSettingsMenu_LayoutGroup" priority="0x0200">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu" />
+			</Group>
+			<Group guid="EditorBarCmdSet" id="EditorBarSettingsMenu_OptionsGroup" priority="0x0300">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu" />
+			</Group>
+			<Group guid="EditorBarCmdSet" id="EditorBarSettingsMenu_PositionSubMenuGroup" priority="0x0100">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_PositionSubMenu" />
+			</Group>
+			<Group guid="EditorBarCmdSet" id="EditorBarSettingsMenu_DisplayModeSubMenuGroup" priority="0x0100">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_DisplayModeSubMenu" />
+			</Group>
 		</Groups>
 
 		<Buttons>
@@ -474,6 +514,93 @@
 				</Strings>
 			</Button>
 
+
+			<!-- Settings context menu commands -->
+			<Button guid="EditorBarCmdSet" id="EditorBarSettings_ToggleEditorBarCommand" priority="0x0100" type="Button">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_ToggleGroup" />
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Toggle Editor Bar</ButtonText>
+					<CommandName>Toggle Editor Bar</CommandName>
+					<CanonicalName>EditorBar.Settings.ToggleEditorBar</CanonicalName>
+					<LocCanonicalName>EditorBar.Settings.ToggleEditorBar</LocCanonicalName>
+				</Strings>
+			</Button>
+
+			<Button guid="EditorBarCmdSet" id="EditorBarSettings_ToggleNavigationBarCommand" priority="0x0200" type="Button">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_ToggleGroup" />
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Toggle Navigation Bar</ButtonText>
+					<CommandName>Toggle Navigation Bar</CommandName>
+					<CanonicalName>EditorBar.Settings.ToggleNavigationBar</CanonicalName>
+					<LocCanonicalName>EditorBar.Settings.ToggleNavigationBar</LocCanonicalName>
+				</Strings>
+			</Button>
+
+			<Button guid="EditorBarCmdSet" id="EditorBarSettings_PositionTopCommand" priority="0x0100" type="Button">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_PositionSubMenuGroup" />
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Top</ButtonText>
+					<CommandName>Position: Top</CommandName>
+					<CanonicalName>EditorBar.Settings.PositionTop</CanonicalName>
+					<LocCanonicalName>EditorBar.Settings.PositionTop</LocCanonicalName>
+				</Strings>
+			</Button>
+
+			<Button guid="EditorBarCmdSet" id="EditorBarSettings_PositionBottomCommand" priority="0x0200" type="Button">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_PositionSubMenuGroup" />
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Bottom</ButtonText>
+					<CommandName>Position: Bottom</CommandName>
+					<CanonicalName>EditorBar.Settings.PositionBottom</CanonicalName>
+					<LocCanonicalName>EditorBar.Settings.PositionBottom</LocCanonicalName>
+				</Strings>
+			</Button>
+
+			<Button guid="EditorBarCmdSet" id="EditorBarSettings_DisplayNormalCommand" priority="0x0100" type="Button">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_DisplayModeSubMenuGroup" />
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Normal</ButtonText>
+					<CommandName>Display Mode: Normal</CommandName>
+					<CanonicalName>EditorBar.Settings.DisplayNormal</CanonicalName>
+					<LocCanonicalName>EditorBar.Settings.DisplayNormal</LocCanonicalName>
+				</Strings>
+			</Button>
+
+			<Button guid="EditorBarCmdSet" id="EditorBarSettings_DisplayCompactCommand" priority="0x0200" type="Button">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_DisplayModeSubMenuGroup" />
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Compact</ButtonText>
+					<CommandName>Display Mode: Compact</CommandName>
+					<CanonicalName>EditorBar.Settings.DisplayCompact</CanonicalName>
+					<LocCanonicalName>EditorBar.Settings.DisplayCompact</LocCanonicalName>
+				</Strings>
+			</Button>
+
+			<Button guid="EditorBarCmdSet" id="EditorBarSettings_OpenOptionsCommand" priority="0x0100" type="Button">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_OptionsGroup" />
+				<Icon guid="ImageCatalogGuid" id="Settings" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Editor Bar Options...</ButtonText>
+					<CommandName>Editor Bar Options</CommandName>
+					<CanonicalName>EditorBar.Settings.Options</CanonicalName>
+					<LocCanonicalName>EditorBar.Settings.Options</LocCanonicalName>
+				</Strings>
+			</Button>
 		</Buttons>
 
 		<Bitmaps>
@@ -491,12 +618,12 @@
 			<Parent guid="EditorBarCmdSet" id="EditorBarTextEditorToolbarGroup" />
 		</CommandPlacement>
 
-		<!-- 
-		Type Breadcrumb Menu 
-		
+		<!--
+		Type Breadcrumb Menu
+
 		+++++++
 		- Copy Documentation Comment ID
-		- Copy Full Name		
+		- Copy Full Name
 		+++++++
 		- Go To Definition
 		+++++++
@@ -512,13 +639,13 @@
 			<Parent guid="EditorBarCmdSet" id="EditorBarTypeBreadcrumbMenu_GotoGroup" />
 		</CommandPlacement>
 
-		<!-- 
-		Member Breadcrumb Menu 
-		
+		<!--
+		Member Breadcrumb Menu
+
 		++++++++
 		- Copy Documentation Comment ID
 		- Copy Full Name
-		++++++++		
+		++++++++
 		- Go To Definition
 		++++++++
 		-->
@@ -535,7 +662,7 @@
 
 		<!--
 		Project Breadcrumb Menu
-		
+
 		++++++++
 		- Copy Full Path
 		++++++++
@@ -561,9 +688,9 @@
 			<Parent guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_PropertyGroup"/>
 		</CommandPlacement>-->
 
-		<!-- 
+		<!--
 		Physical Folder Menu
-		
+
 		++++++++
 		- Copy Full Path
 		++++++++
@@ -667,6 +794,24 @@
 			<IDSymbol name="EditorBarPhysicalDirectoryMenu_OpenContainingFolderCommand" value="0x7012" />
 			<IDSymbol name="EditorBarPhysicalDirectoryMenu_LocateInSolutionExplorerCommand" value="0x7013" />
 
+
+			<!-- context menu: settings -->
+			<IDSymbol name="EditorBarSettingsMenu" value="0x8000" />
+			<IDSymbol name="EditorBarSettingsMenu_ToggleGroup" value="0x8001" />
+			<IDSymbol name="EditorBarSettingsMenu_LayoutGroup" value="0x8002" />
+			<IDSymbol name="EditorBarSettingsMenu_OptionsGroup" value="0x8003" />
+			<IDSymbol name="EditorBarSettingsMenu_PositionSubMenuGroup" value="0x8004" />
+			<IDSymbol name="EditorBarSettingsMenu_DisplayModeSubMenuGroup" value="0x8005" />
+			<IDSymbol name="EditorBarSettingsMenu_PositionSubMenu" value="0x8010" />
+			<IDSymbol name="EditorBarSettingsMenu_DisplayModeSubMenu" value="0x8011" />
+
+			<IDSymbol name="EditorBarSettings_ToggleEditorBarCommand" value="0x8020" />
+			<IDSymbol name="EditorBarSettings_ToggleNavigationBarCommand" value="0x8021" />
+			<IDSymbol name="EditorBarSettings_PositionTopCommand" value="0x8022" />
+			<IDSymbol name="EditorBarSettings_PositionBottomCommand" value="0x8023" />
+			<IDSymbol name="EditorBarSettings_DisplayNormalCommand" value="0x8024" />
+			<IDSymbol name="EditorBarSettings_DisplayCompactCommand" value="0x8025" />
+			<IDSymbol name="EditorBarSettings_OpenOptionsCommand" value="0x8026" />
 		</GuidSymbol>
 
 		<!-- Image Lists -->
