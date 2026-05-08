@@ -22,13 +22,14 @@ namespace JPSoftworks.EditorBar.Options;
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Setters are used implicitly by PropertyGrid.")]
 public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRatingConfig
 {
-    private const int CurrentConfigVersion = 3;
+    private const int CurrentConfigVersion = 5;
 
     private const string AppearanceCategoryName = "Appearance";
     private const string GeneralCategoryName = "General";
     private const string ColorsCategoryName = "Colors";
     private const string AdditionalActionCategoryName = "Actions";
     private const string ExternalEditorCategoryName = "External Editor";
+    private const string TerminalCategoryName = "Terminal";
 
     private const string RegistryCollectionName = "JPSoftworks.EditorBar.Options.GeneralPage";
     internal const string PathToEnabledProperty = RegistryCollectionName + @"\" + nameof(Enabled);
@@ -142,6 +143,31 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
         " represents the file name.")]
     [DefaultValue(Launcher.FileNamePlaceholderConstant)]
     public string? ExternalEditorCommandArguments { get; set; } = Launcher.FileNamePlaceholderConstant;
+
+    // -------------------------------------------
+    // Terminal category
+    // -------------------------------------------
+    [Category(TerminalCategoryName)]
+    [DisplayName("Terminal preset")]
+    [Description("Predefined terminal or shell configuration.")]
+    [DefaultValue(typeof(TerminalProfile), nameof(TerminalProfile.WindowsTerminal))]
+    [TypeConverter(typeof(EnumToDescriptionConverter))]
+    public TerminalProfile TerminalProfile { get; set; } = TerminalProfile.WindowsTerminal;
+
+    [Category(TerminalCategoryName)]
+    [DisplayName("Custom terminal executable")]
+    [Description("Path to custom terminal executable or command.")]
+    [DefaultValue(Launcher.DefaultTerminalCommand)]
+    public string? TerminalCommand { get; set; } = Launcher.DefaultTerminalCommand;
+
+    [Category(TerminalCategoryName)]
+    [DisplayName("Custom terminal executable arguments")]
+    [Description(
+        "Arguments passed to the custom terminal executable. " + Launcher.WorkingDirectoryPlaceholderConstant +
+        " represents the working directory and " + Launcher.ItemPathPlaceholderConstant +
+        " represents the invoked file or folder path.")]
+    [DefaultValue(Launcher.DefaultTerminalArguments)]
+    public string? TerminalCommandArguments { get; set; } = Launcher.DefaultTerminalArguments;
 
     // -------------------------------------------
     // Activation rules category
@@ -260,6 +286,28 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
                 {
                     this.FileLabelStyle = FileLabel.Hidden;
                 }
+            }
+
+            if (this.Version < 4)
+            {
+                if (StringHelper.IsNullOrWhiteSpace(this.TerminalCommand))
+                {
+                    this.TerminalCommand = Launcher.DefaultTerminalCommand;
+                }
+
+                if (StringHelper.IsNullOrWhiteSpace(this.TerminalCommandArguments))
+                {
+                    this.TerminalCommandArguments = Launcher.DefaultTerminalArguments;
+                }
+            }
+
+            if (this.Version < 5)
+            {
+                this.TerminalProfile = Launcher.IsDefaultTerminalConfiguration(
+                    this.TerminalCommand,
+                    this.TerminalCommandArguments)
+                    ? TerminalProfile.WindowsTerminal
+                    : TerminalProfile.Custom;
             }
 
             this.Version = CurrentConfigVersion;

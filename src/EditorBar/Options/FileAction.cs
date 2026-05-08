@@ -31,6 +31,12 @@ public enum FileAction
     OpenInExternalEditor,
 
     /// <summary>
+    /// Opens a terminal window rooted at the document location.
+    /// </summary>
+    [Description("Open in terminal")]
+    OpenInTerminal,
+
+    /// <summary>
     /// Copies the relative path of the document to the clipboard.
     /// </summary>
     [Description("Copy relative path to Clipboard")]

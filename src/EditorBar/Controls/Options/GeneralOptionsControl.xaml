@@ -16,6 +16,7 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <Thickness x:Key="UIElementMargin">0,0,0,12</Thickness>
 
         <Style TargetType="GroupBox">
@@ -419,6 +420,83 @@
                         Style="{StaticResource HintTextBlockStyle}">
                         Use $(FilePath) as a placeholder for name of the current file.
                     </TextBlock>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Header="Terminal">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" MinWidth="160" />
+                        <ColumnDefinition Width="Auto" MinWidth="240" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Content="_Terminal:"
+                        Target="{Binding ElementName=TerminalPresetComboBox}" />
+                    <ComboBox
+                        x:Name="TerminalPresetComboBox"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        DisplayMemberPath="DisplayName"
+                        ItemsSource="{Binding ViewModel.TerminalProfiles}"
+                        SelectedValue="{Binding ViewModel.SelectedTerminalProfile, Mode=TwoWay}"
+                        SelectedValuePath="Value" />
+
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Content="Terminal _path:"
+                        Visibility="{Binding ViewModel.IsCustomTerminalSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Target="{Binding ElementName=TerminalPathTextBox}" />
+                    <DockPanel
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Visibility="{Binding ViewModel.IsCustomTerminalSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Button
+                            MinWidth="24"
+                            MinHeight="{Binding ActualHeight, ElementName=TerminalPathTextBox}"
+                            Margin="4,0,0,0"
+                            VerticalAlignment="Center"
+                            Command="{Binding ViewModel.BrowseForTerminalCommand}"
+                            Visibility="{Binding ViewModel.IsCustomTerminalSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            Content="..."
+                            DockPanel.Dock="Right" />
+                        <TextBox
+                            x:Name="TerminalPathTextBox"
+                            IsReadOnly="{Binding ViewModel.IsTerminalPresetLocked}"
+                            VerticalAlignment="Center"
+                            Text="{Binding ViewModel.TerminalPathDisplay, UpdateSourceTrigger=PropertyChanged, Delay=0}" />
+                    </DockPanel>
+
+                    <Label
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Content="Terminal ar_guments:"
+                        Visibility="{Binding ViewModel.IsCustomTerminalSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Target="{Binding ElementName=TerminalArgumentsTextBox}" />
+                    <TextBox
+                        x:Name="TerminalArgumentsTextBox"
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        IsReadOnly="{Binding ViewModel.IsTerminalPresetLocked}"
+                        VerticalAlignment="Center"
+                        Visibility="{Binding ViewModel.IsCustomTerminalSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Text="{Binding ViewModel.TerminalArgumentsDisplay, UpdateSourceTrigger=PropertyChanged, Delay=0}" />
+
+                    <TextBlock
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        MaxWidth="240"
+                        Style="{StaticResource HintTextBlockStyle}"
+                        Text="{Binding ViewModel.TerminalPresetHint, Mode=OneWay}" />
                 </Grid>
             </GroupBox>
 
