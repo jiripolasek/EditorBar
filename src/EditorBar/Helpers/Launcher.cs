@@ -5,13 +5,14 @@
 #nullable enable
 
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows;
 using Community.VisualStudio.Toolkit;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.Shell;
+using Process = System.Diagnostics.Process;
+using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
 
 namespace JPSoftworks.EditorBar.Helpers;
 
@@ -94,6 +95,8 @@ internal static class Launcher
     /// <param name="itemPath">The file or directory path the action was invoked on.</param>
     internal static void OpenTerminal(string? itemPath)
     {
+        var terminalProfile = NormalizeSupportedTerminalProfile(GeneralOptionsModel.Instance.TerminalProfile);
+
         if (!TryResolveWorkingDirectory(itemPath, out var resolvedItemPath, out var workingDirectory))
         {
             VS.StatusBar.ShowMessageAsync("Failed to resolve terminal working directory").FireAndForget();
@@ -103,11 +106,19 @@ internal static class Launcher
         var configuredCommand = (GeneralOptionsModel.Instance.TerminalCommand ?? string.Empty).Trim();
         var configuredArguments = (GeneralOptionsModel.Instance.TerminalCommandArguments ?? string.Empty).Trim();
 
-        var useDefaultTerminal = IsDefaultTerminalConfiguration(configuredCommand, configuredArguments);
-        var command = string.IsNullOrWhiteSpace(configuredCommand) ? DefaultTerminalCommand : configuredCommand;
-        var arguments = string.IsNullOrWhiteSpace(configuredArguments) && useDefaultTerminal
-            ? DefaultTerminalArguments
-            : configuredArguments;
+        var command = terminalProfile == TerminalProfile.Custom
+            ? configuredCommand
+            : GetTerminalCommand(terminalProfile);
+        var arguments = terminalProfile == TerminalProfile.Custom
+            ? configuredArguments
+            : GetTerminalArguments(terminalProfile, workingDirectory);
+        var useDefaultTerminal = terminalProfile == TerminalProfile.WindowsTerminal;
+
+        if (StringHelper.IsNullOrWhiteSpace(command) || arguments == null)
+        {
+            VS.StatusBar.ShowMessageAsync($"Failed to open terminal at {workingDirectory}").FireAndForget();
+            return;
+        }
 
         if (TryStartTerminal(command, arguments, resolvedItemPath, workingDirectory))
         {
@@ -260,12 +271,71 @@ internal static class Launcher
                 """;
     }
 
-    private static bool IsDefaultTerminalConfiguration(string configuredCommand, string configuredArguments)
+    internal static bool IsDefaultTerminalConfiguration(string? configuredCommand, string? configuredArguments)
     {
         return string.IsNullOrWhiteSpace(configuredCommand) ||
                (string.Equals(configuredCommand, DefaultTerminalCommand, StringComparison.OrdinalIgnoreCase) &&
                 (string.IsNullOrWhiteSpace(configuredArguments) ||
                  string.Equals(configuredArguments, DefaultTerminalArguments, StringComparison.Ordinal)));
+    }
+
+    internal static TerminalProfile NormalizeSupportedTerminalProfile(TerminalProfile terminalProfile)
+    {
+        return terminalProfile == TerminalProfile.VisualStudioIntegratedTerminal
+            ? TerminalProfile.WindowsTerminal
+            : terminalProfile;
+    }
+
+    internal static string GetTerminalDisplayCommand(TerminalProfile terminalProfile)
+    {
+        terminalProfile = NormalizeSupportedTerminalProfile(terminalProfile);
+        return terminalProfile switch
+        {
+            TerminalProfile.WindowsTerminal => DefaultTerminalCommand,
+            TerminalProfile.CommandPrompt => "cmd.exe",
+            TerminalProfile.WindowsPowerShell => "powershell.exe",
+            TerminalProfile.PowerShell => "pwsh.exe",
+            TerminalProfile.DeveloperPowerShell => "powershell.exe",
+            TerminalProfile.Custom => string.Empty,
+            _ => throw new ArgumentOutOfRangeException(nameof(terminalProfile))
+        };
+    }
+
+    internal static string GetTerminalDisplayArguments(TerminalProfile terminalProfile)
+    {
+        terminalProfile = NormalizeSupportedTerminalProfile(terminalProfile);
+        return terminalProfile switch
+        {
+            TerminalProfile.WindowsTerminal => DefaultTerminalArguments,
+            TerminalProfile.CommandPrompt => string.Empty,
+            TerminalProfile.WindowsPowerShell => "-NoExit",
+            TerminalProfile.PowerShell => "-NoExit",
+            TerminalProfile.DeveloperPowerShell =>
+                "-NoExit -ExecutionPolicy Bypass -Command \"& '<Launch-VsDevShell.ps1>'; Set-Location -LiteralPath '$(WorkingDirectory)'\"",
+            TerminalProfile.Custom => string.Empty,
+            _ => throw new ArgumentOutOfRangeException(nameof(terminalProfile))
+        };
+    }
+
+    internal static string GetTerminalPresetNote(TerminalProfile terminalProfile)
+    {
+        terminalProfile = NormalizeSupportedTerminalProfile(terminalProfile);
+        return terminalProfile switch
+        {
+            TerminalProfile.WindowsTerminal =>
+                "Uses Windows Terminal and falls back to cmd.exe if Windows Terminal is unavailable.",
+            TerminalProfile.CommandPrompt =>
+                "Starts cmd.exe in the resolved working directory.",
+            TerminalProfile.WindowsPowerShell =>
+                "Starts Windows PowerShell and keeps the shell open in the resolved working directory.",
+            TerminalProfile.PowerShell =>
+                "Starts PowerShell (pwsh) and keeps the shell open in the resolved working directory.",
+            TerminalProfile.DeveloperPowerShell =>
+                "Starts Developer PowerShell for the current Visual Studio installation, then switches to the resolved working directory.",
+            TerminalProfile.Custom =>
+                "Use custom executable and arguments. $(WorkingDirectory) and $(ItemPath) placeholders are supported.",
+            _ => throw new ArgumentOutOfRangeException(nameof(terminalProfile))
+        };
     }
 
     private static bool TryResolveWorkingDirectory(
@@ -340,4 +410,75 @@ internal static class Launcher
             .Replace(WorkingDirectoryPlaceholderConstant, workingDirectory)
             .Replace(ItemPathPlaceholderConstant, itemPath);
     }
+
+    private static string? GetTerminalCommand(TerminalProfile terminalProfile)
+    {
+        terminalProfile = NormalizeSupportedTerminalProfile(terminalProfile);
+        return terminalProfile switch
+        {
+            TerminalProfile.WindowsTerminal => DefaultTerminalCommand,
+            TerminalProfile.CommandPrompt => "cmd.exe",
+            TerminalProfile.WindowsPowerShell => "powershell.exe",
+            TerminalProfile.PowerShell => "pwsh.exe",
+            TerminalProfile.DeveloperPowerShell => "powershell.exe",
+            TerminalProfile.Custom => (GeneralOptionsModel.Instance.TerminalCommand ?? string.Empty).Trim(),
+            _ => null
+        };
+    }
+
+    private static string? GetTerminalArguments(TerminalProfile terminalProfile, string workingDirectory)
+    {
+        terminalProfile = NormalizeSupportedTerminalProfile(terminalProfile);
+        return terminalProfile switch
+        {
+            TerminalProfile.WindowsTerminal => DefaultTerminalArguments,
+            TerminalProfile.CommandPrompt => string.Empty,
+            TerminalProfile.WindowsPowerShell => "-NoExit",
+            TerminalProfile.PowerShell => "-NoExit",
+            TerminalProfile.DeveloperPowerShell => GetDeveloperPowerShellArguments(workingDirectory),
+            TerminalProfile.Custom => (GeneralOptionsModel.Instance.TerminalCommandArguments ?? string.Empty).Trim(),
+            _ => null
+        };
+    }
+
+    private static string? GetDeveloperPowerShellArguments(string workingDirectory)
+    {
+        var launchScriptPath = GetDeveloperPowerShellScriptPath();
+        if (StringHelper.IsNullOrWhiteSpace(launchScriptPath))
+        {
+            return null;
+        }
+
+        return $"-NoExit -ExecutionPolicy Bypass -Command \"& '{EscapePowerShellSingleQuotedString(launchScriptPath)}'; Set-Location -LiteralPath '{EscapePowerShellSingleQuotedString(workingDirectory)}'\"";
+    }
+
+    private static string? GetDeveloperPowerShellScriptPath()
+    {
+        var devEnvDir = Environment.GetEnvironmentVariable("DevEnvDir");
+        if (StringHelper.IsNullOrWhiteSpace(devEnvDir))
+        {
+            devEnvDir = Environment.GetEnvironmentVariable("VSAPPIDDIR");
+        }
+
+        if (StringHelper.IsNullOrWhiteSpace(devEnvDir))
+        {
+            return null;
+        }
+
+        var ideDirectory = devEnvDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        var common7Directory = Directory.GetParent(ideDirectory)?.FullName;
+        if (StringHelper.IsNullOrWhiteSpace(common7Directory))
+        {
+            return null;
+        }
+
+        var launchScriptPath = Path.Combine(common7Directory, "Tools", "Launch-VsDevShell.ps1");
+        return File.Exists(launchScriptPath) ? launchScriptPath : null;
+    }
+
+    private static string EscapePowerShellSingleQuotedString(string value)
+    {
+        return value.Replace("'", "''");
+    }
+
 }

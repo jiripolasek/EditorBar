@@ -297,6 +297,7 @@
     <Compile Include="Polyfill\NullabilityPolyfills.cs" />
     <Compile Include="Helpers\Launcher.cs" />
     <Compile Include="Options\FileAction.cs" />
+    <Compile Include="Options\TerminalProfile.cs" />
     <Compile Include="Options\EnumToDescriptionConverter.cs" />
     <Compile Include="Options\BarPosition.cs" />
     <Compile Include="Options\DisplayStyle.cs" />

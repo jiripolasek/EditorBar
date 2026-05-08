@@ -6,6 +6,7 @@
 
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Helpers.Presentation;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.PlatformUI;
@@ -32,9 +33,15 @@ public class OptionsPageViewModel : ObservableObject
     private string? _externalEditorPath;
     private bool _isDebugModeEnabled;
     private bool _isEnabled;
+    private bool _isCustomTerminalSelected;
+    private bool _isTerminalPresetLocked;
     private FileLabel _pathStyle;
+    private TerminalProfile _selectedTerminalProfile;
     private string? _terminalArguments;
+    private string _terminalArgumentsDisplay = string.Empty;
+    private string _terminalPresetHint = string.Empty;
     private string? _terminalPath;
+    private string _terminalPathDisplay = string.Empty;
     private VisualStyle _visualStyle;
 
     /// <summary>
@@ -89,6 +96,19 @@ public class OptionsPageViewModel : ObservableObject
         new(FileAction.OpenInDefaultEditor, "Open in Default Editor"),
         new(FileAction.CopyRelativePath, "Copy Relative path"),
         new(FileAction.CopyAbsolutePath, "Copy Full path")
+    ];
+
+    /// <summary>
+    /// Gets the available terminal presets.
+    /// </summary>
+    public ObservableCollection<EnumViewModel<TerminalProfile>> TerminalProfiles { get; } =
+    [
+        new(TerminalProfile.WindowsTerminal, "Windows Terminal"),
+        new(TerminalProfile.CommandPrompt, "Command Prompt"),
+        new(TerminalProfile.WindowsPowerShell, "Windows PowerShell"),
+        new(TerminalProfile.PowerShell, "PowerShell (pwsh)"),
+        new(TerminalProfile.DeveloperPowerShell, "Developer PowerShell"),
+        new(TerminalProfile.Custom, "Custom")
     ];
 
     /// <summary>
@@ -268,12 +288,33 @@ public class OptionsPageViewModel : ObservableObject
     }
 
     /// <summary>
+    /// Gets or sets the selected terminal preset.
+    /// </summary>
+    public TerminalProfile SelectedTerminalProfile
+    {
+        get => this._selectedTerminalProfile;
+        set
+        {
+            if (this.SetProperty(ref this._selectedTerminalProfile, value))
+            {
+                this.NotifyTerminalPresentationChanged();
+            }
+        }
+    }
+
+    /// <summary>
     /// Gets or sets the terminal path.
     /// </summary>
     public string? TerminalPath
     {
         get => this._terminalPath;
-        set => this.SetProperty(ref this._terminalPath, value);
+        set
+        {
+            if (this.SetProperty(ref this._terminalPath, value))
+            {
+                this.UpdateTerminalPresentation();
+            }
+        }
     }
 
     /// <summary>
@@ -282,7 +323,70 @@ public class OptionsPageViewModel : ObservableObject
     public string? TerminalArguments
     {
         get => this._terminalArguments;
-        set => this.SetProperty(ref this._terminalArguments, value);
+        set
+        {
+            if (this.SetProperty(ref this._terminalArguments, value))
+            {
+                this.UpdateTerminalPresentation();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the custom terminal fields are editable.
+    /// </summary>
+    public bool IsCustomTerminalSelected
+    {
+        get => this._isCustomTerminalSelected;
+        private set => this.SetProperty(ref this._isCustomTerminalSelected, value);
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the terminal command fields are read-only.
+    /// </summary>
+    public bool IsTerminalPresetLocked
+    {
+        get => this._isTerminalPresetLocked;
+        private set => this.SetProperty(ref this._isTerminalPresetLocked, value);
+    }
+
+    /// <summary>
+    /// Gets or sets the displayed terminal command text.
+    /// </summary>
+    public string TerminalPathDisplay
+    {
+        get => this._terminalPathDisplay;
+        set
+        {
+            if (this.IsCustomTerminalSelected && this.SetProperty(ref this._terminalPathDisplay, value))
+            {
+                this.TerminalPath = value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the displayed terminal arguments text.
+    /// </summary>
+    public string TerminalArgumentsDisplay
+    {
+        get => this._terminalArgumentsDisplay;
+        set
+        {
+            if (this.IsCustomTerminalSelected && this.SetProperty(ref this._terminalArgumentsDisplay, value))
+            {
+                this.TerminalArguments = value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets the terminal preset hint text.
+    /// </summary>
+    public string TerminalPresetHint
+    {
+        get => this._terminalPresetHint;
+        private set => this.SetProperty(ref this._terminalPresetHint, value);
     }
 
     /// <summary>
@@ -301,6 +405,7 @@ public class OptionsPageViewModel : ObservableObject
     {
         this.BrowseForExternalEditorCommand = new DispatchedDelegateCommand(this.ExecuteBrowseForExternalEditorCommand);
         this.BrowseForTerminalCommand = new DispatchedDelegateCommand(this.ExecuteBrowseForTerminalCommand);
+        this.UpdateTerminalPresentation();
     }
 
     /// <summary>
@@ -387,6 +492,7 @@ public class OptionsPageViewModel : ObservableObject
             this.ExternalEditorArguments = model.ExternalEditorCommandArguments ?? string.Empty;
             this.TerminalPath = model.TerminalCommand ?? string.Empty;
             this.TerminalArguments = model.TerminalCommandArguments ?? string.Empty;
+            this.SelectedTerminalProfile = Launcher.NormalizeSupportedTerminalProfile(model.TerminalProfile);
 
             this.IsDebugModeEnabled = model.DebugMode;
         }
@@ -451,6 +557,7 @@ public class OptionsPageViewModel : ObservableObject
 
             model.ExternalEditorCommand = (this.ExternalEditorPath ?? string.Empty).Trim();
             model.ExternalEditorCommandArguments = (this.ExternalEditorArguments ?? string.Empty).Trim();
+            model.TerminalProfile = Launcher.NormalizeSupportedTerminalProfile(this.SelectedTerminalProfile);
             model.TerminalCommand = (this.TerminalPath ?? string.Empty).Trim();
             model.TerminalCommandArguments = (this.TerminalArguments ?? string.Empty).Trim();
 
@@ -462,5 +569,26 @@ public class OptionsPageViewModel : ObservableObject
         {
             ex.Log();
         }
+    }
+
+    private void NotifyTerminalPresentationChanged()
+    {
+        this.UpdateTerminalPresentation();
+    }
+
+    private void UpdateTerminalPresentation()
+    {
+        var isCustomTerminalSelected = this.SelectedTerminalProfile == TerminalProfile.Custom;
+        this.IsCustomTerminalSelected = isCustomTerminalSelected;
+        this.IsTerminalPresetLocked = !isCustomTerminalSelected;
+        this.TerminalPathDisplay = isCustomTerminalSelected
+            ? this.TerminalPath ?? string.Empty
+            : Launcher.GetTerminalDisplayCommand(this.SelectedTerminalProfile);
+        this.TerminalArgumentsDisplay = isCustomTerminalSelected
+            ? this.TerminalArguments ?? string.Empty
+            : Launcher.GetTerminalDisplayArguments(this.SelectedTerminalProfile);
+        this.TerminalPresetHint = isCustomTerminalSelected
+            ? "Use $(WorkingDirectory) for the terminal start directory and $(ItemPath) for the invoked file or folder path."
+            : Launcher.GetTerminalPresetNote(this.SelectedTerminalProfile);
     }
 }

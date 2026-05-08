@@ -22,7 +22,7 @@ namespace JPSoftworks.EditorBar.Options;
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Setters are used implicitly by PropertyGrid.")]
 public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRatingConfig
 {
-    private const int CurrentConfigVersion = 4;
+    private const int CurrentConfigVersion = 5;
 
     private const string AppearanceCategoryName = "Appearance";
     private const string GeneralCategoryName = "General";
@@ -148,15 +148,22 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     // Terminal category
     // -------------------------------------------
     [Category(TerminalCategoryName)]
-    [DisplayName("Terminal executable")]
-    [Description("Path to terminal executable or command.")]
+    [DisplayName("Terminal preset")]
+    [Description("Predefined terminal or shell configuration.")]
+    [DefaultValue(typeof(TerminalProfile), nameof(TerminalProfile.WindowsTerminal))]
+    [TypeConverter(typeof(EnumToDescriptionConverter))]
+    public TerminalProfile TerminalProfile { get; set; } = TerminalProfile.WindowsTerminal;
+
+    [Category(TerminalCategoryName)]
+    [DisplayName("Custom terminal executable")]
+    [Description("Path to custom terminal executable or command.")]
     [DefaultValue(Launcher.DefaultTerminalCommand)]
     public string? TerminalCommand { get; set; } = Launcher.DefaultTerminalCommand;
 
     [Category(TerminalCategoryName)]
-    [DisplayName("Terminal executable arguments")]
+    [DisplayName("Custom terminal executable arguments")]
     [Description(
-        "Arguments passed to the terminal executable. " + Launcher.WorkingDirectoryPlaceholderConstant +
+        "Arguments passed to the custom terminal executable. " + Launcher.WorkingDirectoryPlaceholderConstant +
         " represents the working directory and " + Launcher.ItemPathPlaceholderConstant +
         " represents the invoked file or folder path.")]
     [DefaultValue(Launcher.DefaultTerminalArguments)]
@@ -292,6 +299,15 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
                 {
                     this.TerminalCommandArguments = Launcher.DefaultTerminalArguments;
                 }
+            }
+
+            if (this.Version < 5)
+            {
+                this.TerminalProfile = Launcher.IsDefaultTerminalConfiguration(
+                    this.TerminalCommand,
+                    this.TerminalCommandArguments)
+                    ? TerminalProfile.WindowsTerminal
+                    : TerminalProfile.Custom;
             }
 
             this.Version = CurrentConfigVersion;
