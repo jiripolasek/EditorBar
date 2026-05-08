@@ -314,6 +314,18 @@
                 </StackPanel>
             </GroupBox>
 
+            <GroupBox Header="Member List">
+                <StackPanel>
+                    <CheckBox
+                        Margin="{StaticResource UIElementMargin}"
+                        Content="Show member list _filter box when empty"
+                        IsChecked="{Binding ViewModel.DisplayMemberListFilterBoxWhenEmpty}" />
+                    <TextBlock Margin="22,0,0,0" Style="{StaticResource HintTextBlockStyle}">
+                        When disabled, the filter box appears automatically when you start typing in the member list popup.
+                    </TextBlock>
+                </StackPanel>
+            </GroupBox>
+
             <GroupBox Header="Path Label">
                 <Grid>
                     <Grid.ColumnDefinitions>
