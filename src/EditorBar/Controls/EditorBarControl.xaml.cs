@@ -9,6 +9,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using JPSoftworks.EditorBar.Commands;
+using JPSoftworks.EditorBar.Commands.Abstractions;
 using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Helpers.Events;
 using JPSoftworks.EditorBar.Helpers.Presentation;
@@ -210,5 +212,10 @@ internal partial class EditorBarControl : IDisposable
             }).FireAndForget();
             e.Handled = true;
         }
+    }
+
+    private void SettingsMenuButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        new SettingsMenuContext(this._textView).ShowMenu();
     }
 }

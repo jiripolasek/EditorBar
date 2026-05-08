@@ -93,6 +93,14 @@
     <Compile Include="Commands\Location\LocateProjectInSolutionExplorerCommand.cs" />
     <Compile Include="Commands\Location\LocatePhysicalDirectoryInSolutionExplorerCommand.cs" />
     <Compile Include="Commands\Location\OpenProjectPropertiesCommand.cs" />
+    <Compile Include="Commands\Settings\SettingsMenuContext.cs" />
+    <Compile Include="Commands\Settings\SettingsToggleEditorBarCommand.cs" />
+    <Compile Include="Commands\Settings\SettingsToggleNavigationBarCommand.cs" />
+    <Compile Include="Commands\Settings\SettingsSetPositionTopCommand.cs" />
+    <Compile Include="Commands\Settings\SettingsSetPositionBottomCommand.cs" />
+    <Compile Include="Commands\Settings\SettingsSetDisplayNormalCommand.cs" />
+    <Compile Include="Commands\Settings\SettingsSetDisplayCompactCommand.cs" />
+    <Compile Include="Commands\Settings\SettingsOpenOptionsCommand.cs" />
     <Compile Include="Commands\Structural\BaseStructureMenuContextCommand`1.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Helpers\Events\CompositionEventAggregator.cs" />
@@ -307,6 +315,7 @@
     <Compile Include="MefComponents\TopEditorBarFactory.cs" />
     <Compile Include="ViewModels\EditorSegmentOptionsViewModel.cs" />
     <Compile Include="ViewModels\OptionsPageViewModel.cs" />
+    <Compile Include="Helpers\VisualStudio\NavigationBarHelper.cs" />
     <Compile Include="Helpers\VisualStudio\VisualStudioHelper.cs" />
   </ItemGroup>
   <ItemGroup>
