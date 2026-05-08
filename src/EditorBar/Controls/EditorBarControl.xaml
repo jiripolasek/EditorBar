@@ -66,6 +66,12 @@
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.OpenFolder}" />
                         </Button>
                         <Button
+                            Command="{Binding OpenTerminalCommand}"
+                            Style="{DynamicResource NoBorderButtonStyle}"
+                            ToolTip="Open in Terminal">
+                            <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.Console}" />
+                        </Button>
+                        <Button
                             x:Name="SettingsMenuButton"
                             Click="SettingsMenuButton_OnClick"
                             Style="{DynamicResource NoBorderButtonStyle}"

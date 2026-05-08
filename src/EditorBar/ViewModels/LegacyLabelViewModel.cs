@@ -149,6 +149,9 @@ internal class LegacyLabelViewModel : ObservableObject, IDisposable
             case FileAction.OpenContainingFolder:
                 Launcher.OpenContaingFolder(this.LocationNavModel.FilePath);
                 break;
+            case FileAction.OpenInTerminal:
+                Launcher.OpenTerminal(this.LocationNavModel.FilePath);
+                break;
             case FileAction.OpenInExternalEditor:
                 Launcher.OpenInExternalEditor(this.LocationNavModel.FilePath);
                 break;

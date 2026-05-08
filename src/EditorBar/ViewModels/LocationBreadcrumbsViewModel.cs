@@ -217,10 +217,20 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
         {
             var crumb = project switch
             {
-                BaseSolutionProjectInfo s => new BreadcrumbModel(
-                    "\\",
-                    options.SolutionBackground,
-                    options.SolutionForeground) { AssociatedFile = s.DirectoryPath },
+                BaseSolutionProjectInfo s => GetSolutionRootPath(s) is { } solutionRootPath
+                    ? new PhysicalDirectoryBreadcrumbModel(
+                        new PhysicalDirectoryModel("\\", solutionRootPath),
+                        "\\",
+                        options.SolutionBackground,
+                        options.SolutionForeground)
+                    {
+                        AssociatedDirectory = solutionRootPath,
+                        ContextCommand = this._openMenuOnPhysicalCrumb
+                    }
+                    : new BreadcrumbModel(
+                        "\\",
+                        options.SolutionBackground,
+                        options.SolutionForeground),
 
                 FileSystemProjectInfo fsProject => new BreadcrumbModel(
                     fsProject.DisplayName,
@@ -386,5 +396,15 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
         }
 
         new LocationBreadcrumbMenuContext(breadcrumbModel.Model, this._textView).ShowMenu();
+    }
+
+    private static string? GetSolutionRootPath(BaseSolutionProjectInfo project)
+    {
+        if (project is GenericProjectInfo { Solution.FullPath: { } solutionFullPath })
+        {
+            return Path.GetDirectoryName(solutionFullPath);
+        }
+
+        return project.DirectoryPath;
     }
 }

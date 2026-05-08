@@ -17,16 +17,19 @@ internal sealed class OpenProjectContainingFolderCommand
 {
     protected override Task ExecuteCoreAsync(IProjectInfo project, IWpfTextView wpfTextView)
     {
-        // If IProjectInfo is ProjectWrapper then we can extract the FullPath property to the project open containing folder and preselect the project file;
-        // Otherwise just use project.DirectoryPath to open plain folder.
-        if (project is GenericProjectInfo projectWrapper
-            && !string.IsNullOrWhiteSpace(projectWrapper.Project.FullPath!))
+        var path = ProjectLocationHelper.GetProjectLaunchPath(project);
+        if (path == null)
         {
-            Launcher.OpenContaingFolder(projectWrapper.Project.FullPath);
             return Task.CompletedTask;
         }
 
-        Launcher.OpenFolder(project.DirectoryPath);
+        if (project is GenericProjectInfo)
+        {
+            Launcher.OpenContaingFolder(path);
+            return Task.CompletedTask;
+        }
+
+        Launcher.OpenFolder(path);
         return Task.CompletedTask;
     }
 }

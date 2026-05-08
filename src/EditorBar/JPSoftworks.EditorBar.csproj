@@ -84,6 +84,7 @@
     <Compile Include="Commands\Abstractions\MenuIdAttribute.cs" />
     <Compile Include="Commands\File\BaseFileActionMenuContextCommand`1.cs" />
     <Compile Include="Commands\File\LocateInSolutionExplorerCommand.cs" />
+    <Compile Include="Commands\File\OpenTerminalCommand.cs" />
     <Compile Include="Commands\General\BaseFocusBreadcrumbCommand`1.cs" />
     <Compile Include="Commands\General\FocusEditorBarFileCrumbCommand.cs" />
     <Compile Include="Commands\General\FocusEditorBarInnermostTypeCrumbCommand.cs" />
@@ -92,7 +93,10 @@
     <Compile Include="Commands\Location\BasePhysicalLocationContextMenuCommand`1.cs" />
     <Compile Include="Commands\Location\LocateProjectInSolutionExplorerCommand.cs" />
     <Compile Include="Commands\Location\LocatePhysicalDirectoryInSolutionExplorerCommand.cs" />
+    <Compile Include="Commands\Location\OpenPhysicalDirectoryInTerminalCommand.cs" />
+    <Compile Include="Commands\Location\OpenProjectInTerminalCommand.cs" />
     <Compile Include="Commands\Location\OpenProjectPropertiesCommand.cs" />
+    <Compile Include="Commands\Location\ProjectLocationHelper.cs" />
     <Compile Include="Commands\Settings\SettingsMenuContext.cs" />
     <Compile Include="Commands\Settings\SettingsToggleEditorBarCommand.cs" />
     <Compile Include="Commands\Settings\SettingsToggleNavigationBarCommand.cs" />

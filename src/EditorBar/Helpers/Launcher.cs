@@ -4,6 +4,7 @@
 
 #nullable enable
 
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -21,6 +22,10 @@ namespace JPSoftworks.EditorBar.Helpers;
 internal static class Launcher
 {
     internal const string FileNamePlaceholderConstant = "$(FilePath)";
+    internal const string WorkingDirectoryPlaceholderConstant = "$(WorkingDirectory)";
+    internal const string ItemPathPlaceholderConstant = "$(ItemPath)";
+    internal const string DefaultTerminalCommand = "wt.exe";
+    internal const string DefaultTerminalArguments = "-d \"$(WorkingDirectory)\"";
 
     /// <summary>
     /// Opens the specified file in an external editor.
@@ -81,6 +86,48 @@ internal static class Launcher
             ex.Log();
             VS.StatusBar.ShowMessageAsync($"Failed to open {filePath} in default editor").FireAndForget();
         }
+    }
+
+    /// <summary>
+    /// Opens a terminal rooted at the specified file or directory path.
+    /// </summary>
+    /// <param name="itemPath">The file or directory path the action was invoked on.</param>
+    internal static void OpenTerminal(string? itemPath)
+    {
+        if (!TryResolveWorkingDirectory(itemPath, out var resolvedItemPath, out var workingDirectory))
+        {
+            VS.StatusBar.ShowMessageAsync("Failed to resolve terminal working directory").FireAndForget();
+            return;
+        }
+
+        var configuredCommand = (GeneralOptionsModel.Instance.TerminalCommand ?? string.Empty).Trim();
+        var configuredArguments = (GeneralOptionsModel.Instance.TerminalCommandArguments ?? string.Empty).Trim();
+
+        var useDefaultTerminal = IsDefaultTerminalConfiguration(configuredCommand, configuredArguments);
+        var command = string.IsNullOrWhiteSpace(configuredCommand) ? DefaultTerminalCommand : configuredCommand;
+        var arguments = string.IsNullOrWhiteSpace(configuredArguments) && useDefaultTerminal
+            ? DefaultTerminalArguments
+            : configuredArguments;
+
+        if (TryStartTerminal(command, arguments, resolvedItemPath, workingDirectory))
+        {
+            VS.StatusBar.ShowMessageAsync($"Opened terminal at {workingDirectory}").FireAndForget();
+            return;
+        }
+
+        if (!useDefaultTerminal)
+        {
+            VS.StatusBar.ShowMessageAsync($"Failed to open terminal at {workingDirectory}").FireAndForget();
+            return;
+        }
+
+        if (TryStartTerminal("cmd.exe", string.Empty, resolvedItemPath, workingDirectory))
+        {
+            VS.StatusBar.ShowMessageAsync($"Opened terminal at {workingDirectory} using cmd.exe").FireAndForget();
+            return;
+        }
+
+        VS.StatusBar.ShowMessageAsync($"Failed to open terminal at {workingDirectory}").FireAndForget();
     }
 
     /// <summary>
@@ -211,5 +258,86 @@ internal static class Launcher
         return $"""
                 "{fileName}"
                 """;
+    }
+
+    private static bool IsDefaultTerminalConfiguration(string configuredCommand, string configuredArguments)
+    {
+        return string.IsNullOrWhiteSpace(configuredCommand) ||
+               (string.Equals(configuredCommand, DefaultTerminalCommand, StringComparison.OrdinalIgnoreCase) &&
+                (string.IsNullOrWhiteSpace(configuredArguments) ||
+                 string.Equals(configuredArguments, DefaultTerminalArguments, StringComparison.Ordinal)));
+    }
+
+    private static bool TryResolveWorkingDirectory(
+        string? itemPath,
+        [NotNullWhen(true)] out string? resolvedItemPath,
+        [NotNullWhen(true)] out string? workingDirectory)
+    {
+        resolvedItemPath = null;
+        workingDirectory = null;
+
+        if (StringHelper.IsNullOrWhiteSpace(itemPath))
+        {
+            return false;
+        }
+
+        resolvedItemPath = itemPath.Trim();
+
+        if (Directory.Exists(resolvedItemPath))
+        {
+            workingDirectory = resolvedItemPath;
+            return true;
+        }
+
+        var directoryName = Path.GetDirectoryName(resolvedItemPath);
+        if (!StringHelper.IsNullOrWhiteSpace(directoryName!) && Directory.Exists(directoryName))
+        {
+            workingDirectory = directoryName;
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool TryStartTerminal(
+        string command,
+        string arguments,
+        string itemPath,
+        string workingDirectory)
+    {
+        try
+        {
+            var expandedArguments = ExpandTerminalArguments(arguments, itemPath, workingDirectory);
+            Process.Start(
+                new ProcessStartInfo(command)
+                {
+                    Arguments = expandedArguments,
+                    UseShellExecute = true,
+                    WorkingDirectory = workingDirectory
+                });
+            return true;
+        }
+        catch (Win32Exception ex)
+        {
+            ex.Log();
+            return false;
+        }
+        catch (FileNotFoundException ex)
+        {
+            ex.Log();
+            return false;
+        }
+        catch (Exception ex)
+        {
+            ex.Log();
+            return false;
+        }
+    }
+
+    private static string ExpandTerminalArguments(string arguments, string itemPath, string workingDirectory)
+    {
+        return arguments
+            .Replace(WorkingDirectoryPlaceholderConstant, workingDirectory)
+            .Replace(ItemPathPlaceholderConstant, itemPath);
     }
 }

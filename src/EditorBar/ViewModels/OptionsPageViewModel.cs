@@ -33,6 +33,8 @@ public class OptionsPageViewModel : ObservableObject
     private bool _isDebugModeEnabled;
     private bool _isEnabled;
     private FileLabel _pathStyle;
+    private string? _terminalArguments;
+    private string? _terminalPath;
     private VisualStyle _visualStyle;
 
     /// <summary>
@@ -82,6 +84,7 @@ public class OptionsPageViewModel : ObservableObject
     [
         new(FileAction.None, "Do nothing"),
         new(FileAction.OpenContainingFolder, "Open Containing Folder"),
+        new(FileAction.OpenInTerminal, "Open in Terminal"),
         new(FileAction.OpenInExternalEditor, "Open in External Editor"),
         new(FileAction.OpenInDefaultEditor, "Open in Default Editor"),
         new(FileAction.CopyRelativePath, "Copy Relative path"),
@@ -92,6 +95,11 @@ public class OptionsPageViewModel : ObservableObject
     /// Gets the command to browse for an external editor.
     /// </summary>
     public ICommand BrowseForExternalEditorCommand { get; }
+
+    /// <summary>
+    /// Gets the command to browse for a terminal executable.
+    /// </summary>
+    public ICommand BrowseForTerminalCommand { get; }
 
     /// <summary>
     /// Gets or sets a value indicating whether a feature is enabled.
@@ -260,6 +268,24 @@ public class OptionsPageViewModel : ObservableObject
     }
 
     /// <summary>
+    /// Gets or sets the terminal path.
+    /// </summary>
+    public string? TerminalPath
+    {
+        get => this._terminalPath;
+        set => this.SetProperty(ref this._terminalPath, value);
+    }
+
+    /// <summary>
+    /// Gets or sets the terminal arguments.
+    /// </summary>
+    public string? TerminalArguments
+    {
+        get => this._terminalArguments;
+        set => this.SetProperty(ref this._terminalArguments, value);
+    }
+
+    /// <summary>
     /// Gets or sets a value indicating whether debug mode is enabled.
     /// </summary>
     public bool IsDebugModeEnabled
@@ -274,6 +300,7 @@ public class OptionsPageViewModel : ObservableObject
     public OptionsPageViewModel()
     {
         this.BrowseForExternalEditorCommand = new DispatchedDelegateCommand(this.ExecuteBrowseForExternalEditorCommand);
+        this.BrowseForTerminalCommand = new DispatchedDelegateCommand(this.ExecuteBrowseForTerminalCommand);
     }
 
     /// <summary>
@@ -282,10 +309,24 @@ public class OptionsPageViewModel : ObservableObject
     /// <param name="parameter">The command parameter.</param>
     private void ExecuteBrowseForExternalEditorCommand(object parameter)
     {
+        this.BrowseForExecutable(path => this.ExternalEditorPath = path);
+    }
+
+    /// <summary>
+    /// Executes the command to browse for a terminal executable.
+    /// </summary>
+    /// <param name="parameter">The command parameter.</param>
+    private void ExecuteBrowseForTerminalCommand(object parameter)
+    {
+        this.BrowseForExecutable(path => this.TerminalPath = path);
+    }
+
+    private void BrowseForExecutable(Action<string> setPath)
+    {
         var dlg = new OpenFileDialog { Filter = "Executables (*.exe)|*.exe|All Files|*.*" };
         if (dlg.ShowDialog() == true)
         {
-            this.ExternalEditorPath = dlg.FileName;
+            setPath(dlg.FileName);
         }
     }
 
@@ -344,6 +385,8 @@ public class OptionsPageViewModel : ObservableObject
 
             this.ExternalEditorPath = model.ExternalEditorCommand ?? string.Empty;
             this.ExternalEditorArguments = model.ExternalEditorCommandArguments ?? string.Empty;
+            this.TerminalPath = model.TerminalCommand ?? string.Empty;
+            this.TerminalArguments = model.TerminalCommandArguments ?? string.Empty;
 
             this.IsDebugModeEnabled = model.DebugMode;
         }
@@ -408,6 +451,8 @@ public class OptionsPageViewModel : ObservableObject
 
             model.ExternalEditorCommand = (this.ExternalEditorPath ?? string.Empty).Trim();
             model.ExternalEditorCommandArguments = (this.ExternalEditorArguments ?? string.Empty).Trim();
+            model.TerminalCommand = (this.TerminalPath ?? string.Empty).Trim();
+            model.TerminalCommandArguments = (this.TerminalArguments ?? string.Empty).Trim();
 
             model.DebugMode = this.IsDebugModeEnabled;
 

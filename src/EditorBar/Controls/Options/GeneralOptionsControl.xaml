@@ -422,6 +422,61 @@
                 </Grid>
             </GroupBox>
 
+            <GroupBox Header="Terminal">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" MinWidth="160" />
+                        <ColumnDefinition Width="Auto" MinWidth="240" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Content="_Terminal path:"
+                        Target="{Binding ElementName=TerminalPathTextBox}" />
+                    <DockPanel Grid.Row="0" Grid.Column="1">
+                        <Button
+                            MinWidth="24"
+                            MinHeight="{Binding ActualHeight, ElementName=TerminalPathTextBox}"
+                            Margin="4,0,0,0"
+                            VerticalAlignment="Center"
+                            Command="{Binding ViewModel.BrowseForTerminalCommand}"
+                            Content="..."
+                            DockPanel.Dock="Right" />
+                        <TextBox
+                            x:Name="TerminalPathTextBox"
+                            VerticalAlignment="Center"
+                            Text="{Binding ViewModel.TerminalPath, UpdateSourceTrigger=PropertyChanged, Delay=0}" />
+                    </DockPanel>
+
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Content="Terminal ar_guments:"
+                        Target="{Binding ElementName=TerminalArgumentsTextBox}" />
+                    <TextBox
+                        x:Name="TerminalArgumentsTextBox"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding ViewModel.TerminalArguments, UpdateSourceTrigger=PropertyChanged, Delay=0}" />
+
+                    <TextBlock
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        MaxWidth="240"
+                        Style="{StaticResource HintTextBlockStyle}">
+                        Use $(WorkingDirectory) for the terminal start directory and $(ItemPath) for the invoked file or folder path.
+                        Default configuration uses Windows Terminal and falls back to cmd.exe when it is unavailable.
+                    </TextBlock>
+                </Grid>
+            </GroupBox>
+
             <GroupBox Header="Development">
                 <StackPanel Grid.IsSharedSizeScope="True">
                     <CheckBox Content="Enabled development mode" IsChecked="{Binding ViewModel.IsDebugModeEnabled}" />

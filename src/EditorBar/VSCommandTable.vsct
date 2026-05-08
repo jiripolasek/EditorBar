@@ -118,6 +118,9 @@
 			<Group guid="EditorBarCmdSet" id="EditorBarFileActionMenuOpenFolderGroup" priority="0x300">
 				<Parent guid="EditorBarCmdSet" id="EditorBarFileActionMenu" />
 			</Group>
+			<Group guid="EditorBarCmdSet" id="EditorBarFileActionMenuLocateGroup" priority="0x400">
+				<Parent guid="EditorBarCmdSet" id="EditorBarFileActionMenu" />
+			</Group>
 
 			<!-- Structure breadcrumb context menu -->
 			<Group guid="EditorBarCmdSet" id="EditorBarStructureBreadcrumbMenuStaticCommandsGroup" priority="0x100">
@@ -158,7 +161,10 @@
 			<Group guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_ContainerGroup" priority="0x200">
 				<Parent guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu" />
 			</Group>
-			<Group guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_PropertyGroup" priority="0x300">
+			<Group guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_GotoGroup" priority="0x300">
+				<Parent guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu" />
+			</Group>
+			<Group guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_PropertyGroup" priority="0x400">
 				<Parent guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu" />
 			</Group>
 
@@ -167,6 +173,9 @@
 				<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu" />
 			</Group>
 			<Group guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_ContainerGroup" priority="0x200">
+				<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu" />
+			</Group>
+			<Group guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_LocateGroup" priority="0x300">
 				<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu" />
 			</Group>
 
@@ -262,7 +271,7 @@
 			</Button>
 
 			<Button guid="EditorBarCmdSet" id="EditorBarFileAction_LocateInSolutionExplorer" priority="0x0200" type="Button">
-				<Parent guid="EditorBarCmdSet" id="EditorBarFileActionMenuOpenFolderGroup" />
+				<Parent guid="EditorBarCmdSet" id="EditorBarFileActionMenuLocateGroup" />
 				<Icon guid="ImageCatalogGuid" id="SwitchSourceOrTarget" />
 				<CommandFlag>IconIsMoniker</CommandFlag>
 				<CommandFlag>NoKeyCustomize</CommandFlag>
@@ -272,6 +281,20 @@
 					<CommandName>Locate in Solution Explorer</CommandName>
 					<CanonicalName>EditorBar.LocateInSolutionExplorer</CanonicalName>
 					<LocCanonicalName>EditorBar.LocateInSolutionExplorer</LocCanonicalName>
+				</Strings>
+			</Button>
+
+			<Button guid="EditorBarCmdSet" id="EditorBarFileAction_OpenTerminalCommand" priority="0x0300" type="Button">
+				<Parent guid="EditorBarCmdSet" id="EditorBarFileActionMenuOpenFolderGroup" />
+				<Icon guid="ImageCatalogGuid" id="Console" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Open in &amp;Terminal</ButtonText>
+					<CommandName>Open in Terminal</CommandName>
+					<CanonicalName>EditorBar.OpenInTerminal</CanonicalName>
+					<LocCanonicalName>EditorBar.OpenInTerminal</LocCanonicalName>
 				</Strings>
 			</Button>
 
@@ -460,6 +483,19 @@
 				</Strings>
 			</Button>
 
+			<Button guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_OpenTerminalCommand">
+				<Icon guid="ImageCatalogGuid" id="Console" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Open in Terminal</ButtonText>
+					<CommandName>Open in Terminal</CommandName>
+					<CanonicalName>EditorBar.Project.OpenTerminal</CanonicalName>
+					<LocCanonicalName>EditorBar.Project.OpenTerminal</LocCanonicalName>
+				</Strings>
+			</Button>
+
 			<!-- physical directory context menu -->
 
 			<Button guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_CopyFullPathCommand">
@@ -511,6 +547,19 @@
 					<CommandName>Locate in Solution Explorer</CommandName>
 					<CanonicalName>EditorBar.PhysicalDirectory.LocateInSolutionExplorer</CanonicalName>
 					<LocCanonicalName>EditorBar.PhysicalDirectory.LocateInSolutionExplorer</LocCanonicalName>
+				</Strings>
+			</Button>
+
+			<Button guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_OpenTerminalCommand">
+				<Icon guid="ImageCatalogGuid" id="Console" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Open in Terminal</ButtonText>
+					<CommandName>Open in Terminal</CommandName>
+					<CanonicalName>EditorBar.PhysicalDirectory.OpenTerminal</CanonicalName>
+					<LocCanonicalName>EditorBar.PhysicalDirectory.OpenTerminal</LocCanonicalName>
 				</Strings>
 			</Button>
 
@@ -667,6 +716,8 @@
 		- Copy Full Path
 		++++++++
 		- Open Containing Folder
+		- Open in Terminal
+		++++++++
 		- Locate in Solution Explorer
 		++++++++
 		- Properties
@@ -682,6 +733,10 @@
 		</CommandPlacement>
 		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_LocateInSolutionExplorerCommand"
 		                  priority="0x0400">
+			<Parent guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_GotoGroup" />
+		</CommandPlacement>
+		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_OpenTerminalCommand"
+		                  priority="0x0200">
 			<Parent guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_ContainerGroup" />
 		</CommandPlacement>
 		<!--<CommandPlacement guid="EditorBarCmdSet" id="EditorBarProjectBreadcrumbMenu_OpenPropertiesCommand" priority="0x0300">
@@ -695,6 +750,8 @@
 		- Copy Full Path
 		++++++++
 		- Open Containing Folder
+		- Open in Terminal
+		++++++++
 		- Locate in Solution Explorer
 		++++++++
 		-->
@@ -706,6 +763,10 @@
 			<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_ContainerGroup" />
 		</CommandPlacement>
 		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_LocateInSolutionExplorerCommand"
+		                  priority="0x0300">
+			<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_LocateGroup" />
+		</CommandPlacement>
+		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_OpenTerminalCommand"
 		                  priority="0x0300">
 			<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_ContainerGroup" />
 		</CommandPlacement>
@@ -738,6 +799,7 @@
 			<IDSymbol name="EditorBarFileActionMenuCopyPathGroup" value="0x2001" />
 			<IDSymbol name="EditorBarFileActionMenuOpenFileGroup" value="0x2002" />
 			<IDSymbol name="EditorBarFileActionMenuOpenFolderGroup" value="0x2003" />
+			<IDSymbol name="EditorBarFileActionMenuLocateGroup" value="0x2004" />
 
 			<IDSymbol name="EditorBarFileAction_OpenContainingFolderCommand" value="0x2010" />
 			<IDSymbol name="EditorBarFileAction_OpenFileInDefaultEditorCommand" value="0x2011" />
@@ -745,6 +807,7 @@
 			<IDSymbol name="EditorBarFileAction_CopyFullPathCommand" value="0x2013" />
 			<IDSymbol name="EditorBarFileAction_CopyRelativePathCommand" value="0x2014" />
 			<IDSymbol name="EditorBarFileAction_LocateInSolutionExplorer" value="0x2015" />
+			<IDSymbol name="EditorBarFileAction_OpenTerminalCommand" value="0x2016" />
 
 			<!-- context menu: structure model  -->
 			<IDSymbol name="EditorBarStructureBreadcrumbMenu" value="0x3000" />
@@ -783,16 +846,19 @@
 			<IDSymbol name="EditorBarProjectBreadcrumbMenu_OpenContainingFolderCommand" value="0x6012" />
 			<IDSymbol name="EditorBarProjectBreadcrumbMenu_OpenPropertiesCommand" value="0x6013" />
 			<IDSymbol name="EditorBarProjectBreadcrumbMenu_LocateInSolutionExplorerCommand" value="0x6014" />
+			<IDSymbol name="EditorBarProjectBreadcrumbMenu_OpenTerminalCommand" value="0x6015" />
 
 			<!-- context menu: physical directory -->
 			<IDSymbol name="EditorBarPhysicalDirectoryMenu" value="0x7000" />
 			<IDSymbol name="EditorBarPhysicalDirectoryMenu_PrimaryGroup" value="0x7001" />
 			<IDSymbol name="EditorBarPhysicalDirectoryMenu_ContainerGroup" value="0x7002" />
+			<IDSymbol name="EditorBarPhysicalDirectoryMenu_LocateGroup" value="0x7003" />
 
 			<IDSymbol name="EditorBarPhysicalDirectoryMenu_CopyFullPathCommand" value="0x7010" />
 			<IDSymbol name="EditorBarPhysicalDirectoryMenu_CopyRelativePathCommand" value="0x7011" />
 			<IDSymbol name="EditorBarPhysicalDirectoryMenu_OpenContainingFolderCommand" value="0x7012" />
 			<IDSymbol name="EditorBarPhysicalDirectoryMenu_LocateInSolutionExplorerCommand" value="0x7013" />
+			<IDSymbol name="EditorBarPhysicalDirectoryMenu_OpenTerminalCommand" value="0x7014" />
 
 
 			<!-- context menu: settings -->
