@@ -243,6 +243,8 @@
     <Compile Include="Services\StructureProviders\Xml\Models\XmlNodeStructureModel.cs" />
     <Compile Include="Options\FileLabel.cs" />
     <Compile Include="Options\VisualStyle.cs" />
+    <Compile Include="Options\EditorColorMode.cs" />
+    <Compile Include="Options\EditorBarColorSet.cs" />
     <Compile Include="Polyfill\System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.cs" />
     <Compile Include="Polyfill\System.Runtime.CompilerServices.RequiredMemberAttribute.cs" />
     <Compile Include="Presentation\BrightnessConverter.cs" />
@@ -310,6 +312,7 @@
     <Compile Include="Options\GeneralOptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Options\GeneralOptionPageSettings.cs" />
     <Compile Include="Controls\Options\GeneralOptionsControl.xaml.cs">
       <DependentUpon>GeneralOptionsControl.xaml</DependentUpon>
     </Compile>
@@ -318,6 +321,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EditorBarPackage.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
+    <Compile Include="Helpers\VisualStudio\EditorAppearanceHelper.cs" />
     <Compile Include="source.extension.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

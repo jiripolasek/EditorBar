@@ -17,6 +17,7 @@ using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Helpers.Events;
 using JPSoftworks.EditorBar.Helpers.Events.Abstractions;
 using JPSoftworks.EditorBar.Helpers.Presentation;
+using JPSoftworks.EditorBar.Helpers.VisualStudio;
 using JPSoftworks.EditorBar.Options;
 using JPSoftworks.EditorBar.Resources;
 using JPSoftworks.EditorBar.Services;
@@ -210,6 +211,7 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
         Requires.NotNull(locationModel);
 
         var project = locationModel.Project;
+        var colors = options.GetColorSet(EditorAppearanceHelper.GetCurrentMode(this._textView));
 
         // Rebuild breadcrumbs
         var breadcrumbs = new List<BreadcrumbModel>();
@@ -228,8 +230,8 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                                 : null
                         },
                         "\\",
-                        options.SolutionBackground,
-                        options.SolutionForeground)
+                        colors.SolutionBackground,
+                        colors.SolutionForeground)
                     {
                         AssociatedDirectory = solutionRootPath,
                         TreeItemsProvider = project is GenericProjectInfo
@@ -239,14 +241,14 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                     }
                     : new BreadcrumbModel(
                         "\\",
-                        options.SolutionBackground,
-                        options.SolutionForeground),
+                        colors.SolutionBackground,
+                        colors.SolutionForeground),
 
                 FileSystemProjectInfo fsProject when fsProject.DirectoryPath != null => new PhysicalDirectoryBreadcrumbModel(
                     new PhysicalDirectoryModel(fsProject.DisplayName, fsProject.DirectoryPath),
                     fsProject.DisplayName,
-                    options.NonSolutionRootBackground,
-                    options.NonSolutionRootForeground)
+                    colors.NonSolutionRootBackground,
+                    colors.NonSolutionRootForeground)
                 {
                     AssociatedDirectory = fsProject.DirectoryPath,
                     TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(fsProject.DirectoryPath),
@@ -255,13 +257,13 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
 
                 FileSystemProjectInfo fsProject => new BreadcrumbModel(
                     fsProject.DisplayName,
-                    options.NonSolutionRootBackground,
-                    options.NonSolutionRootForeground),
+                    colors.NonSolutionRootBackground,
+                    colors.NonSolutionRootForeground),
 
                 NullProjectInfo => new BreadcrumbModel(
                     Strings.CodeFragment!,
-                    options.NonSolutionRootBackground,
-                    options.NonSolutionRootForeground),
+                    colors.NonSolutionRootBackground,
+                    colors.NonSolutionRootForeground),
 
                 _ => throw new InvalidOperationException("Invalid project type")
             };
@@ -276,8 +278,8 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                     new BreadcrumbModel<SolutionItem>(
                         folder,
                         folder.Name,
-                        options.SolutionFolderBackground,
-                        options.SolutionFolderForeground)
+                        colors.SolutionFolderBackground,
+                        colors.SolutionFolderForeground)
                     {
                         TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateSolutionItemChildrenAsync(folder),
                         ContextCommand = this._openMenuOnSolutionFolderCrumb
@@ -295,8 +297,8 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                         ProjectContainerBreadcrumbModel(
                             p,
                             p.DisplayName,
-                            options.ProjectBackground,
-                            options.ProjectForeground)
+                            colors.ProjectBackground,
+                            colors.ProjectForeground)
                         {
                             AssociatedDirectory = p.DirectoryPath,
                             TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateProjectItemsAsync(
@@ -308,8 +310,8 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                     BaseSolutionProjectInfo solutionProject => new ProjectContainerBreadcrumbModel(
                         project,
                         project.DisplayName,
-                        options.ProjectBackground,
-                        options.ProjectForeground)
+                        colors.ProjectBackground,
+                        colors.ProjectForeground)
                     {
                         AssociatedDirectory = project.DirectoryPath,
                         TreeItemsProvider = solutionProject is GenericProjectInfo gp
@@ -333,10 +335,10 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
         {
             var partialPath = locationModel.Project.DirectoryPath ?? string.Empty;
 
-            var projectFoldersBackground = new SolidColorBrush(options.ProjectFoldersBackground.ToMediaColor());
+            var projectFoldersBackground = new SolidColorBrush(colors.ProjectFoldersBackground.ToMediaColor());
             projectFoldersBackground.Freeze();
 
-            var projectFoldersForeground = new SolidColorBrush(options.ProjectFoldersForeground.ToMediaColor());
+            var projectFoldersForeground = new SolidColorBrush(colors.ProjectFoldersForeground.ToMediaColor());
             projectFoldersForeground.Freeze();
 
             // show in-project path part, if there's more that two elements; skip the last element, if that is the parent folder that is displayed separately
@@ -372,8 +374,8 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                 new PhysicalDirectoryBreadcrumbModel(
                     model,
                     locationModel.ProjectFolders.Last(),
-                    options.ParentFolderBackground,
-                    options.ParentFolderForeground)
+                    colors.ParentFolderBackground,
+                    colors.ParentFolderForeground)
                 {
                     TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(model.FullPath),
                     ContextCommand = this._openMenuOnPhysicalCrumb

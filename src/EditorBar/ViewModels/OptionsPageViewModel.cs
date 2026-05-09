@@ -6,8 +6,10 @@
 
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using System.Windows.Media;
 using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Helpers.Presentation;
+using JPSoftworks.EditorBar.Helpers.VisualStudio;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.Win32;
@@ -34,13 +36,20 @@ public class OptionsPageViewModel : ObservableObject
     private DisplayStyle _displayStyle;
     private FileAction _doubleClickActionOnFileLabel;
     private FileAction _doubleClickCtrlActionOnFileLabel;
+    private Color _bulkBreadcrumbBackgroundColor;
+    private Color _bulkBreadcrumbForegroundColor;
     private string? _externalEditorArguments;
     private string? _externalEditorPath;
     private bool _isDebugModeEnabled;
     private bool _isEnabled;
     private bool _isCustomTerminalSelected;
     private bool _isTerminalPresetLocked;
+    private bool _isEditingDarkColors;
+    private bool _isEditingLightColors;
     private FileLabel _pathStyle;
+    private string _copyFromOtherColorModeButtonText = string.Empty;
+    private string _currentEditorAppearanceText = string.Empty;
+    private EditorColorMode _selectedColorMode;
     private TerminalProfile _selectedTerminalProfile;
     private string? _terminalArguments;
     private string _terminalArgumentsDisplay = string.Empty;
@@ -125,6 +134,16 @@ public class OptionsPageViewModel : ObservableObject
     /// Gets the command to browse for a terminal executable.
     /// </summary>
     public ICommand BrowseForTerminalCommand { get; }
+
+    /// <summary>
+    /// Gets the command to copy colors from the non-selected color set.
+    /// </summary>
+    public ICommand CopyFromOtherColorModeCommand { get; }
+
+    /// <summary>
+    /// Gets the command to reset the selected color set to defaults.
+    /// </summary>
+    public ICommand ResetCurrentColorModeCommand { get; }
 
     /// <summary>
     /// Gets or sets a value indicating whether a feature is enabled.
@@ -439,6 +458,87 @@ public class OptionsPageViewModel : ObservableObject
         private set => this.SetProperty(ref this._terminalPresetHint, value);
     }
 
+    public string CurrentEditorAppearanceText
+    {
+        get => this._currentEditorAppearanceText;
+        private set => this.SetProperty(ref this._currentEditorAppearanceText, value);
+    }
+
+    /// <summary>
+    /// Gets or sets the foreground color that is applied to all breadcrumb segments in the selected color set.
+    /// </summary>
+    public Color BulkBreadcrumbForegroundColor
+    {
+        get => this._bulkBreadcrumbForegroundColor;
+        set => this.ApplyForegroundColorToAllSegments(value);
+    }
+
+    /// <summary>
+    /// Gets or sets the background color that is applied to all breadcrumb segments in the selected color set.
+    /// </summary>
+    public Color BulkBreadcrumbBackgroundColor
+    {
+        get => this._bulkBreadcrumbBackgroundColor;
+        set => this.ApplyBackgroundColorToAllSegments(value);
+    }
+
+    /// <summary>
+    /// Gets the text for the copy-colors action.
+    /// </summary>
+    public string CopyFromOtherColorModeButtonText
+    {
+        get => this._copyFromOtherColorModeButtonText;
+        private set => this.SetProperty(ref this._copyFromOtherColorModeButtonText, value);
+    }
+
+    public EditorColorMode SelectedColorMode
+    {
+        get => this._selectedColorMode;
+        set
+        {
+            if (this.SetProperty(ref this._selectedColorMode, value))
+            {
+                this.UpdateSelectedColorModePresentation(value);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the light appearance color set is being edited.
+    /// </summary>
+    public bool IsEditingLightColors
+    {
+        get => this._isEditingLightColors;
+        set
+        {
+            if (this.SetProperty(ref this._isEditingLightColors, value))
+            {
+                if (value)
+                {
+                    this.SelectedColorMode = EditorColorMode.Light;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the dark appearance color set is being edited.
+    /// </summary>
+    public bool IsEditingDarkColors
+    {
+        get => this._isEditingDarkColors;
+        set
+        {
+            if (this.SetProperty(ref this._isEditingDarkColors, value))
+            {
+                if (value)
+                {
+                    this.SelectedColorMode = EditorColorMode.Dark;
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// Gets or sets a value indicating whether debug mode is enabled.
     /// </summary>
@@ -455,6 +555,10 @@ public class OptionsPageViewModel : ObservableObject
     {
         this.BrowseForExternalEditorCommand = new DispatchedDelegateCommand(this.ExecuteBrowseForExternalEditorCommand);
         this.BrowseForTerminalCommand = new DispatchedDelegateCommand(this.ExecuteBrowseForTerminalCommand);
+        this.CopyFromOtherColorModeCommand = new DispatchedDelegateCommand(_ => this.CopyFromOtherColorMode());
+        this.ResetCurrentColorModeCommand = new DispatchedDelegateCommand(_ => this.ResetCurrentColorModeToDefaults());
+        this._selectedColorMode = EditorAppearanceHelper.GetCurrentMode();
+        this.UpdateSelectedColorModePresentation(this._selectedColorMode);
         this.UpdateTerminalPresentation();
     }
 
@@ -514,34 +618,50 @@ public class OptionsPageViewModel : ObservableObject
             this.DoubleClickCtrlActionOnFileLabel = model.AlternateFileAction;
 
             this.SolutionRootSegment.IsVisible = model.ShowSolutionRoot;
-            this.SolutionRootSegment.ForegroundColor = model.SolutionForeground.ToMediaColor();
-            this.SolutionRootSegment.BackgroundColor = model.SolutionBackground.ToMediaColor();
-            this.NonSolutionRootSegment.ForegroundColor = model.NonSolutionRootForeground.ToMediaColor();
-            this.NonSolutionRootSegment.BackgroundColor = model.NonSolutionRootBackground.ToMediaColor();
+            this.SolutionRootSegment.DarkForegroundColor = model.SolutionForeground.ToMediaColor();
+            this.SolutionRootSegment.DarkBackgroundColor = model.SolutionBackground.ToMediaColor();
+            this.SolutionRootSegment.LightForegroundColor = model.LightSolutionForeground.ToMediaColor();
+            this.SolutionRootSegment.LightBackgroundColor = model.LightSolutionBackground.ToMediaColor();
+            this.NonSolutionRootSegment.DarkForegroundColor = model.NonSolutionRootForeground.ToMediaColor();
+            this.NonSolutionRootSegment.DarkBackgroundColor = model.NonSolutionRootBackground.ToMediaColor();
+            this.NonSolutionRootSegment.LightForegroundColor = model.LightNonSolutionRootForeground.ToMediaColor();
+            this.NonSolutionRootSegment.LightBackgroundColor = model.LightNonSolutionRootBackground.ToMediaColor();
 
             this.SolutionFolderSegment.IsVisible = model.ShowSolutionFolders;
-            this.SolutionFolderSegment.ForegroundColor = model.SolutionFolderForeground.ToMediaColor();
-            this.SolutionFolderSegment.BackgroundColor = model.SolutionFolderBackground.ToMediaColor();
+            this.SolutionFolderSegment.DarkForegroundColor = model.SolutionFolderForeground.ToMediaColor();
+            this.SolutionFolderSegment.DarkBackgroundColor = model.SolutionFolderBackground.ToMediaColor();
+            this.SolutionFolderSegment.LightForegroundColor = model.LightSolutionFolderForeground.ToMediaColor();
+            this.SolutionFolderSegment.LightBackgroundColor = model.LightSolutionFolderBackground.ToMediaColor();
 
             this.ProjectNameSegment.IsVisible = model.ShowProject;
-            this.ProjectNameSegment.ForegroundColor = model.ProjectForeground.ToMediaColor();
-            this.ProjectNameSegment.BackgroundColor = model.ProjectBackground.ToMediaColor();
+            this.ProjectNameSegment.DarkForegroundColor = model.ProjectForeground.ToMediaColor();
+            this.ProjectNameSegment.DarkBackgroundColor = model.ProjectBackground.ToMediaColor();
+            this.ProjectNameSegment.LightForegroundColor = model.LightProjectForeground.ToMediaColor();
+            this.ProjectNameSegment.LightBackgroundColor = model.LightProjectBackground.ToMediaColor();
 
             this.ProjectFolderSegments.IsVisible = model.ShowProjectFolders;
-            this.ProjectFolderSegments.ForegroundColor = model.ProjectFoldersForeground.ToMediaColor();
-            this.ProjectFolderSegments.BackgroundColor = model.ProjectFoldersBackground.ToMediaColor();
+            this.ProjectFolderSegments.DarkForegroundColor = model.ProjectFoldersForeground.ToMediaColor();
+            this.ProjectFolderSegments.DarkBackgroundColor = model.ProjectFoldersBackground.ToMediaColor();
+            this.ProjectFolderSegments.LightForegroundColor = model.LightProjectFoldersForeground.ToMediaColor();
+            this.ProjectFolderSegments.LightBackgroundColor = model.LightProjectFoldersBackground.ToMediaColor();
 
             this.ParentFolderSegment.IsVisible = model.ShowParentFolder;
-            this.ParentFolderSegment.ForegroundColor = model.ParentFolderForeground.ToMediaColor();
-            this.ParentFolderSegment.BackgroundColor = model.ParentFolderBackground.ToMediaColor();
+            this.ParentFolderSegment.DarkForegroundColor = model.ParentFolderForeground.ToMediaColor();
+            this.ParentFolderSegment.DarkBackgroundColor = model.ParentFolderBackground.ToMediaColor();
+            this.ParentFolderSegment.LightForegroundColor = model.LightParentFolderForeground.ToMediaColor();
+            this.ParentFolderSegment.LightBackgroundColor = model.LightParentFolderBackground.ToMediaColor();
 
             this.FileSegment.IsVisible = model.ShowFileNameBreadcrumb;
-            this.FileSegment.ForegroundColor = model.FileBreadcrumbForeground.ToMediaColor();
-            this.FileSegment.BackgroundColor = model.FileBreadcrumbBackground.ToMediaColor();
+            this.FileSegment.DarkForegroundColor = model.FileBreadcrumbForeground.ToMediaColor();
+            this.FileSegment.DarkBackgroundColor = model.FileBreadcrumbBackground.ToMediaColor();
+            this.FileSegment.LightForegroundColor = model.LightFileBreadcrumbForeground.ToMediaColor();
+            this.FileSegment.LightBackgroundColor = model.LightFileBreadcrumbBackground.ToMediaColor();
 
             this.CodeStructureSegment.IsVisible = model.ShowCodeStructureBreadcrumbs;
-            this.CodeStructureSegment.ForegroundColor = model.StructureBreadcrumbForeground.ToMediaColor();
-            this.CodeStructureSegment.BackgroundColor = model.StructureBreadcrumbBackground.ToMediaColor();
+            this.CodeStructureSegment.DarkForegroundColor = model.StructureBreadcrumbForeground.ToMediaColor();
+            this.CodeStructureSegment.DarkBackgroundColor = model.StructureBreadcrumbBackground.ToMediaColor();
+            this.CodeStructureSegment.LightForegroundColor = model.LightStructureBreadcrumbForeground.ToMediaColor();
+            this.CodeStructureSegment.LightBackgroundColor = model.LightStructureBreadcrumbBackground.ToMediaColor();
 
             this.ExternalEditorPath = model.ExternalEditorCommand ?? string.Empty;
             this.ExternalEditorArguments = model.ExternalEditorCommandArguments ?? string.Empty;
@@ -550,6 +670,12 @@ public class OptionsPageViewModel : ObservableObject
             this.SelectedTerminalProfile = Launcher.NormalizeSupportedTerminalProfile(model.TerminalProfile);
 
             this.IsDebugModeEnabled = model.DebugMode;
+            var currentMode = EditorAppearanceHelper.GetCurrentMode();
+            this.CurrentEditorAppearanceText =
+                $"Current editor appearance: {currentMode}. Editor Bar uses the editor appearance when available and falls back to the IDE theme.";
+            this.SelectedColorMode = currentMode;
+            this.UpdateSelectedColorModePresentation(currentMode);
+            this.SyncBulkBreadcrumbColorsFromSegments();
         }
         catch (Exception ex)
         {
@@ -565,64 +691,7 @@ public class OptionsPageViewModel : ObservableObject
     {
         try
         {
-            model.Enabled = this.IsEnabled;
-            model.BarPosition = this.BarPosition;
-            model.DisplayStyle = this.DisplayStyle;
-            model.VisualStyle = this.VisualStyle;
-            model.FileLabelStyle = this.PathStyle;
-
-            model.DisplayInAuxiliaryDocuments = this.DisplayInAuxiliaryDocuments;
-            model.DisplayInNonEditableDocuments = this.DisplayInNonEditableDocuments;
-            model.DisplayInDiffViews = this.DisplayInDiffViews;
-            model.DisplayInBlame = this.DisplayInBlame;
-            model.DisplayInTempFiles = this.DisplayInTemp;
-            model.ShowMemberListFilterBoxWhenEmpty = this.DisplayMemberListFilterBoxWhenEmpty;
-            model.ShowOpenDefaultEditorButton = this.DisplayOpenDefaultEditorButton;
-            model.ShowOpenExternalEditorButton = this.DisplayOpenExternalEditorButton;
-            model.ShowOpenContainingFolderButton = this.DisplayOpenContainingFolderButton;
-            model.ShowOpenTerminalButton = this.DisplayOpenTerminalButton;
-
-            model.FileAction = this.DoubleClickActionOnFileLabel;
-            model.AlternateFileAction = this.DoubleClickCtrlActionOnFileLabel;
-
-            model.ShowSolutionRoot = this.SolutionRootSegment.IsVisible;
-            model.SolutionForeground = this.SolutionRootSegment.ForegroundColor.ToDrawingColor();
-            model.SolutionBackground = this.SolutionRootSegment.BackgroundColor.ToDrawingColor();
-            model.NonSolutionRootForeground = this.NonSolutionRootSegment.ForegroundColor.ToDrawingColor();
-            model.NonSolutionRootBackground = this.NonSolutionRootSegment.BackgroundColor.ToDrawingColor();
-
-            model.ShowSolutionFolders = this.SolutionFolderSegment.IsVisible;
-            model.SolutionFolderForeground = this.SolutionFolderSegment.ForegroundColor.ToDrawingColor();
-            model.SolutionFolderBackground = this.SolutionFolderSegment.BackgroundColor.ToDrawingColor();
-
-            model.ShowProject = this.ProjectNameSegment.IsVisible;
-            model.ProjectForeground = this.ProjectNameSegment.ForegroundColor.ToDrawingColor();
-            model.ProjectBackground = this.ProjectNameSegment.BackgroundColor.ToDrawingColor();
-
-            model.ShowProjectFolders = this.ProjectFolderSegments.IsVisible;
-            model.ProjectFoldersForeground = this.ProjectFolderSegments.ForegroundColor.ToDrawingColor();
-            model.ProjectFoldersBackground = this.ProjectFolderSegments.BackgroundColor.ToDrawingColor();
-
-            model.ShowParentFolder = this.ParentFolderSegment.IsVisible;
-            model.ParentFolderForeground = this.ParentFolderSegment.ForegroundColor.ToDrawingColor();
-            model.ParentFolderBackground = this.ParentFolderSegment.BackgroundColor.ToDrawingColor();
-
-            model.ShowFileNameBreadcrumb = this.FileSegment.IsVisible;
-            model.FileBreadcrumbForeground = this.FileSegment.ForegroundColor.ToDrawingColor();
-            model.FileBreadcrumbBackground = this.FileSegment.BackgroundColor.ToDrawingColor();
-
-            model.ShowCodeStructureBreadcrumbs = this.CodeStructureSegment.IsVisible;
-            model.StructureBreadcrumbForeground = this.CodeStructureSegment.ForegroundColor.ToDrawingColor();
-            model.StructureBreadcrumbBackground = this.CodeStructureSegment.BackgroundColor.ToDrawingColor();
-
-            model.ExternalEditorCommand = (this.ExternalEditorPath ?? string.Empty).Trim();
-            model.ExternalEditorCommandArguments = (this.ExternalEditorArguments ?? string.Empty).Trim();
-            model.TerminalProfile = Launcher.NormalizeSupportedTerminalProfile(this.SelectedTerminalProfile);
-            model.TerminalCommand = (this.TerminalPath ?? string.Empty).Trim();
-            model.TerminalCommandArguments = (this.TerminalArguments ?? string.Empty).Trim();
-
-            model.DebugMode = this.IsDebugModeEnabled;
-
+            this.ApplyToModel(model);
             model.Save();
         }
         catch (Exception ex)
@@ -631,9 +700,250 @@ public class OptionsPageViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Applies the current view-model values to the specified model without saving it.
+    /// </summary>
+    /// <param name="model">The model to update.</param>
+    public void ApplyToModel(GeneralOptionsModel model)
+    {
+        this.ApplyGeneralSettingsToModel(model);
+        this.ApplyColorSettingsToModel(model);
+    }
+
+    /// <summary>
+    /// Applies the general, visibility, action, and local-tool settings to the specified model.
+    /// </summary>
+    /// <param name="model">The model to update.</param>
+    public void ApplyGeneralSettingsToModel(GeneralOptionsModel model)
+    {
+        model.Enabled = this.IsEnabled;
+        model.BarPosition = this.BarPosition;
+        model.DisplayStyle = this.DisplayStyle;
+        model.VisualStyle = this.VisualStyle;
+        model.FileLabelStyle = this.PathStyle;
+
+        model.DisplayInAuxiliaryDocuments = this.DisplayInAuxiliaryDocuments;
+        model.DisplayInNonEditableDocuments = this.DisplayInNonEditableDocuments;
+        model.DisplayInDiffViews = this.DisplayInDiffViews;
+        model.DisplayInBlame = this.DisplayInBlame;
+        model.DisplayInTempFiles = this.DisplayInTemp;
+        model.ShowMemberListFilterBoxWhenEmpty = this.DisplayMemberListFilterBoxWhenEmpty;
+        model.ShowOpenDefaultEditorButton = this.DisplayOpenDefaultEditorButton;
+        model.ShowOpenExternalEditorButton = this.DisplayOpenExternalEditorButton;
+        model.ShowOpenContainingFolderButton = this.DisplayOpenContainingFolderButton;
+        model.ShowOpenTerminalButton = this.DisplayOpenTerminalButton;
+        model.ShowSolutionRoot = this.SolutionRootSegment.IsVisible;
+        model.ShowSolutionFolders = this.SolutionFolderSegment.IsVisible;
+        model.ShowProject = this.ProjectNameSegment.IsVisible;
+        model.ShowProjectFolders = this.ProjectFolderSegments.IsVisible;
+        model.ShowParentFolder = this.ParentFolderSegment.IsVisible;
+        model.ShowFileNameBreadcrumb = this.FileSegment.IsVisible;
+        model.ShowCodeStructureBreadcrumbs = this.CodeStructureSegment.IsVisible;
+
+        model.FileAction = this.DoubleClickActionOnFileLabel;
+        model.AlternateFileAction = this.DoubleClickCtrlActionOnFileLabel;
+
+        model.ExternalEditorCommand = (this.ExternalEditorPath ?? string.Empty).Trim();
+        model.ExternalEditorCommandArguments = (this.ExternalEditorArguments ?? string.Empty).Trim();
+        model.TerminalProfile = Launcher.NormalizeSupportedTerminalProfile(this.SelectedTerminalProfile);
+        model.TerminalCommand = (this.TerminalPath ?? string.Empty).Trim();
+        model.TerminalCommandArguments = (this.TerminalArguments ?? string.Empty).Trim();
+
+        model.DebugMode = this.IsDebugModeEnabled;
+    }
+
+    /// <summary>
+    /// Applies only breadcrumb visibility and color settings to the specified model.
+    /// </summary>
+    /// <param name="model">The model to update.</param>
+    public void ApplyColorSettingsToModel(GeneralOptionsModel model)
+    {
+        model.SolutionForeground = this.SolutionRootSegment.DarkForegroundColor.ToDrawingColor();
+        model.SolutionBackground = this.SolutionRootSegment.DarkBackgroundColor.ToDrawingColor();
+        model.LightSolutionForeground = this.SolutionRootSegment.LightForegroundColor.ToDrawingColor();
+        model.LightSolutionBackground = this.SolutionRootSegment.LightBackgroundColor.ToDrawingColor();
+        model.NonSolutionRootForeground = this.NonSolutionRootSegment.DarkForegroundColor.ToDrawingColor();
+        model.NonSolutionRootBackground = this.NonSolutionRootSegment.DarkBackgroundColor.ToDrawingColor();
+        model.LightNonSolutionRootForeground = this.NonSolutionRootSegment.LightForegroundColor.ToDrawingColor();
+        model.LightNonSolutionRootBackground = this.NonSolutionRootSegment.LightBackgroundColor.ToDrawingColor();
+
+        model.SolutionFolderForeground = this.SolutionFolderSegment.DarkForegroundColor.ToDrawingColor();
+        model.SolutionFolderBackground = this.SolutionFolderSegment.DarkBackgroundColor.ToDrawingColor();
+        model.LightSolutionFolderForeground = this.SolutionFolderSegment.LightForegroundColor.ToDrawingColor();
+        model.LightSolutionFolderBackground = this.SolutionFolderSegment.LightBackgroundColor.ToDrawingColor();
+
+        model.ProjectForeground = this.ProjectNameSegment.DarkForegroundColor.ToDrawingColor();
+        model.ProjectBackground = this.ProjectNameSegment.DarkBackgroundColor.ToDrawingColor();
+        model.LightProjectForeground = this.ProjectNameSegment.LightForegroundColor.ToDrawingColor();
+        model.LightProjectBackground = this.ProjectNameSegment.LightBackgroundColor.ToDrawingColor();
+
+        model.ProjectFoldersForeground = this.ProjectFolderSegments.DarkForegroundColor.ToDrawingColor();
+        model.ProjectFoldersBackground = this.ProjectFolderSegments.DarkBackgroundColor.ToDrawingColor();
+        model.LightProjectFoldersForeground = this.ProjectFolderSegments.LightForegroundColor.ToDrawingColor();
+        model.LightProjectFoldersBackground = this.ProjectFolderSegments.LightBackgroundColor.ToDrawingColor();
+
+        model.ParentFolderForeground = this.ParentFolderSegment.DarkForegroundColor.ToDrawingColor();
+        model.ParentFolderBackground = this.ParentFolderSegment.DarkBackgroundColor.ToDrawingColor();
+        model.LightParentFolderForeground = this.ParentFolderSegment.LightForegroundColor.ToDrawingColor();
+        model.LightParentFolderBackground = this.ParentFolderSegment.LightBackgroundColor.ToDrawingColor();
+
+        model.FileBreadcrumbForeground = this.FileSegment.DarkForegroundColor.ToDrawingColor();
+        model.FileBreadcrumbBackground = this.FileSegment.DarkBackgroundColor.ToDrawingColor();
+        model.LightFileBreadcrumbForeground = this.FileSegment.LightForegroundColor.ToDrawingColor();
+        model.LightFileBreadcrumbBackground = this.FileSegment.LightBackgroundColor.ToDrawingColor();
+
+        model.StructureBreadcrumbForeground = this.CodeStructureSegment.DarkForegroundColor.ToDrawingColor();
+        model.StructureBreadcrumbBackground = this.CodeStructureSegment.DarkBackgroundColor.ToDrawingColor();
+        model.LightStructureBreadcrumbForeground = this.CodeStructureSegment.LightForegroundColor.ToDrawingColor();
+        model.LightStructureBreadcrumbBackground = this.CodeStructureSegment.LightBackgroundColor.ToDrawingColor();
+    }
+
     private void NotifyTerminalPresentationChanged()
     {
         this.UpdateTerminalPresentation();
+    }
+
+    private void UpdateSelectedColorModePresentation(EditorColorMode value)
+    {
+        this.ApplyColorModeToSegments(value);
+        this.SetProperty(ref this._isEditingLightColors, value == EditorColorMode.Light, nameof(this.IsEditingLightColors));
+        this.SetProperty(ref this._isEditingDarkColors, value == EditorColorMode.Dark, nameof(this.IsEditingDarkColors));
+        this.CopyFromOtherColorModeButtonText = value == EditorColorMode.Light
+            ? "Copy colors from Dark"
+            : "Copy colors from Light";
+        this.SyncBulkBreadcrumbColorsFromSegments();
+    }
+
+    private void ApplyColorModeToSegments(EditorColorMode colorMode)
+    {
+        this.SolutionRootSegment.ActiveColorMode = colorMode;
+        this.NonSolutionRootSegment.ActiveColorMode = colorMode;
+        this.SolutionFolderSegment.ActiveColorMode = colorMode;
+        this.ProjectNameSegment.ActiveColorMode = colorMode;
+        this.ProjectFolderSegments.ActiveColorMode = colorMode;
+        this.ParentFolderSegment.ActiveColorMode = colorMode;
+        this.FileSegment.ActiveColorMode = colorMode;
+        this.CodeStructureSegment.ActiveColorMode = colorMode;
+    }
+
+    private void CopyFromOtherColorMode()
+    {
+        var sourceMode = this.SelectedColorMode == EditorColorMode.Light
+            ? EditorColorMode.Dark
+            : EditorColorMode.Light;
+
+        CopySegmentColors(this.SolutionRootSegment, sourceMode, this.SelectedColorMode);
+        CopySegmentColors(this.NonSolutionRootSegment, sourceMode, this.SelectedColorMode);
+        CopySegmentColors(this.SolutionFolderSegment, sourceMode, this.SelectedColorMode);
+        CopySegmentColors(this.ProjectNameSegment, sourceMode, this.SelectedColorMode);
+        CopySegmentColors(this.ProjectFolderSegments, sourceMode, this.SelectedColorMode);
+        CopySegmentColors(this.ParentFolderSegment, sourceMode, this.SelectedColorMode);
+        CopySegmentColors(this.FileSegment, sourceMode, this.SelectedColorMode);
+        CopySegmentColors(this.CodeStructureSegment, sourceMode, this.SelectedColorMode);
+        this.SyncBulkBreadcrumbColorsFromSegments();
+    }
+
+    private static void CopySegmentColors(
+        EditorSegmentOptionsViewModel segment,
+        EditorColorMode sourceMode,
+        EditorColorMode targetMode)
+    {
+        if (sourceMode == EditorColorMode.Light)
+        {
+            if (targetMode == EditorColorMode.Dark)
+            {
+                segment.DarkForegroundColor = segment.LightForegroundColor;
+                segment.DarkBackgroundColor = segment.LightBackgroundColor;
+            }
+        }
+        else if (targetMode == EditorColorMode.Light)
+        {
+            segment.LightForegroundColor = segment.DarkForegroundColor;
+            segment.LightBackgroundColor = segment.DarkBackgroundColor;
+        }
+    }
+
+    private void ApplyForegroundColorToAllSegments(Color color)
+    {
+        foreach (var segment in this.GetColorSegments())
+        {
+            segment.ForegroundColor = color;
+        }
+    }
+
+    private void ApplyBackgroundColorToAllSegments(Color color)
+    {
+        foreach (var segment in this.GetColorSegments())
+        {
+            segment.BackgroundColor = color;
+        }
+    }
+
+    private void ResetCurrentColorModeToDefaults()
+    {
+        var defaultModel = new GeneralOptionsModel();
+
+        if (this.SelectedColorMode == EditorColorMode.Light)
+        {
+            this.SolutionRootSegment.LightForegroundColor = defaultModel.LightSolutionForeground.ToMediaColor();
+            this.SolutionRootSegment.LightBackgroundColor = defaultModel.LightSolutionBackground.ToMediaColor();
+            this.NonSolutionRootSegment.LightForegroundColor = defaultModel.LightNonSolutionRootForeground.ToMediaColor();
+            this.NonSolutionRootSegment.LightBackgroundColor = defaultModel.LightNonSolutionRootBackground.ToMediaColor();
+            this.SolutionFolderSegment.LightForegroundColor = defaultModel.LightSolutionFolderForeground.ToMediaColor();
+            this.SolutionFolderSegment.LightBackgroundColor = defaultModel.LightSolutionFolderBackground.ToMediaColor();
+            this.ProjectNameSegment.LightForegroundColor = defaultModel.LightProjectForeground.ToMediaColor();
+            this.ProjectNameSegment.LightBackgroundColor = defaultModel.LightProjectBackground.ToMediaColor();
+            this.ProjectFolderSegments.LightForegroundColor = defaultModel.LightProjectFoldersForeground.ToMediaColor();
+            this.ProjectFolderSegments.LightBackgroundColor = defaultModel.LightProjectFoldersBackground.ToMediaColor();
+            this.ParentFolderSegment.LightForegroundColor = defaultModel.LightParentFolderForeground.ToMediaColor();
+            this.ParentFolderSegment.LightBackgroundColor = defaultModel.LightParentFolderBackground.ToMediaColor();
+            this.FileSegment.LightForegroundColor = defaultModel.LightFileBreadcrumbForeground.ToMediaColor();
+            this.FileSegment.LightBackgroundColor = defaultModel.LightFileBreadcrumbBackground.ToMediaColor();
+            this.CodeStructureSegment.LightForegroundColor = defaultModel.LightStructureBreadcrumbForeground.ToMediaColor();
+            this.CodeStructureSegment.LightBackgroundColor = defaultModel.LightStructureBreadcrumbBackground.ToMediaColor();
+        }
+        else
+        {
+            this.SolutionRootSegment.DarkForegroundColor = defaultModel.SolutionForeground.ToMediaColor();
+            this.SolutionRootSegment.DarkBackgroundColor = defaultModel.SolutionBackground.ToMediaColor();
+            this.NonSolutionRootSegment.DarkForegroundColor = defaultModel.NonSolutionRootForeground.ToMediaColor();
+            this.NonSolutionRootSegment.DarkBackgroundColor = defaultModel.NonSolutionRootBackground.ToMediaColor();
+            this.SolutionFolderSegment.DarkForegroundColor = defaultModel.SolutionFolderForeground.ToMediaColor();
+            this.SolutionFolderSegment.DarkBackgroundColor = defaultModel.SolutionFolderBackground.ToMediaColor();
+            this.ProjectNameSegment.DarkForegroundColor = defaultModel.ProjectForeground.ToMediaColor();
+            this.ProjectNameSegment.DarkBackgroundColor = defaultModel.ProjectBackground.ToMediaColor();
+            this.ProjectFolderSegments.DarkForegroundColor = defaultModel.ProjectFoldersForeground.ToMediaColor();
+            this.ProjectFolderSegments.DarkBackgroundColor = defaultModel.ProjectFoldersBackground.ToMediaColor();
+            this.ParentFolderSegment.DarkForegroundColor = defaultModel.ParentFolderForeground.ToMediaColor();
+            this.ParentFolderSegment.DarkBackgroundColor = defaultModel.ParentFolderBackground.ToMediaColor();
+            this.FileSegment.DarkForegroundColor = defaultModel.FileBreadcrumbForeground.ToMediaColor();
+            this.FileSegment.DarkBackgroundColor = defaultModel.FileBreadcrumbBackground.ToMediaColor();
+            this.CodeStructureSegment.DarkForegroundColor = defaultModel.StructureBreadcrumbForeground.ToMediaColor();
+            this.CodeStructureSegment.DarkBackgroundColor = defaultModel.StructureBreadcrumbBackground.ToMediaColor();
+        }
+
+        this.SyncBulkBreadcrumbColorsFromSegments();
+    }
+
+    private EditorSegmentOptionsViewModel[] GetColorSegments()
+    {
+        return
+        [
+            this.SolutionRootSegment,
+            this.NonSolutionRootSegment,
+            this.SolutionFolderSegment,
+            this.ProjectNameSegment,
+            this.ProjectFolderSegments,
+            this.ParentFolderSegment,
+            this.FileSegment,
+            this.CodeStructureSegment
+        ];
+    }
+
+    private void SyncBulkBreadcrumbColorsFromSegments()
+    {
+        this.SetProperty(ref this._bulkBreadcrumbForegroundColor, this.FileSegment.ForegroundColor, nameof(this.BulkBreadcrumbForegroundColor));
+        this.SetProperty(ref this._bulkBreadcrumbBackgroundColor, this.FileSegment.BackgroundColor, nameof(this.BulkBreadcrumbBackgroundColor));
     }
 
     private void UpdateTerminalPresentation()

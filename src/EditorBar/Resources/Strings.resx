@@ -141,6 +141,21 @@
   <data name="MiscellaneousFilesName" xml:space="preserve">
     <value>Miscellaneous Files</value>
   </data>
+  <data name="1000" xml:space="preserve">
+    <value>Editor Bar</value>
+  </data>
+  <data name="1001" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="1002" xml:space="preserve">
+    <value>Editor Bar Settings</value>
+  </data>
+  <data name="1003" xml:space="preserve">
+    <value>Exports and imports Editor Bar appearance and behavior settings.</value>
+  </data>
+  <data name="1004" xml:space="preserve">
+    <value>Colors</value>
+  </data>
   <data name="CodeFragment" xml:space="preserve">
     <value>Code Fragment</value>
     <comment>Code Fragment</comment>

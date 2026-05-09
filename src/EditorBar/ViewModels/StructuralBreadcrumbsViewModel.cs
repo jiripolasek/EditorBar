@@ -15,6 +15,7 @@ using JPSoftworks.EditorBar.Commands.Abstractions;
 using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Helpers.Events;
 using JPSoftworks.EditorBar.Helpers.Events.Abstractions;
+using JPSoftworks.EditorBar.Helpers.VisualStudio;
 using JPSoftworks.EditorBar.Options;
 using JPSoftworks.EditorBar.Services;
 using JPSoftworks.EditorBar.Services.StructureProviders;
@@ -95,6 +96,7 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
                 static (structureProvider, settings) => structureProvider.Select(state => (state, settings)))
             .LogAndRetry("Combine active structure provider and settings")
             .Switch()
+            .ObserveOnDispatcher()
             .Subscribe(tuple => this.UpdateFileStructure(tuple.state, tuple.settings!))
             .AddTo(this._disposables);
 
@@ -165,13 +167,14 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
 
     private BreadcrumbModel BuildCrumb(BaseStructureModel baseStructureModel, GeneralOptionsModel options)
     {
+        var colors = options.GetColorSet(EditorAppearanceHelper.GetCurrentMode(this._textView));
         var crumb = baseStructureModel switch
         {
             FileModel fileModel => new StructureBreadcrumbViewModel(
                 fileModel,
                 fileModel.DisplayName,
-                options.FileBreadcrumbBackground,
-                options.FileBreadcrumbForeground)
+                colors.FileBreadcrumbBackground,
+                colors.FileBreadcrumbForeground)
             {
                 ItemsProvider = fileModel.CanHaveChildren ? () => this.GetChildrenItemsAsync(fileModel) : null,
                 ImageMoniker = GetMonikerForFile(fileModel),
@@ -180,8 +183,8 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
             TypeModel typeModel => new StructureBreadcrumbViewModel(
                 typeModel,
                 typeModel.DisplayName,
-                options.StructureBreadcrumbBackground,
-                options.StructureBreadcrumbForeground)
+                colors.StructureBreadcrumbBackground,
+                colors.StructureBreadcrumbForeground)
             {
                 ItemsProvider = typeModel.CanHaveChildren ? () => this.GetChildrenItemsAsync(typeModel) : null,
                 ContextCommand = new DispatchedDelegateCommand(this.OpenContextMenuOnTypeCrumb)
@@ -189,24 +192,24 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
             FunctionModel methodModel => new StructureBreadcrumbViewModel(
                 methodModel,
                 methodModel.DisplayName,
-                options.StructureBreadcrumbBackground,
-                options.StructureBreadcrumbForeground)
+                colors.StructureBreadcrumbBackground,
+                colors.StructureBreadcrumbForeground)
             {
                 ContextCommand = new DispatchedDelegateCommand(this.OpenContextMenuOnMemberCrumb)
             },
             TypeMemberModel memberModel => new StructureBreadcrumbViewModel(
                 memberModel,
                 memberModel.DisplayName,
-                options.StructureBreadcrumbBackground,
-                options.StructureBreadcrumbForeground)
+                colors.StructureBreadcrumbBackground,
+                colors.StructureBreadcrumbForeground)
             {
                 ContextCommand = new DispatchedDelegateCommand(this.OpenContextMenuOnMemberCrumb)
             },
             { } model => new StructureBreadcrumbViewModel(
                 baseStructureModel,
                 baseStructureModel.DisplayName,
-                options.StructureBreadcrumbBackground,
-                options.StructureBreadcrumbForeground)
+                colors.StructureBreadcrumbBackground,
+                colors.StructureBreadcrumbForeground)
             {
                 ItemsProvider = model.CanHaveChildren ? () => this.GetChildrenItemsAsync(model) : null
             }

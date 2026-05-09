@@ -5,6 +5,7 @@
 #nullable enable
 
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Media;
 using JPSoftworks.EditorBar.Helpers.Presentation;
@@ -56,6 +57,7 @@ public partial class ColorButton
         if (colorDialog.ShowDialog() == DialogResult.OK)
         {
             this.SelectedColor = colorDialog.Color.ToMediaColor();
+            BindingOperations.GetBindingExpression(this, SelectedColorProperty)?.UpdateSource();
         }
     }
 
@@ -70,6 +72,7 @@ public partial class ColorButton
         if (sender is Button { Tag: Color color })
         {
             this.SelectedColor = color;
+            BindingOperations.GetBindingExpression(this, SelectedColorProperty)?.UpdateSource();
             this.Popup!.IsOpen = false;
         }
     }
