@@ -83,7 +83,7 @@
                     <Setter Property="Margin" Value="0,1,0,1" />
                     <EventSetter Event="Expanded" Handler="TreeViewItem_OnExpanded" />
                     <EventSetter Event="Loaded" Handler="TreeViewItem_OnLoaded" />
-                    <EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_OnMouseDoubleClick" />
+                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="TreeViewItem_OnPreviewMouseLeftButtonDown" />
                 </Style>
             </TreeView.ItemContainerStyle>
         </TreeView>

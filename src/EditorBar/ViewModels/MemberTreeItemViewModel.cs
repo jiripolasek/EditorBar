@@ -30,6 +30,8 @@ public sealed class MemberTreeItemViewModel
 
     public bool AutoExpand { get; init; }
 
+    public bool ExpandOnActivate { get; init; }
+
     public bool InvokeOnActivate { get; init; }
 
     internal bool IsPlaceholder { get; init; }

@@ -120,6 +120,7 @@ internal static class LocationBreadcrumbTreeBuilder
             SearchText = string.Join(" ", new[] { primaryName, item.Name, item.FullPath }.Where(static value => !string.IsNullOrWhiteSpace(value))),
             ImageMoniker = GetSolutionItemMoniker(item),
             ChildrenProvider = canHaveChildren ? () => CreateSolutionItemChildrenAsync(item) : null,
+            ExpandOnActivate = ShouldExpandOnActivate(item, canHaveChildren),
             Command = canHaveChildren && !IsActivatableFileItem(item) ? null : CreateLeafCommand(item),
             InvokeOnActivate = IsActivatableFileItem(item)
         };
@@ -136,6 +137,7 @@ internal static class LocationBreadcrumbTreeBuilder
             PrimaryName = Path.GetFileName(directoryPath),
             SearchText = directoryPath,
             ImageMoniker = KnownMonikers.FolderOpened,
+            ExpandOnActivate = true,
             ChildrenProvider = hasEntries ? () => CreateDirectoryItemsAsync(directoryPath) : null
         };
 
@@ -214,6 +216,11 @@ internal static class LocationBreadcrumbTreeBuilder
     private static bool IsActivatableFileItem(SolutionItem item)
     {
         return item.Type == SolutionItemType.PhysicalFile && HasExistingFile(item);
+    }
+
+    private static bool ShouldExpandOnActivate(SolutionItem item, bool canHaveChildren)
+    {
+        return canHaveChildren && !IsActivatableFileItem(item);
     }
 
     private static StackedImageMoniker GetSolutionItemMoniker(SolutionItem item)
