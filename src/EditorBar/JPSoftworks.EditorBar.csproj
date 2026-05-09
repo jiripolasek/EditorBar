@@ -92,6 +92,7 @@
     <Compile Include="Commands\Location\BaseLocationMenuContextCommand`1.cs" />
     <Compile Include="Commands\Location\BasePhysicalLocationContextMenuCommand`1.cs" />
     <Compile Include="Commands\Location\LocateProjectInSolutionExplorerCommand.cs" />
+    <Compile Include="Commands\Location\LocateSolutionFolderInSolutionExplorerCommand.cs" />
     <Compile Include="Commands\Location\LocatePhysicalDirectoryInSolutionExplorerCommand.cs" />
     <Compile Include="Commands\Location\OpenPhysicalDirectoryInTerminalCommand.cs" />
     <Compile Include="Commands\Location\OpenProjectInTerminalCommand.cs" />
@@ -151,6 +152,7 @@
     <Compile Include="Commands\Location\CopyFullPathContainingFolderCommand.cs" />
     <Compile Include="Commands\Location\CopyPhysicalDirectoryFullPathContainingFolderCommand.cs" />
     <Compile Include="Commands\Location\LocationBreadcrumbMenuContext.cs" />
+    <Compile Include="Commands\Location\SolutionFolderBreadcrumbMenuContext.cs" />
     <Compile Include="Commands\Location\OpenProjectContainingFolderCommand.cs" />
     <Compile Include="Commands\Location\OpenPhysicalDirectoryContainingFolderCommand.cs" />
     <Compile Include="Commands\Structural\CopyDocIdCommand.cs" />
