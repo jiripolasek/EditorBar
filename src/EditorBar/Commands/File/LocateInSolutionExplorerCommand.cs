@@ -6,7 +6,6 @@
 
 using Community.VisualStudio.Toolkit;
 using JPSoftworks.EditorBar.Helpers;
-using Microsoft.VisualStudio.Text;
 
 namespace JPSoftworks.EditorBar.Commands;
 
@@ -15,10 +14,10 @@ namespace JPSoftworks.EditorBar.Commands;
 internal sealed class LocateInSolutionExplorerCommand
     : BaseFileActionMenuContextCommand<LocateInSolutionExplorerCommand>
 {
-    protected override Task ExecuteCoreAsync(ITextDocument currentDocument)
+    protected override Task ExecuteCoreAsync(string filePath)
     {
-        return !string.IsNullOrWhiteSpace(currentDocument.FilePath!)
-            ? ProjectProperties.SelectInSolutionExplorerAsync(currentDocument.FilePath!)
+        return !string.IsNullOrWhiteSpace(filePath)
+            ? ProjectProperties.SelectInSolutionExplorerAsync(filePath)
             : Task.CompletedTask;
     }
 }

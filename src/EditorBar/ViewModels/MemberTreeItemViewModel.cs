@@ -24,6 +24,8 @@ public sealed class MemberTreeItemViewModel
 
     public object? CommandParameter { get; init; }
 
+    public ICommand? ContextCommand { get; init; }
+
     public Func<Task<IList<MemberTreeItemViewModel>>>? ChildrenProvider { get; init; }
 
     public ObservableCollection<MemberTreeItemViewModel> Children { get; } = [];

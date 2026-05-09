@@ -6,7 +6,6 @@
 
 using Community.VisualStudio.Toolkit;
 using JPSoftworks.EditorBar.Helpers;
-using Microsoft.VisualStudio.Text;
 
 namespace JPSoftworks.EditorBar.Commands;
 
@@ -18,9 +17,9 @@ namespace JPSoftworks.EditorBar.Commands;
 internal sealed class CopyFullPathToClipboardCommand
     : BaseFileActionMenuContextCommand<CopyFullPathToClipboardCommand>
 {
-    protected override Task ExecuteCoreAsync(ITextDocument currentDocument)
+    protected override Task ExecuteCoreAsync(string filePath)
     {
-        Launcher.CopyAbsolutePath(currentDocument.FilePath);
+        Launcher.CopyAbsolutePath(filePath);
         return Task.CompletedTask;
     }
 }

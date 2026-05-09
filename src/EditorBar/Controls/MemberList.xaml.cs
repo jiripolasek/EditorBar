@@ -5,12 +5,14 @@
 #nullable enable
 
 using System.Collections;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using JPSoftworks.EditorBar.Options;
 using JPSoftworks.EditorBar.ViewModels;
+using Microsoft.VisualStudio.Threading;
 
 namespace JPSoftworks.EditorBar.Controls;
 
@@ -122,32 +124,39 @@ public partial class MemberList : UserControl
         }
     }
 
-    private void FilterTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    private void ListBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
     {
-        var view = this._collectionViewSource.View;
+        this.SelectFirstItemForFocusedList();
+    }
 
-        if (string.IsNullOrEmpty(this.FilterTextBox!.Text))
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD100:Avoid async void methods", Justification = "Event handler")]
+    private async void FilterTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        try
         {
-            this.ApplyEmptyFilterVisibilityPreference();
+            var view = this._collectionViewSource.View;
+            var shouldReturnFocusToList = string.IsNullOrEmpty(this.FilterTextBox!.Text);
 
-            // Return focus to list so user can continue navigating immediately
-            this.ListBox!.Focus();
-            if (view != null && !view.IsEmpty)
+            if (shouldReturnFocusToList)
             {
-                if (this.ListBox.SelectedIndex < 0)
-                {
-                    view.MoveCurrentToFirst();
-                    this.ListBox.SelectedIndex = 0;
-                }
-                else
-                {
-                    _ = view.MoveCurrentToPosition(this.ListBox.SelectedIndex);
-                }
+                this.ApplyEmptyFilterVisibilityPreference();
+            }
+
+            this.UpdateFilterPredicate();
+            view?.Refresh();
+
+            if (shouldReturnFocusToList)
+            {
+                // Return focus only after the refreshed view is in place, otherwise selection can be cleared again.
+                await Task.Yield();
+                this.ListBox!.Focus();
+                this.SelectFirstItemForFocusedList();
             }
         }
-
-        this.UpdateFilterPredicate();
-        view?.Refresh();
+        catch (Exception ex)
+        {
+            await ex.LogAsync();
+        }
     }
 
     private void FilterTextBox_OnKeyDown(object sender, KeyEventArgs e)
@@ -380,5 +389,27 @@ public partial class MemberList : UserControl
         this.FilterTextBox.Visibility = this._showFilterBoxWhenEmpty
             ? Visibility.Visible
             : Visibility.Collapsed;
+    }
+
+    private void SelectFirstItemForFocusedList()
+    {
+        var view = this._collectionViewSource.View;
+        if (view == null || view.IsEmpty || this.ListBox == null)
+        {
+            return;
+        }
+
+        for (var i = 0; i < this.ListBox.Items.Count; i++)
+        {
+            if (this.ListBox.Items[i] is SeparatorListItemViewModel)
+            {
+                continue;
+            }
+
+            this.ListBox.SelectedIndex = i;
+            _ = view.MoveCurrentToPosition(i);
+            this.ListBox.ScrollIntoView(this.ListBox.Items[i]);
+            return;
+        }
     }
 }

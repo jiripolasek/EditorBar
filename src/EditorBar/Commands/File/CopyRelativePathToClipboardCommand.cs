@@ -7,7 +7,6 @@
 using Community.VisualStudio.Toolkit;
 using JPSoftworks.EditorBar.Helpers;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Text;
 
 namespace JPSoftworks.EditorBar.Commands;
 
@@ -20,9 +19,9 @@ namespace JPSoftworks.EditorBar.Commands;
 internal sealed class CopyRelativePathToClipboardCommand
     : BaseFileActionMenuContextCommand<CopyRelativePathToClipboardCommand>
 {
-    protected override async Task ExecuteCoreAsync(ITextDocument currentDocument)
+    protected override async Task ExecuteCoreAsync(string filePath)
     {
         await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync();
-        Launcher.CopyRelativePathFromFullPath(currentDocument.FilePath);
+        Launcher.CopyRelativePathFromFullPath(filePath);
     }
 }

@@ -5,7 +5,6 @@
 #nullable enable
 
 using JPSoftworks.EditorBar.Commands.Abstractions;
-using Microsoft.VisualStudio.Text;
 
 namespace JPSoftworks.EditorBar.Commands;
 
@@ -28,13 +27,13 @@ internal abstract class BaseFileActionMenuContextCommand<TCommand>
     /// <returns>A task representing the asynchronous operation.</returns>
     protected override Task ExecuteCoreAsync(FileActionMenuContext context)
     {
-        return this.ExecuteCoreAsync(context.CurrentDocument!);
+        return this.ExecuteCoreAsync(context.TargetFilePath!);
     }
 
     /// <summary>
-    /// Executes the core asynchronous operation using the current document.
+    /// Executes the core asynchronous operation using the target file path.
     /// </summary>
-    /// <param name="currentDocument">The current document. Caller ensures that the value is not null when the method is invoked.</param>
+    /// <param name="filePath">The file path. Caller ensures that the value is not null when the method is invoked.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    protected abstract Task ExecuteCoreAsync(ITextDocument currentDocument);
+    protected abstract Task ExecuteCoreAsync(string filePath);
 }

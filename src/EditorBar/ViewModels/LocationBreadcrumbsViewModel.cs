@@ -235,8 +235,8 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                     {
                         AssociatedDirectory = solutionRootPath,
                         TreeItemsProvider = project is GenericProjectInfo
-                            ? LocationBreadcrumbTreeBuilder.CreateSolutionRootItemsAsync
-                            : () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(solutionRootPath),
+                            ? () => LocationBreadcrumbTreeBuilder.CreateSolutionRootItemsAsync(this._textView)
+                            : () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(solutionRootPath, this._textView),
                         ContextCommand = this._openMenuOnPhysicalCrumb
                     }
                     : new BreadcrumbModel(
@@ -251,7 +251,7 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                     colors.NonSolutionRootForeground)
                 {
                     AssociatedDirectory = fsProject.DirectoryPath,
-                    TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(fsProject.DirectoryPath),
+                    TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(fsProject.DirectoryPath, this._textView),
                     ContextCommand = this._openMenuOnPhysicalCrumb
                 },
 
@@ -281,7 +281,7 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                         colors.SolutionFolderBackground,
                         colors.SolutionFolderForeground)
                     {
-                        TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateSolutionItemChildrenAsync(folder),
+                        TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateSolutionItemChildrenAsync(folder, this._textView),
                         ContextCommand = this._openMenuOnSolutionFolderCrumb
                     }));
         }
@@ -303,7 +303,8 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                             AssociatedDirectory = p.DirectoryPath,
                             TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateProjectItemsAsync(
                                 p,
-                                this._switchProjectCommand),
+                                this._switchProjectCommand,
+                                this._textView),
                             ContextCommand = this._openMenuOnProjectCrumb
                         },
 
@@ -315,7 +316,7 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                     {
                         AssociatedDirectory = project.DirectoryPath,
                         TreeItemsProvider = solutionProject is GenericProjectInfo gp
-                            ? () => LocationBreadcrumbTreeBuilder.CreateProjectItemsAsync(gp, this._switchProjectCommand)
+                            ? () => LocationBreadcrumbTreeBuilder.CreateProjectItemsAsync(gp, this._switchProjectCommand, this._textView)
                             : null,
                         ContextCommand = this._openMenuOnProjectCrumb
                     },
@@ -357,7 +358,7 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                         projectFoldersBackground,
                         projectFoldersForeground)
                     {
-                        TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(model.FullPath),
+                        TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(model.FullPath, this._textView),
                         ContextCommand = this._openMenuOnPhysicalCrumb
                     });
             }
@@ -377,7 +378,7 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                     colors.ParentFolderBackground,
                     colors.ParentFolderForeground)
                 {
-                    TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(model.FullPath),
+                    TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(model.FullPath, this._textView),
                     ContextCommand = this._openMenuOnPhysicalCrumb
                 });
         }

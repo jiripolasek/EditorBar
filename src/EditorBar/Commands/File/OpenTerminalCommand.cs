@@ -6,7 +6,6 @@
 
 using Community.VisualStudio.Toolkit;
 using JPSoftworks.EditorBar.Helpers;
-using Microsoft.VisualStudio.Text;
 
 namespace JPSoftworks.EditorBar.Commands;
 
@@ -16,9 +15,9 @@ namespace JPSoftworks.EditorBar.Commands;
 [Command(PackageGuids.EditorBarCmdSetString, PackageIds.EditorBarFileAction_OpenTerminalCommand)]
 internal sealed class OpenTerminalCommand : BaseFileActionMenuContextCommand<OpenTerminalCommand>
 {
-    protected override Task ExecuteCoreAsync(ITextDocument currentDocument)
+    protected override Task ExecuteCoreAsync(string filePath)
     {
-        Launcher.OpenTerminal(currentDocument.FilePath);
+        Launcher.OpenTerminal(filePath);
         return Task.CompletedTask;
     }
 }

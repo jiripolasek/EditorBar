@@ -7,6 +7,7 @@
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using JPSoftworks.EditorBar.Options;
@@ -126,6 +127,10 @@ public partial class MemberTree : UserControl
             await this.ActivateSelectedItemAsync();
             e.Handled = true;
         }
+        else if (e.Key == Key.Apps || (e.Key == Key.F10 && Keyboard.Modifiers == ModifierKeys.Shift))
+        {
+            e.Handled = this.OpenContextMenuForSelectedItem();
+        }
         else if (IsTextInputKey(e))
         {
             this.ShowFilterAndForwardKey();
@@ -145,9 +150,9 @@ public partial class MemberTree : UserControl
         e.Handled = true;
     }
 
-    private void TreeViewItem_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void TreeViewItem_OnPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (e.ClickCount != 2)
+        if (e.ClickCount != 1)
         {
             return;
         }
@@ -162,9 +167,34 @@ public partial class MemberTree : UserControl
             return;
         }
 
+        if (this.FindNearestAncestor<ToggleButton>(e.OriginalSource as DependencyObject) != null)
+        {
+            return;
+        }
+
         e.Handled = true;
         container.IsSelected = true;
         this.ActivateItemAsync(item).FireAndForget();
+    }
+
+    private void TreeViewItem_OnPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not TreeViewItem { DataContext: MemberTreeItemViewModel item } container)
+        {
+            return;
+        }
+
+        if (!ReferenceEquals(this.FindNearestTreeViewItem(e.OriginalSource as DependencyObject), container))
+        {
+            return;
+        }
+
+        if (!this.OpenContextMenu(item, container))
+        {
+            return;
+        }
+
+        e.Handled = true;
     }
 
     private async Task ActivateSelectedItemAsync()
@@ -201,6 +231,28 @@ public partial class MemberTree : UserControl
         }
 
         this.ItemInvoked?.Invoke(this, EventArgs.Empty);
+    }
+
+    private bool OpenContextMenuForSelectedItem()
+    {
+        if (this.TreeView.SelectedItem is not MemberTreeItemViewModel selectedItem || selectedItem.IsPlaceholder)
+        {
+            return false;
+        }
+
+        return this.OpenContextMenu(selectedItem, this.FindContainer(this.TreeView, selectedItem));
+    }
+
+    private bool OpenContextMenu(MemberTreeItemViewModel item, TreeViewItem? container)
+    {
+        if (item.IsPlaceholder || container == null || item.ContextCommand == null || !item.ContextCommand.CanExecute(null))
+        {
+            return false;
+        }
+
+        container.IsSelected = true;
+        item.ContextCommand.Execute(null);
+        return true;
     }
 
     private async Task ApplyFilterWithDebounceAsync(int version, CancellationToken cancellationToken)
@@ -294,6 +346,7 @@ public partial class MemberTree : UserControl
             ImageMoniker = item.ImageMoniker,
             Command = item.Command,
             CommandParameter = item.CommandParameter,
+            ContextCommand = item.ContextCommand,
             ExpandOnActivate = item.ExpandOnActivate,
             InvokeOnActivate = item.InvokeOnActivate,
             ChildrenProvider = filteredChildren.Count > 0
@@ -444,6 +497,23 @@ public partial class MemberTree : UserControl
             if (current is TreeViewItem treeViewItem)
             {
                 return treeViewItem;
+            }
+
+            current = VisualTreeHelper.GetParent(current) ?? LogicalTreeHelper.GetParent(current);
+        }
+
+        return null;
+    }
+
+    private T? FindNearestAncestor<T>(DependencyObject? source)
+        where T : DependencyObject
+    {
+        var current = source;
+        while (current != null)
+        {
+            if (current is T match)
+            {
+                return match;
             }
 
             current = VisualTreeHelper.GetParent(current) ?? LogicalTreeHelper.GetParent(current);
