@@ -36,8 +36,8 @@ namespace JPSoftworks.EditorBar;
 [InstalledProductRegistration(Vsix.Name, Vsix.Description, Vsix.Version)]
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 [Guid(PackageGuids.EditorBarString)]
-[ProvideOptionPage(typeof(GeneralOptionPage), "Editor Bar", "General", 0, 0, true)]
-[ProvideProfile(typeof(GeneralOptionPage), "Editor Bar", "General", 0, 0, true)]
+[ProvideOptionPage(typeof(GeneralOptionPage), "Editor Bar", "General", 1000, 1001, true)]
+[ProvideProfile(typeof(GeneralOptionPage), "Editor Bar", "Settings", 1000, 1002, true, DescriptionResourceID = 1003)]
 [ProvideMenuResource("Menus.ctmenu", 1)]
 [ProvideService(typeof(IMenuContextService), IsAsyncQueryable = true)]
 [ProvideService(typeof(ILocationProvider), IsAsyncQueryable = true)]
@@ -70,8 +70,15 @@ public sealed class EditorBarPackage : AsyncPackage
 
         // upgrade settings from previous versions
         var options = await GeneralOptionsModel.GetLiveInstanceAsync();
+        var optionPage = (GeneralOptionPage)this.GetDialogPage(typeof(GeneralOptionPage));
+
+        // The dialog page now persists GeneralOptionsModel through Visual Studio's settings system,
+        // which enables roaming and Import/Export while preserving the legacy settings store.
+        optionPage.LoadSettingsFromStorage();
 
         await options.UpgradeAsync();
+        optionPage.SaveSettingsToStorage();
+        await options.SaveAsync();
 
         await this.RegisterCommandsAsync();
 

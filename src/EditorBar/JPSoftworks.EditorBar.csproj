@@ -310,6 +310,7 @@
     <Compile Include="Options\GeneralOptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Options\GeneralOptionPageSettings.cs" />
     <Compile Include="Controls\Options\GeneralOptionsControl.xaml.cs">
       <DependentUpon>GeneralOptionsControl.xaml</DependentUpon>
     </Compile>

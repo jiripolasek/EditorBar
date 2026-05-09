@@ -9,6 +9,7 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using Community.VisualStudio.Toolkit;
 using JPSoftworks.EditorBar.Helpers;
 
@@ -20,6 +21,7 @@ namespace JPSoftworks.EditorBar.Options;
 /// <seealso cref="BaseOptionModel{GeneralPage}" />
 [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global", Justification = "Used implicitly.")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Setters are used implicitly by PropertyGrid.")]
+[ComVisible(true)]
 public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRatingConfig
 {
     private const int CurrentConfigVersion = 6;

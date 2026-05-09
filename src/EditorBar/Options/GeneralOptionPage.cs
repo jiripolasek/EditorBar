@@ -4,10 +4,12 @@
 
 #nullable enable
 
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using JPSoftworks.EditorBar.Controls;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace JPSoftworks.EditorBar.Options;
 
@@ -19,6 +21,13 @@ namespace JPSoftworks.EditorBar.Options;
 public class GeneralOptionPage : UIElementDialogPage
 {
     private GeneralOptionsControl? _control;
+    private readonly GeneralOptionPageSettings _settings = new();
+
+    /// <summary>
+    /// Gets the automation object whose properties Visual Studio persists for roaming and Import/Export.
+    /// </summary>
+    [Browsable(false)]
+    public override object AutomationObject => this._settings;
 
     /// <summary>
     /// Gets the child element of the options page.
@@ -58,7 +67,21 @@ public class GeneralOptionPage : UIElementDialogPage
     /// </summary>
     public override void LoadSettingsFromStorage()
     {
+        this._settings.CopyFromModel(GeneralOptionsModel.Instance);
         base.LoadSettingsFromStorage();
+        this._settings.ApplyToModel(GeneralOptionsModel.Instance);
+        this._control?.Initialize();
+    }
+
+    /// <summary>
+    /// Loads the settings from a Visual Studio settings file.
+    /// </summary>
+    /// <param name="reader">The Visual Studio settings reader.</param>
+    public override void LoadSettingsFromXml(IVsSettingsReader reader)
+    {
+        base.LoadSettingsFromXml(reader);
+        this._settings.ApplyToModel(GeneralOptionsModel.Instance);
+        GeneralOptionsModel.Instance.Save();
         this._control?.Initialize();
     }
 
@@ -67,7 +90,8 @@ public class GeneralOptionPage : UIElementDialogPage
     /// </summary>
     public override void SaveSettingsToStorage()
     {
-        base.SaveSettingsToStorage();
         this._control?.Apply();
+        this._settings.CopyFromModel(GeneralOptionsModel.Instance);
+        base.SaveSettingsToStorage();
     }
 }
