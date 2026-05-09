@@ -242,16 +242,21 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                         options.SolutionBackground,
                         options.SolutionForeground),
 
-                FileSystemProjectInfo fsProject => new BreadcrumbModel(
+                FileSystemProjectInfo fsProject when fsProject.DirectoryPath != null => new PhysicalDirectoryBreadcrumbModel(
+                    new PhysicalDirectoryModel(fsProject.DisplayName, fsProject.DirectoryPath),
                     fsProject.DisplayName,
                     options.NonSolutionRootBackground,
                     options.NonSolutionRootForeground)
                 {
                     AssociatedDirectory = fsProject.DirectoryPath,
-                    TreeItemsProvider = fsProject.DirectoryPath != null
-                        ? () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(fsProject.DirectoryPath)
-                        : null
+                    TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(fsProject.DirectoryPath),
+                    ContextCommand = this._openMenuOnPhysicalCrumb
                 },
+
+                FileSystemProjectInfo fsProject => new BreadcrumbModel(
+                    fsProject.DisplayName,
+                    options.NonSolutionRootBackground,
+                    options.NonSolutionRootForeground),
 
                 NullProjectInfo => new BreadcrumbModel(
                     Strings.CodeFragment!,
