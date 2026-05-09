@@ -5,12 +5,13 @@
 #nullable enable
 
 using System.Threading;
-using System.Windows.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using JPSoftworks.EditorBar.Options;
 using JPSoftworks.EditorBar.ViewModels;
+using Microsoft.VisualStudio.Shell;
 
 namespace JPSoftworks.EditorBar.Controls;
 
@@ -19,6 +20,7 @@ public partial class MemberTree : UserControl
     private readonly List<MemberTreeItemViewModel> _items;
     private readonly bool _showFilterBoxWhenEmpty;
     private CancellationTokenSource? _filterDebounceCancellationTokenSource;
+    private EventHandler? _pendingSelectFirstItemHandler;
     private int _filterRequestVersion;
 
     public event EventHandler? ItemInvoked;
@@ -36,7 +38,12 @@ public partial class MemberTree : UserControl
         this.UpdatePlaceholders(this._items.Count > 0);
     }
 
-    private async void TreeViewItem_OnExpanded(object sender, RoutedEventArgs e)
+    private void TreeViewItem_OnExpanded(object sender, RoutedEventArgs e)
+    {
+        this.TreeViewItemOnExpandedAsync(e).FireAndForget();
+    }
+
+    private async Task TreeViewItemOnExpandedAsync(RoutedEventArgs e)
     {
         if (e.OriginalSource is not TreeViewItem { DataContext: MemberTreeItemViewModel item } || item.IsPlaceholder)
         {
@@ -74,7 +81,12 @@ public partial class MemberTree : UserControl
         }
     }
 
-    private async void FilterTextBox_OnKeyDown(object sender, KeyEventArgs e)
+    private void FilterTextBox_OnKeyDown(object sender, KeyEventArgs e)
+    {
+        this.FilterTextBoxOnKeyDownAsync(e).FireAndForget();
+    }
+
+    private async Task FilterTextBoxOnKeyDownAsync(KeyEventArgs e)
     {
         if (e.Key == Key.Escape)
         {
@@ -94,7 +106,12 @@ public partial class MemberTree : UserControl
         }
     }
 
-    private async void TreeView_OnPreviewKeyDown(object sender, KeyEventArgs e)
+    private void TreeView_OnPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        this.TreeViewOnPreviewKeyDownAsync(e).FireAndForget();
+    }
+
+    private async Task TreeViewOnPreviewKeyDownAsync(KeyEventArgs e)
     {
         if (e.Key == Key.Escape)
         {
@@ -128,15 +145,26 @@ public partial class MemberTree : UserControl
         e.Handled = true;
     }
 
-    private async void TreeViewItem_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+    private void TreeViewItem_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (sender is not TreeViewItem)
+        if (e.ClickCount != 2)
         {
             return;
         }
 
-        await this.ActivateSelectedItemAsync();
+        if (sender is not TreeViewItem { DataContext: MemberTreeItemViewModel item } container)
+        {
+            return;
+        }
+
+        if (!ReferenceEquals(this.FindNearestTreeViewItem(e.OriginalSource as DependencyObject), container))
+        {
+            return;
+        }
+
         e.Handled = true;
+        container.IsSelected = true;
+        this.ActivateItemAsync(item).FireAndForget();
     }
 
     private async Task ActivateSelectedItemAsync()
@@ -146,13 +174,24 @@ public partial class MemberTree : UserControl
             return;
         }
 
-        if (selectedItem.CanHaveChildren && !selectedItem.InvokeOnActivate)
+        await this.ActivateItemAsync(selectedItem);
+    }
+
+    private async Task ActivateItemAsync(MemberTreeItemViewModel item)
+    {
+        if (item.IsPlaceholder)
         {
-            if (this.FindContainer(this.TreeView, selectedItem) is { } container)
+            return;
+        }
+
+        if (item.CanHaveChildren && item.ExpandOnActivate)
+        {
+            if (this.FindContainer(this.TreeView, item) is { } container)
             {
+                container.IsSelected = true;
                 if (!container.IsExpanded)
                 {
-                    await selectedItem.EnsureChildrenLoadedAsync();
+                    await item.EnsureChildrenLoadedAsync();
                 }
 
                 container.IsExpanded = !container.IsExpanded;
@@ -255,6 +294,8 @@ public partial class MemberTree : UserControl
             ImageMoniker = item.ImageMoniker,
             Command = item.Command,
             CommandParameter = item.CommandParameter,
+            ExpandOnActivate = item.ExpandOnActivate,
+            InvokeOnActivate = item.InvokeOnActivate,
             ChildrenProvider = filteredChildren.Count > 0
                 ? () => Task.FromResult<IList<MemberTreeItemViewModel>>(filteredChildren)
                 : null,
@@ -287,21 +328,48 @@ public partial class MemberTree : UserControl
             return;
         }
 
-        this.Dispatcher.BeginInvoke(
-            DispatcherPriority.Loaded,
-            new Action(() =>
-            {
-                if (this.TreeView.ItemContainerGenerator.ContainerFromIndex(0) is TreeViewItem firstItem)
-                {
-                    firstItem.IsSelected = true;
-                    if (this.FilterTextBox.Visibility == Visibility.Visible && this.FilterTextBox.IsKeyboardFocused)
-                    {
-                        return;
-                    }
+        if (this.TrySelectFirstItem())
+        {
+            return;
+        }
 
-                    firstItem.Focus();
-                }
-            }));
+        if (this._pendingSelectFirstItemHandler != null)
+        {
+            this.TreeView.LayoutUpdated -= this._pendingSelectFirstItemHandler;
+        }
+
+        this._pendingSelectFirstItemHandler = (_, _) =>
+        {
+            if (!this.TrySelectFirstItem())
+            {
+                return;
+            }
+
+            if (this._pendingSelectFirstItemHandler != null)
+            {
+                this.TreeView.LayoutUpdated -= this._pendingSelectFirstItemHandler;
+                this._pendingSelectFirstItemHandler = null;
+            }
+        };
+
+        this.TreeView.LayoutUpdated += this._pendingSelectFirstItemHandler;
+    }
+
+    private bool TrySelectFirstItem()
+    {
+        if (this.TreeView.ItemContainerGenerator.ContainerFromIndex(0) is not TreeViewItem firstItem)
+        {
+            return false;
+        }
+
+        firstItem.IsSelected = true;
+        if (this.FilterTextBox.Visibility == Visibility.Visible && this.FilterTextBox.IsKeyboardFocused)
+        {
+            return true;
+        }
+
+        firstItem.Focus();
+        return true;
     }
 
     private void UpdatePlaceholders(bool hasVisibleItems)
@@ -366,6 +434,22 @@ public partial class MemberTree : UserControl
         return this.FilterTextBox.Visibility != Visibility.Visible &&
                string.IsNullOrEmpty(this.FilterTextBox.Text) &&
                e.Key is Key.Back or Key.Delete;
+    }
+
+    private TreeViewItem? FindNearestTreeViewItem(DependencyObject? source)
+    {
+        var current = source;
+        while (current != null)
+        {
+            if (current is TreeViewItem treeViewItem)
+            {
+                return treeViewItem;
+            }
+
+            current = VisualTreeHelper.GetParent(current) ?? LogicalTreeHelper.GetParent(current);
+        }
+
+        return null;
     }
 
     private void ApplyEmptyFilterVisibilityPreference()
