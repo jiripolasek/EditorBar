@@ -18,6 +18,8 @@ namespace JPSoftworks.EditorBar.Controls;
 
 public partial class MemberTree : UserControl
 {
+    private static readonly TimeSpan FilterThrottleDelay = TimeSpan.FromMilliseconds(350);
+
     private readonly List<MemberTreeItemViewModel> _items;
     private readonly bool _showFilterBoxWhenEmpty;
     private CancellationTokenSource? _filterDebounceCancellationTokenSource;
@@ -262,7 +264,7 @@ public partial class MemberTree : UserControl
         {
             try
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(175), cancellationToken);
+                await Task.Delay(FilterThrottleDelay, cancellationToken);
             }
             catch (OperationCanceledException)
             {
