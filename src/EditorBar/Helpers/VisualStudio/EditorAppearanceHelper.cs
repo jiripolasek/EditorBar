@@ -4,11 +4,11 @@
 
 #nullable enable
 
-using DrawingColor = System.Drawing.Color;
 using System.Windows.Media;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Text.Editor;
+using DrawingColor = System.Drawing.Color;
 
 namespace JPSoftworks.EditorBar.Helpers.VisualStudio;
 
@@ -19,13 +19,35 @@ public static class EditorAppearanceHelper
 {
     public static EditorColorMode GetCurrentMode(IWpfTextView? textView = null)
     {
-        var brush = textView?.Background as SolidColorBrush;
-        if (brush is { Color.A: > 0 })
+        var editorBackground = TryGetEditorBackgroundColor(textView);
+        if (editorBackground is { A: > 0 } color)
         {
-            return GetMode(brush.Color);
+            return GetMode(color);
         }
 
         return GetMode(ToMediaColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowBackgroundColorKey)));
+    }
+
+    private static Color? TryGetEditorBackgroundColor(IWpfTextView? textView)
+    {
+        var visualElement = textView?.VisualElement;
+        if (visualElement == null)
+        {
+            return null;
+        }
+
+        var dispatcher = visualElement.Dispatcher;
+        if (dispatcher == null)
+        {
+            return null;
+        }
+
+        if (!dispatcher.CheckAccess())
+        {
+            return null;
+        }
+
+        return (textView!.Background as SolidColorBrush)?.Color;
     }
 
     private static EditorColorMode GetMode(Color color)

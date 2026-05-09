@@ -153,6 +153,9 @@
   <data name="1003" xml:space="preserve">
     <value>Exports and imports Editor Bar appearance and behavior settings.</value>
   </data>
+  <data name="1004" xml:space="preserve">
+    <value>Colors</value>
+  </data>
   <data name="CodeFragment" xml:space="preserve">
     <value>Code Fragment</value>
     <comment>Code Fragment</comment>

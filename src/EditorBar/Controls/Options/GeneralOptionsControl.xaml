@@ -32,8 +32,7 @@
         </Style>
         <Style x:Key="HintTextBlockStyle" TargetType="TextBlock">
             <Setter Property="TextWrapping" Value="Wrap" />
-            <Setter Property="FontSize"
-                    Value="{DynamicResource {x:Static shell:VsFonts.Environment90PercentFontSizeKey}}" />
+            <Setter Property="FontSize" Value="{DynamicResource {x:Static shell:VsFonts.Environment90PercentFontSizeKey}}" />
             <Setter Property="Foreground" Value="{x:Static SystemColors.GrayTextBrush}" />
         </Style>
         <Style TargetType="Label">
@@ -47,12 +46,9 @@
                 <StackPanel>
                     <CheckBox Content="Show _Editor Bar" IsChecked="{Binding ViewModel.IsEnabled}" />
                     <TextBlock Margin="22,4,0,0" Style="{StaticResource HintTextBlockStyle}">
-                        You can toggle Editor Bar using a menu command
-                        <Run FontWeight="SemiBold">View / Editor Bar</Run>
-                        or assign a keyboard shortcut to toggle Editor Bar on and off using
-                        <Hyperlink Click="CustomizeKeyboardHyperlink_OnClick">Environment / Keyboard</Hyperlink>
-                        options.
-                    </TextBlock>
+                        You can toggle Editor Bar using a menu command<Run FontWeight="SemiBold">View / Editor Bar</Run>
+                        or assign a keyboard shortcut to toggle Editor Bar on and off using<Hyperlink Click="CustomizeKeyboardHyperlink_OnClick">Environment / Keyboard</Hyperlink>
+                        options.</TextBlock>
                 </StackPanel>
             </GroupBox>
 
@@ -99,8 +95,7 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                                <RadioButton
-                                                    IsChecked="{Binding IsSelected, RelativeSource={x:Static RelativeSource.TemplatedParent}}">
+                                                <RadioButton IsChecked="{Binding IsSelected, RelativeSource={x:Static RelativeSource.TemplatedParent}}">
                                                     <ContentPresenter />
                                                 </RadioButton>
                                             </ControlTemplate>
@@ -158,8 +153,7 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                                <RadioButton
-                                                    IsChecked="{Binding IsSelected, RelativeSource={x:Static RelativeSource.TemplatedParent}}">
+                                                <RadioButton IsChecked="{Binding IsSelected, RelativeSource={x:Static RelativeSource.TemplatedParent}}">
                                                     <ContentPresenter />
                                                 </RadioButton>
                                             </ControlTemplate>
@@ -211,16 +205,47 @@
 
             <GroupBox Header="Breadcrumbs">
                 <StackPanel Grid.IsSharedSizeScope="True">
-                    <StackPanel Margin="{StaticResource UIElementMargin}" Orientation="Horizontal">
-                        <Label Content="Color set" Target="{Binding ElementName=ColorModeComboBox}" />
-                        <ComboBox
-                            x:Name="ColorModeComboBox"
-                            MinWidth="140"
-                            DisplayMemberPath="DisplayName"
-                            ItemsSource="{Binding ViewModel.ColorModes}"
-                            SelectedValue="{Binding ViewModel.SelectedColorMode, Mode=TwoWay}"
-                            SelectedValuePath="Value" />
-                    </StackPanel>
+                    <Grid Margin="{StaticResource UIElementMargin}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160" />
+                            <ColumnDefinition Width="Auto" MinWidth="240" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Content="Edit colors for"
+                            Target="{Binding ElementName=LightColorModeRadioButton}" />
+                        <StackPanel
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            HorizontalAlignment="Left"
+                            Orientation="Horizontal">
+                            <RadioButton
+                                x:Name="LightColorModeRadioButton"
+                                Margin="0,0,16,0"
+                                Content="_Light appearance"
+                                GroupName="ColorMode"
+                                IsChecked="{Binding ViewModel.IsEditingLightColors, Mode=TwoWay}" />
+                            <RadioButton
+                                Content="_Dark appearance"
+                                GroupName="ColorMode"
+                                IsChecked="{Binding ViewModel.IsEditingDarkColors, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Margin="0,0,0,8"
+                            Style="{StaticResource HintTextBlockStyle}"
+                            Text="{Binding ViewModel.CurrentEditorAppearanceText}" />
+                    </Grid>
+
                     <controls:ColorSelector
                         BackgroundColor="{Binding ViewModel.SolutionRootSegment.BackgroundColor}"
                         ForegroundColor="{Binding ViewModel.SolutionRootSegment.ForegroundColor}"
@@ -230,7 +255,6 @@
                         BackgroundColor="{Binding ViewModel.NonSolutionRootSegment.BackgroundColor}"
                         ForegroundColor="{Binding ViewModel.NonSolutionRootSegment.ForegroundColor}"
                         IsCheckable="False"
-                        IsChecked="{Binding ViewModel.SolutionRootSegment.IsVisible}"
                         LabelContent="No_n-solution root" />
                     <controls:ColorSelector
                         BackgroundColor="{Binding ViewModel.SolutionFolderSegment.BackgroundColor}"
@@ -252,7 +276,6 @@
                         ForegroundColor="{Binding ViewModel.ParentFolderSegment.ForegroundColor}"
                         IsChecked="{Binding ViewModel.ParentFolderSegment.IsVisible}"
                         LabelContent="_Parent folder" />
-
                     <controls:ColorSelector
                         BackgroundColor="{Binding ViewModel.FileSegment.BackgroundColor}"
                         ForegroundColor="{Binding ViewModel.FileSegment.ForegroundColor}"
@@ -264,6 +287,26 @@
                         IsChecked="{Binding ViewModel.CodeStructureSegment.IsVisible}"
                         LabelContent="_File structure" />
 
+                    <Separator Margin="0,8,0,8" />
+
+                    <TextBlock
+                        Margin="0,0,0,8"
+                        Style="{StaticResource HintTextBlockStyle}"
+                        Text="Changing this pair applies the selected colors to every breadcrumb above in the currently edited appearance." />
+                    <controls:ColorSelector
+                        Margin="0,0,0,0"
+                        BackgroundColor="{Binding ViewModel.BulkBreadcrumbBackgroundColor}"
+                        ForegroundColor="{Binding ViewModel.BulkBreadcrumbForegroundColor}"
+                        IsCheckable="False"
+                        LabelContent="A_ll breadcrumbs" />
+
+                    <StackPanel Margin="0,12,0,0" Orientation="Horizontal">
+                        <Button
+                            Margin="0,0,8,0"
+                            Command="{Binding ViewModel.CopyFromOtherColorModeCommand}"
+                            Content="{Binding ViewModel.CopyFromOtherColorModeButtonText}" />
+                        <Button Command="{Binding ViewModel.ResetCurrentColorModeCommand}" Content="Reset selected colors to defaults" />
+                    </StackPanel>
                 </StackPanel>
             </GroupBox>
 
@@ -500,8 +543,8 @@
                         Grid.Row="1"
                         Grid.Column="0"
                         Content="Terminal _path:"
-                        Visibility="{Binding ViewModel.IsCustomTerminalSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
-                        Target="{Binding ElementName=TerminalPathTextBox}" />
+                        Target="{Binding ElementName=TerminalPathTextBox}"
+                        Visibility="{Binding ViewModel.IsCustomTerminalSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     <DockPanel
                         Grid.Row="1"
                         Grid.Column="1"
@@ -512,13 +555,13 @@
                             Margin="4,0,0,0"
                             VerticalAlignment="Center"
                             Command="{Binding ViewModel.BrowseForTerminalCommand}"
-                            Visibility="{Binding ViewModel.IsCustomTerminalSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
                             Content="..."
-                            DockPanel.Dock="Right" />
+                            DockPanel.Dock="Right"
+                            Visibility="{Binding ViewModel.IsCustomTerminalSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         <TextBox
                             x:Name="TerminalPathTextBox"
-                            IsReadOnly="{Binding ViewModel.IsTerminalPresetLocked}"
                             VerticalAlignment="Center"
+                            IsReadOnly="{Binding ViewModel.IsTerminalPresetLocked}"
                             Text="{Binding ViewModel.TerminalPathDisplay, UpdateSourceTrigger=PropertyChanged, Delay=0}" />
                     </DockPanel>
 
@@ -526,16 +569,16 @@
                         Grid.Row="2"
                         Grid.Column="0"
                         Content="Terminal ar_guments:"
-                        Visibility="{Binding ViewModel.IsCustomTerminalSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
-                        Target="{Binding ElementName=TerminalArgumentsTextBox}" />
+                        Target="{Binding ElementName=TerminalArgumentsTextBox}"
+                        Visibility="{Binding ViewModel.IsCustomTerminalSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     <TextBox
                         x:Name="TerminalArgumentsTextBox"
                         Grid.Row="2"
                         Grid.Column="1"
-                        IsReadOnly="{Binding ViewModel.IsTerminalPresetLocked}"
                         VerticalAlignment="Center"
-                        Visibility="{Binding ViewModel.IsCustomTerminalSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
-                        Text="{Binding ViewModel.TerminalArgumentsDisplay, UpdateSourceTrigger=PropertyChanged, Delay=0}" />
+                        IsReadOnly="{Binding ViewModel.IsTerminalPresetLocked}"
+                        Text="{Binding ViewModel.TerminalArgumentsDisplay, UpdateSourceTrigger=PropertyChanged, Delay=0}"
+                        Visibility="{Binding ViewModel.IsCustomTerminalSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                     <TextBlock
                         Grid.Row="3"
