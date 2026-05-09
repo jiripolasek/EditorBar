@@ -225,6 +225,9 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                         options.SolutionForeground)
                     {
                         AssociatedDirectory = solutionRootPath,
+                        TreeItemsProvider = project is GenericProjectInfo
+                            ? LocationBreadcrumbTreeBuilder.CreateSolutionRootItemsAsync
+                            : () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(solutionRootPath),
                         ContextCommand = this._openMenuOnPhysicalCrumb
                     }
                     : new BreadcrumbModel(
@@ -235,7 +238,13 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                 FileSystemProjectInfo fsProject => new BreadcrumbModel(
                     fsProject.DisplayName,
                     options.NonSolutionRootBackground,
-                    options.NonSolutionRootForeground) { AssociatedDirectory = fsProject.DirectoryPath },
+                    options.NonSolutionRootForeground)
+                {
+                    AssociatedDirectory = fsProject.DirectoryPath,
+                    TreeItemsProvider = fsProject.DirectoryPath != null
+                        ? () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(fsProject.DirectoryPath)
+                        : null
+                },
 
                 NullProjectInfo => new BreadcrumbModel(
                     Strings.CodeFragment!,
@@ -248,11 +257,18 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
         }
 
         // 2) Solution folders
-        if (options.ShowSolutionFolders && project is IHasSolutionFolders hasSolutionFolders)
+        if (options.ShowSolutionFolders && project is GenericProjectInfo genericProjectInfo)
         {
             breadcrumbs.AddRange(
-                hasSolutionFolders.SolutionFolders.Select(folder =>
-                    new BreadcrumbModel(folder, options.SolutionFolderBackground, options.SolutionFolderForeground)));
+                genericProjectInfo.SolutionFolderItems.Select(folder =>
+                    new BreadcrumbModel<SolutionItem>(
+                        folder,
+                        folder.Name,
+                        options.SolutionFolderBackground,
+                        options.SolutionFolderForeground)
+                    {
+                        TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateSolutionItemChildrenAsync(folder)
+                    }));
         }
 
         // 3) Project
@@ -270,29 +286,22 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                             options.ProjectForeground)
                         {
                             AssociatedDirectory = p.DirectoryPath,
-                            ItemsProvider = () => Task.FromResult<IList<MemberListItemViewModel>>(
-                                p.IntelliSenseAlternativeContextsDocuments
-                                    .Select(alternativeContextDocument =>
-                                        new MemberListItemViewModel
-                                        {
-                                            PrimaryName = alternativeContextDocument.Project.Name,
-                                            SearchText = alternativeContextDocument.Project.Name,
-                                            Command = this._switchProjectCommand,
-                                            CommandParameter = alternativeContextDocument
-                                        })
-                                    .OrderBy(static t => t.PrimaryName)
-                                    .ToList()),
+                            TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateProjectItemsAsync(
+                                p,
+                                this._switchProjectCommand),
                             ContextCommand = this._openMenuOnProjectCrumb
                         },
 
-                    BaseSolutionProjectInfo => new ProjectContainerBreadcrumbModel(
+                    BaseSolutionProjectInfo solutionProject => new ProjectContainerBreadcrumbModel(
                         project,
                         project.DisplayName,
                         options.ProjectBackground,
                         options.ProjectForeground)
                     {
                         AssociatedDirectory = project.DirectoryPath,
-                        ItemsProvider = null,
+                        TreeItemsProvider = solutionProject is GenericProjectInfo gp
+                            ? () => LocationBreadcrumbTreeBuilder.CreateProjectItemsAsync(gp, this._switchProjectCommand)
+                            : null,
                         ContextCommand = this._openMenuOnProjectCrumb
                     },
 
@@ -331,7 +340,11 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                         model,
                         pathSegment,
                         projectFoldersBackground,
-                        projectFoldersForeground) { ContextCommand = this._openMenuOnPhysicalCrumb });
+                        projectFoldersForeground)
+                    {
+                        TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(model.FullPath),
+                        ContextCommand = this._openMenuOnPhysicalCrumb
+                    });
             }
         }
 
@@ -349,6 +362,7 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                     options.ParentFolderBackground,
                     options.ParentFolderForeground)
                 {
+                    TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(model.FullPath),
                     ContextCommand = this._openMenuOnPhysicalCrumb
                 });
         }

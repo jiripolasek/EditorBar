@@ -27,6 +27,12 @@ public class SymbolChevronButton : ChevronButton, IDisposable
         typeof(SymbolChevronButton),
         new PropertyMetadata(null!));
 
+    public static readonly DependencyProperty TreeModelsAccessorProperty = DependencyProperty.Register(
+        nameof(TreeModelsAccessor),
+        typeof(Func<Task<IList<MemberTreeItemViewModel>>>),
+        typeof(SymbolChevronButton),
+        new PropertyMetadata(null!));
+
     public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(
         nameof(Command),
         typeof(ICommand),
@@ -83,6 +89,12 @@ public class SymbolChevronButton : ChevronButton, IDisposable
     {
         get => (Func<Task<IList<MemberListItemViewModel>>>?)this.GetValue(ModelsAccessorProperty);
         set => this.SetValue(ModelsAccessorProperty, value!);
+    }
+
+    public Func<Task<IList<MemberTreeItemViewModel>>>? TreeModelsAccessor
+    {
+        get => (Func<Task<IList<MemberTreeItemViewModel>>>?)this.GetValue(TreeModelsAccessorProperty);
+        set => this.SetValue(TreeModelsAccessorProperty, value!);
     }
 
     static SymbolChevronButton()
@@ -148,6 +160,23 @@ public class SymbolChevronButton : ChevronButton, IDisposable
 
     private async Task ShowPopupAsync()
     {
+        if (this.TreeModelsAccessor != null)
+        {
+            var treeItems = await this.TreeModelsAccessor.Invoke();
+            if (treeItems.Count == 0)
+            {
+                return;
+            }
+
+            var treePopup = this.EnsureTreePopupIsCreated(treeItems);
+            if (treePopup != null)
+            {
+                treePopup.IsOpen = true;
+            }
+
+            return;
+        }
+
         var members = await this.EvalMembersAsync();
         if (members.Count == 0)
         {
@@ -200,6 +229,31 @@ public class SymbolChevronButton : ChevronButton, IDisposable
 
                 selectedItem.Command?.Execute(selectedItem.CommandParameter!);
             }
+        }
+    }
+
+    private Popup? EnsureTreePopupIsCreated(IEnumerable<MemberTreeItemViewModel> items)
+    {
+        var memberTree = new MemberTree(items);
+        memberTree.ItemInvoked += OnMemberTreeOnItemInvoked;
+
+        if (this._popup == null)
+        {
+            return null;
+        }
+
+        this._popup.Content = memberTree;
+        return this._popup;
+
+        void OnMemberTreeOnItemInvoked(object? sender, EventArgs eventArgs)
+        {
+            if (memberTree.SelectedItem is not MemberTreeItemViewModel selectedItem)
+            {
+                return;
+            }
+
+            this._popup!.IsOpen = false;
+            selectedItem.Command?.Execute(selectedItem.CommandParameter);
         }
     }
 

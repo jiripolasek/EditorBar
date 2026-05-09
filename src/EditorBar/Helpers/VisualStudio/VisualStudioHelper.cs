@@ -164,4 +164,24 @@ internal static class VisualStudioHelper
 
         return folderPath;
     }
+
+    internal static async Task<List<SolutionItem>> GetSolutionFolderItemsAsync(
+        SolutionItem solutionItem,
+        CancellationToken cancellationToken = default)
+    {
+        Requires.NotNull(solutionItem);
+
+        var folderItems = new List<SolutionItem>();
+
+        await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync(cancellationToken);
+
+        var parent = solutionItem.FindParent(SolutionItemType.SolutionFolder);
+        while (parent != null)
+        {
+            folderItems.Insert(0, parent);
+            parent = parent.FindParent(SolutionItemType.SolutionFolder);
+        }
+
+        return folderItems;
+    }
 }

@@ -29,6 +29,7 @@
                 ContextCommand="{Binding ContextCommand}"
                 DataContext="{Binding}"
                 ModelsAccessor="{Binding ItemsProvider}"
+                TreeModelsAccessor="{Binding TreeItemsProvider}"
                 ShowRightBorder="True">
 
                 <local:SymbolChevronButton.CustomBackground>
