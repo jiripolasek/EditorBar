@@ -211,6 +211,16 @@
 
             <GroupBox Header="Breadcrumbs">
                 <StackPanel Grid.IsSharedSizeScope="True">
+                    <StackPanel Margin="{StaticResource UIElementMargin}" Orientation="Horizontal">
+                        <Label Content="Color set" Target="{Binding ElementName=ColorModeComboBox}" />
+                        <ComboBox
+                            x:Name="ColorModeComboBox"
+                            MinWidth="140"
+                            DisplayMemberPath="DisplayName"
+                            ItemsSource="{Binding ViewModel.ColorModes}"
+                            SelectedValue="{Binding ViewModel.SelectedColorMode, Mode=TwoWay}"
+                            SelectedValuePath="Value" />
+                    </StackPanel>
                     <controls:ColorSelector
                         BackgroundColor="{Binding ViewModel.SolutionRootSegment.BackgroundColor}"
                         ForegroundColor="{Binding ViewModel.SolutionRootSegment.ForegroundColor}"

@@ -4,8 +4,10 @@
 
 #nullable enable
 
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows.Media;
-using Microsoft.VisualStudio.PlatformUI;
+using JPSoftworks.EditorBar.Options;
 
 namespace JPSoftworks.EditorBar.ViewModels;
 
@@ -15,19 +17,95 @@ namespace JPSoftworks.EditorBar.ViewModels;
 /// <remarks>
 /// This class provides properties for the foreground color, background color, and visibility of the editor segment.
 /// </remarks>
-public class EditorSegmentOptionsViewModel : ObservableObject
+public class EditorSegmentOptionsViewModel : INotifyPropertyChanged
 {
-    private Color _backgroundColor;
-    private Color _foregroundColor;
+    private EditorColorMode _activeColorMode;
+    private Color _darkBackgroundColor;
+    private Color _darkForegroundColor;
     private bool _isVisible;
+    private Color _lightBackgroundColor;
+    private Color _lightForegroundColor;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public EditorColorMode ActiveColorMode
+    {
+        get => this._activeColorMode;
+        set
+        {
+            if (this.SetProperty(ref this._activeColorMode, value))
+            {
+                this.RaisePropertyChanged(nameof(this.ForegroundColor));
+                this.RaisePropertyChanged(nameof(this.BackgroundColor));
+            }
+        }
+    }
+
+    public Color LightForegroundColor
+    {
+        get => this._lightForegroundColor;
+        set
+        {
+            if (this.SetProperty(ref this._lightForegroundColor, value) && this.ActiveColorMode == EditorColorMode.Light)
+            {
+                this.RaisePropertyChanged(nameof(this.ForegroundColor));
+            }
+        }
+    }
+
+    public Color DarkForegroundColor
+    {
+        get => this._darkForegroundColor;
+        set
+        {
+            if (this.SetProperty(ref this._darkForegroundColor, value) && this.ActiveColorMode == EditorColorMode.Dark)
+            {
+                this.RaisePropertyChanged(nameof(this.ForegroundColor));
+            }
+        }
+    }
 
     /// <summary>
     /// Gets or sets the foreground color of the editor segment.
     /// </summary>
     public Color ForegroundColor
     {
-        get => this._foregroundColor;
-        set => this.SetProperty(ref this._foregroundColor, value);
+        get => this.ActiveColorMode == EditorColorMode.Light ? this.LightForegroundColor : this.DarkForegroundColor;
+        set
+        {
+            if (this.ActiveColorMode == EditorColorMode.Light)
+            {
+                this.LightForegroundColor = value;
+            }
+            else
+            {
+                this.DarkForegroundColor = value;
+            }
+        }
+    }
+
+    public Color LightBackgroundColor
+    {
+        get => this._lightBackgroundColor;
+        set
+        {
+            if (this.SetProperty(ref this._lightBackgroundColor, value) && this.ActiveColorMode == EditorColorMode.Light)
+            {
+                this.RaisePropertyChanged(nameof(this.BackgroundColor));
+            }
+        }
+    }
+
+    public Color DarkBackgroundColor
+    {
+        get => this._darkBackgroundColor;
+        set
+        {
+            if (this.SetProperty(ref this._darkBackgroundColor, value) && this.ActiveColorMode == EditorColorMode.Dark)
+            {
+                this.RaisePropertyChanged(nameof(this.BackgroundColor));
+            }
+        }
     }
 
     /// <summary>
@@ -35,8 +113,18 @@ public class EditorSegmentOptionsViewModel : ObservableObject
     /// </summary>
     public Color BackgroundColor
     {
-        get => this._backgroundColor;
-        set => this.SetProperty(ref this._backgroundColor, value);
+        get => this.ActiveColorMode == EditorColorMode.Light ? this.LightBackgroundColor : this.DarkBackgroundColor;
+        set
+        {
+            if (this.ActiveColorMode == EditorColorMode.Light)
+            {
+                this.LightBackgroundColor = value;
+            }
+            else
+            {
+                this.DarkBackgroundColor = value;
+            }
+        }
     }
 
     /// <summary>
@@ -46,5 +134,22 @@ public class EditorSegmentOptionsViewModel : ObservableObject
     {
         get => this._isVisible;
         set => this.SetProperty(ref this._isVisible, value);
+    }
+
+    private bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (Equals(field, value))
+        {
+            return false;
+        }
+
+        field = value;
+        this.RaisePropertyChanged(propertyName);
+        return true;
+    }
+
+    private void RaisePropertyChanged(string? propertyName)
+    {
+        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

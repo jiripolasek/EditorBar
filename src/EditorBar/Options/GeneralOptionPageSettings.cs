@@ -72,37 +72,69 @@ public class GeneralOptionPageSettings
 
     public bool DebugMode { get; set; }
 
-    public Color SolutionBackground { get; set; }
+    public Color DarkSolutionBackground { get; set; }
 
-    public Color SolutionForeground { get; set; }
+    public Color DarkSolutionForeground { get; set; }
 
-    public Color NonSolutionRootBackground { get; set; }
+    public Color DarkNonSolutionRootBackground { get; set; }
 
-    public Color NonSolutionRootForeground { get; set; }
+    public Color DarkNonSolutionRootForeground { get; set; }
 
-    public Color ProjectBackground { get; set; }
+    public Color DarkProjectBackground { get; set; }
 
-    public Color ProjectForeground { get; set; }
+    public Color DarkProjectForeground { get; set; }
 
-    public Color SolutionFolderBackground { get; set; }
+    public Color DarkSolutionFolderBackground { get; set; }
 
-    public Color SolutionFolderForeground { get; set; }
+    public Color DarkSolutionFolderForeground { get; set; }
 
-    public Color ParentFolderBackground { get; set; }
+    public Color DarkParentFolderBackground { get; set; }
 
-    public Color ParentFolderForeground { get; set; }
+    public Color DarkParentFolderForeground { get; set; }
 
-    public Color ProjectFoldersBackground { get; set; }
+    public Color DarkProjectFoldersBackground { get; set; }
 
-    public Color ProjectFoldersForeground { get; set; }
+    public Color DarkProjectFoldersForeground { get; set; }
 
-    public Color FileBreadcrumbBackground { get; set; }
+    public Color DarkFileBreadcrumbBackground { get; set; }
 
-    public Color FileBreadcrumbForeground { get; set; }
+    public Color DarkFileBreadcrumbForeground { get; set; }
 
-    public Color StructureBreadcrumbBackground { get; set; }
+    public Color DarkStructureBreadcrumbBackground { get; set; }
 
-    public Color StructureBreadcrumbForeground { get; set; }
+    public Color DarkStructureBreadcrumbForeground { get; set; }
+
+    public Color LightSolutionBackground { get; set; }
+
+    public Color LightSolutionForeground { get; set; }
+
+    public Color LightNonSolutionRootBackground { get; set; }
+
+    public Color LightNonSolutionRootForeground { get; set; }
+
+    public Color LightProjectBackground { get; set; }
+
+    public Color LightProjectForeground { get; set; }
+
+    public Color LightSolutionFolderBackground { get; set; }
+
+    public Color LightSolutionFolderForeground { get; set; }
+
+    public Color LightParentFolderBackground { get; set; }
+
+    public Color LightParentFolderForeground { get; set; }
+
+    public Color LightProjectFoldersBackground { get; set; }
+
+    public Color LightProjectFoldersForeground { get; set; }
+
+    public Color LightFileBreadcrumbBackground { get; set; }
+
+    public Color LightFileBreadcrumbForeground { get; set; }
+
+    public Color LightStructureBreadcrumbBackground { get; set; }
+
+    public Color LightStructureBreadcrumbForeground { get; set; }
 
     public void CopyFromModel(GeneralOptionsModel model)
     {
@@ -132,22 +164,38 @@ public class GeneralOptionPageSettings
         this.AlternateFileAction = model.AlternateFileAction;
         this.ShowMemberListFilterBoxWhenEmpty = model.ShowMemberListFilterBoxWhenEmpty;
         this.DebugMode = model.DebugMode;
-        this.SolutionBackground = model.SolutionBackground;
-        this.SolutionForeground = model.SolutionForeground;
-        this.NonSolutionRootBackground = model.NonSolutionRootBackground;
-        this.NonSolutionRootForeground = model.NonSolutionRootForeground;
-        this.ProjectBackground = model.ProjectBackground;
-        this.ProjectForeground = model.ProjectForeground;
-        this.SolutionFolderBackground = model.SolutionFolderBackground;
-        this.SolutionFolderForeground = model.SolutionFolderForeground;
-        this.ParentFolderBackground = model.ParentFolderBackground;
-        this.ParentFolderForeground = model.ParentFolderForeground;
-        this.ProjectFoldersBackground = model.ProjectFoldersBackground;
-        this.ProjectFoldersForeground = model.ProjectFoldersForeground;
-        this.FileBreadcrumbBackground = model.FileBreadcrumbBackground;
-        this.FileBreadcrumbForeground = model.FileBreadcrumbForeground;
-        this.StructureBreadcrumbBackground = model.StructureBreadcrumbBackground;
-        this.StructureBreadcrumbForeground = model.StructureBreadcrumbForeground;
+        this.DarkSolutionBackground = model.SolutionBackground;
+        this.DarkSolutionForeground = model.SolutionForeground;
+        this.DarkNonSolutionRootBackground = model.NonSolutionRootBackground;
+        this.DarkNonSolutionRootForeground = model.NonSolutionRootForeground;
+        this.DarkProjectBackground = model.ProjectBackground;
+        this.DarkProjectForeground = model.ProjectForeground;
+        this.DarkSolutionFolderBackground = model.SolutionFolderBackground;
+        this.DarkSolutionFolderForeground = model.SolutionFolderForeground;
+        this.DarkParentFolderBackground = model.ParentFolderBackground;
+        this.DarkParentFolderForeground = model.ParentFolderForeground;
+        this.DarkProjectFoldersBackground = model.ProjectFoldersBackground;
+        this.DarkProjectFoldersForeground = model.ProjectFoldersForeground;
+        this.DarkFileBreadcrumbBackground = model.FileBreadcrumbBackground;
+        this.DarkFileBreadcrumbForeground = model.FileBreadcrumbForeground;
+        this.DarkStructureBreadcrumbBackground = model.StructureBreadcrumbBackground;
+        this.DarkStructureBreadcrumbForeground = model.StructureBreadcrumbForeground;
+        this.LightSolutionBackground = model.LightSolutionBackground;
+        this.LightSolutionForeground = model.LightSolutionForeground;
+        this.LightNonSolutionRootBackground = model.LightNonSolutionRootBackground;
+        this.LightNonSolutionRootForeground = model.LightNonSolutionRootForeground;
+        this.LightProjectBackground = model.LightProjectBackground;
+        this.LightProjectForeground = model.LightProjectForeground;
+        this.LightSolutionFolderBackground = model.LightSolutionFolderBackground;
+        this.LightSolutionFolderForeground = model.LightSolutionFolderForeground;
+        this.LightParentFolderBackground = model.LightParentFolderBackground;
+        this.LightParentFolderForeground = model.LightParentFolderForeground;
+        this.LightProjectFoldersBackground = model.LightProjectFoldersBackground;
+        this.LightProjectFoldersForeground = model.LightProjectFoldersForeground;
+        this.LightFileBreadcrumbBackground = model.LightFileBreadcrumbBackground;
+        this.LightFileBreadcrumbForeground = model.LightFileBreadcrumbForeground;
+        this.LightStructureBreadcrumbBackground = model.LightStructureBreadcrumbBackground;
+        this.LightStructureBreadcrumbForeground = model.LightStructureBreadcrumbForeground;
     }
 
     public void ApplyToModel(GeneralOptionsModel model)
@@ -178,21 +226,37 @@ public class GeneralOptionPageSettings
         model.AlternateFileAction = this.AlternateFileAction;
         model.ShowMemberListFilterBoxWhenEmpty = this.ShowMemberListFilterBoxWhenEmpty;
         model.DebugMode = this.DebugMode;
-        model.SolutionBackground = this.SolutionBackground;
-        model.SolutionForeground = this.SolutionForeground;
-        model.NonSolutionRootBackground = this.NonSolutionRootBackground;
-        model.NonSolutionRootForeground = this.NonSolutionRootForeground;
-        model.ProjectBackground = this.ProjectBackground;
-        model.ProjectForeground = this.ProjectForeground;
-        model.SolutionFolderBackground = this.SolutionFolderBackground;
-        model.SolutionFolderForeground = this.SolutionFolderForeground;
-        model.ParentFolderBackground = this.ParentFolderBackground;
-        model.ParentFolderForeground = this.ParentFolderForeground;
-        model.ProjectFoldersBackground = this.ProjectFoldersBackground;
-        model.ProjectFoldersForeground = this.ProjectFoldersForeground;
-        model.FileBreadcrumbBackground = this.FileBreadcrumbBackground;
-        model.FileBreadcrumbForeground = this.FileBreadcrumbForeground;
-        model.StructureBreadcrumbBackground = this.StructureBreadcrumbBackground;
-        model.StructureBreadcrumbForeground = this.StructureBreadcrumbForeground;
+        model.SolutionBackground = this.DarkSolutionBackground;
+        model.SolutionForeground = this.DarkSolutionForeground;
+        model.NonSolutionRootBackground = this.DarkNonSolutionRootBackground;
+        model.NonSolutionRootForeground = this.DarkNonSolutionRootForeground;
+        model.ProjectBackground = this.DarkProjectBackground;
+        model.ProjectForeground = this.DarkProjectForeground;
+        model.SolutionFolderBackground = this.DarkSolutionFolderBackground;
+        model.SolutionFolderForeground = this.DarkSolutionFolderForeground;
+        model.ParentFolderBackground = this.DarkParentFolderBackground;
+        model.ParentFolderForeground = this.DarkParentFolderForeground;
+        model.ProjectFoldersBackground = this.DarkProjectFoldersBackground;
+        model.ProjectFoldersForeground = this.DarkProjectFoldersForeground;
+        model.FileBreadcrumbBackground = this.DarkFileBreadcrumbBackground;
+        model.FileBreadcrumbForeground = this.DarkFileBreadcrumbForeground;
+        model.StructureBreadcrumbBackground = this.DarkStructureBreadcrumbBackground;
+        model.StructureBreadcrumbForeground = this.DarkStructureBreadcrumbForeground;
+        model.LightSolutionBackground = this.LightSolutionBackground;
+        model.LightSolutionForeground = this.LightSolutionForeground;
+        model.LightNonSolutionRootBackground = this.LightNonSolutionRootBackground;
+        model.LightNonSolutionRootForeground = this.LightNonSolutionRootForeground;
+        model.LightProjectBackground = this.LightProjectBackground;
+        model.LightProjectForeground = this.LightProjectForeground;
+        model.LightSolutionFolderBackground = this.LightSolutionFolderBackground;
+        model.LightSolutionFolderForeground = this.LightSolutionFolderForeground;
+        model.LightParentFolderBackground = this.LightParentFolderBackground;
+        model.LightParentFolderForeground = this.LightParentFolderForeground;
+        model.LightProjectFoldersBackground = this.LightProjectFoldersBackground;
+        model.LightProjectFoldersForeground = this.LightProjectFoldersForeground;
+        model.LightFileBreadcrumbBackground = this.LightFileBreadcrumbBackground;
+        model.LightFileBreadcrumbForeground = this.LightFileBreadcrumbForeground;
+        model.LightStructureBreadcrumbBackground = this.LightStructureBreadcrumbBackground;
+        model.LightStructureBreadcrumbForeground = this.LightStructureBreadcrumbForeground;
     }
 }

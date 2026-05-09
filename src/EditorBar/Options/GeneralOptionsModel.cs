@@ -24,7 +24,7 @@ namespace JPSoftworks.EditorBar.Options;
 [ComVisible(true)]
 public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRatingConfig
 {
-    private const int CurrentConfigVersion = 6;
+    private const int CurrentConfigVersion = 7;
 
     private const string AppearanceCategoryName = "Appearance";
     private const string GeneralCategoryName = "General";
@@ -349,6 +349,26 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
                 this.ShowMemberListFilterBoxWhenEmpty = false;
             }
 
+            if (this.Version < 7)
+            {
+                this.LightSolutionBackground = this.SolutionBackground;
+                this.LightSolutionForeground = this.SolutionForeground;
+                this.LightNonSolutionRootBackground = this.NonSolutionRootBackground;
+                this.LightNonSolutionRootForeground = this.NonSolutionRootForeground;
+                this.LightProjectBackground = this.ProjectBackground;
+                this.LightProjectForeground = this.ProjectForeground;
+                this.LightSolutionFolderBackground = this.SolutionFolderBackground;
+                this.LightSolutionFolderForeground = this.SolutionFolderForeground;
+                this.LightParentFolderBackground = this.ParentFolderBackground;
+                this.LightParentFolderForeground = this.ParentFolderForeground;
+                this.LightProjectFoldersBackground = this.ProjectFoldersBackground;
+                this.LightProjectFoldersForeground = this.ProjectFoldersForeground;
+                this.LightFileBreadcrumbBackground = this.FileBreadcrumbBackground;
+                this.LightFileBreadcrumbForeground = this.FileBreadcrumbForeground;
+                this.LightStructureBreadcrumbBackground = this.StructureBreadcrumbBackground;
+                this.LightStructureBreadcrumbForeground = this.StructureBreadcrumbForeground;
+            }
+
             this.Version = CurrentConfigVersion;
             changed = true;
         }
@@ -362,6 +382,8 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     // -------------------------------------------
     // Colors category
     // -------------------------------------------
+    // The original color properties below are kept as the dark appearance color set for backward compatibility.
+    // Separate light appearance colors are stored in the Light* properties further below.
 
     // Comparison of System.Drawing.Colors is little bit funny: Color.Black != Color.FromArgb(0, 0, 0)
     // So let's do comparison by ARGB values. See ColorEquality method below.
@@ -716,4 +738,134 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     }
 
     #endregion
+
+    // -------------------------------------------
+    // Light appearance colors
+    // -------------------------------------------
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme solution root background color")]
+    [Description("Background color of solution element in light editor appearance.")]
+    public Color LightSolutionBackground { get; set; } = SolutionBackgroundDefault;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme solution root text color")]
+    [Description("Foreground color of solution element in light editor appearance.")]
+    public Color LightSolutionForeground { get; set; } = SolutionForegroundDefault;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme non-solution root background color")]
+    [Description("Background color of non-solution root element in light editor appearance.")]
+    public Color LightNonSolutionRootBackground { get; set; } = NonSolutionRootBackgroundDefault;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme non-solution root text color")]
+    [Description("Foreground color of non-solution root element in light editor appearance.")]
+    public Color LightNonSolutionRootForeground { get; set; } = NonSolutionRootForegroundDefault;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme project background color")]
+    [Description("Background color of project name element in light editor appearance.")]
+    public Color LightProjectBackground { get; set; } = ProjectBackgroundDefault;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme project text color")]
+    [Description("Foreground color of project name element in light editor appearance.")]
+    public Color LightProjectForeground { get; set; } = ProjectForegroundDefault;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme solution folder background color")]
+    [Description("Background color of solution folder element in light editor appearance.")]
+    public Color LightSolutionFolderBackground { get; set; } = SolutionFolderBackgroundDefault;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme solution folder text color")]
+    [Description("Foreground color of solution folder element in light editor appearance.")]
+    public Color LightSolutionFolderForeground { get; set; } = SolutionFolderForegroundDefaultColor;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme parent folder background color")]
+    [Description("Background color of parent folder element in light editor appearance.")]
+    public Color LightParentFolderBackground { get; set; } = ParentFolderBackgroundDefault;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme parent folder text color")]
+    [Description("Foreground color of parent folder element in light editor appearance.")]
+    public Color LightParentFolderForeground { get; set; } = ParentFolderForegroundDefaultColor;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme project folder background color")]
+    [Description("Background color of project folder element in light editor appearance.")]
+    public Color LightProjectFoldersBackground { get; set; } = ProjectFoldersBackgroundDefault;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme project folder text color")]
+    [Description("Foreground color of project folder element in light editor appearance.")]
+    public Color LightProjectFoldersForeground { get; set; } = ProjectFoldersForegroundDefaultColor;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme file background color")]
+    [Description("Background color of file element in light editor appearance.")]
+    public Color LightFileBreadcrumbBackground { get; set; } = FileBreadcrumbBackgroundDefault;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme file text color")]
+    [Description("Foreground color of file element in light editor appearance.")]
+    public Color LightFileBreadcrumbForeground { get; set; } = FileBreadcrumbForegroundDefaultColor;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme code structure element background color")]
+    [Description("Background color of code structure element in light editor appearance.")]
+    public Color LightStructureBreadcrumbBackground { get; set; } = StructureBreadcrumbBackgroundDefault;
+
+    [Category(ColorsCategoryName)]
+    [DisplayName("Light theme code structure element text color")]
+    [Description("Foreground color of code structure element in light editor appearance.")]
+    public Color LightStructureBreadcrumbForeground { get; set; } = StructureBreadcrumbForegroundDefaultColor;
+
+    public EditorBarColorSet GetColorSet(EditorColorMode mode)
+    {
+        return mode switch
+        {
+            EditorColorMode.Light => new EditorBarColorSet
+            {
+                SolutionBackground = this.LightSolutionBackground,
+                SolutionForeground = this.LightSolutionForeground,
+                NonSolutionRootBackground = this.LightNonSolutionRootBackground,
+                NonSolutionRootForeground = this.LightNonSolutionRootForeground,
+                ProjectBackground = this.LightProjectBackground,
+                ProjectForeground = this.LightProjectForeground,
+                SolutionFolderBackground = this.LightSolutionFolderBackground,
+                SolutionFolderForeground = this.LightSolutionFolderForeground,
+                ParentFolderBackground = this.LightParentFolderBackground,
+                ParentFolderForeground = this.LightParentFolderForeground,
+                ProjectFoldersBackground = this.LightProjectFoldersBackground,
+                ProjectFoldersForeground = this.LightProjectFoldersForeground,
+                FileBreadcrumbBackground = this.LightFileBreadcrumbBackground,
+                FileBreadcrumbForeground = this.LightFileBreadcrumbForeground,
+                StructureBreadcrumbBackground = this.LightStructureBreadcrumbBackground,
+                StructureBreadcrumbForeground = this.LightStructureBreadcrumbForeground
+            },
+            EditorColorMode.Dark => new EditorBarColorSet
+            {
+                SolutionBackground = this.SolutionBackground,
+                SolutionForeground = this.SolutionForeground,
+                NonSolutionRootBackground = this.NonSolutionRootBackground,
+                NonSolutionRootForeground = this.NonSolutionRootForeground,
+                ProjectBackground = this.ProjectBackground,
+                ProjectForeground = this.ProjectForeground,
+                SolutionFolderBackground = this.SolutionFolderBackground,
+                SolutionFolderForeground = this.SolutionFolderForeground,
+                ParentFolderBackground = this.ParentFolderBackground,
+                ParentFolderForeground = this.ParentFolderForeground,
+                ProjectFoldersBackground = this.ProjectFoldersBackground,
+                ProjectFoldersForeground = this.ProjectFoldersForeground,
+                FileBreadcrumbBackground = this.FileBreadcrumbBackground,
+                FileBreadcrumbForeground = this.FileBreadcrumbForeground,
+                StructureBreadcrumbBackground = this.StructureBreadcrumbBackground,
+                StructureBreadcrumbForeground = this.StructureBreadcrumbForeground
+            },
+            _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null)
+        };
+    }
 }

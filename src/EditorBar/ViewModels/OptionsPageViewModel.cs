@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Helpers.Presentation;
+using JPSoftworks.EditorBar.Helpers.VisualStudio;
 using JPSoftworks.EditorBar.Options;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.Win32;
@@ -41,6 +42,7 @@ public class OptionsPageViewModel : ObservableObject
     private bool _isCustomTerminalSelected;
     private bool _isTerminalPresetLocked;
     private FileLabel _pathStyle;
+    private EditorColorMode _selectedColorMode;
     private TerminalProfile _selectedTerminalProfile;
     private string? _terminalArguments;
     private string _terminalArgumentsDisplay = string.Empty;
@@ -114,6 +116,12 @@ public class OptionsPageViewModel : ObservableObject
         new(TerminalProfile.PowerShell, "PowerShell (pwsh)"),
         new(TerminalProfile.DeveloperPowerShell, "Developer PowerShell"),
         new(TerminalProfile.Custom, "Custom")
+    ];
+
+    public ObservableCollection<EnumViewModel<EditorColorMode>> ColorModes { get; } =
+    [
+        new(EditorColorMode.Light, "Light"),
+        new(EditorColorMode.Dark, "Dark")
     ];
 
     /// <summary>
@@ -439,6 +447,18 @@ public class OptionsPageViewModel : ObservableObject
         private set => this.SetProperty(ref this._terminalPresetHint, value);
     }
 
+    public EditorColorMode SelectedColorMode
+    {
+        get => this._selectedColorMode;
+        set
+        {
+            if (this.SetProperty(ref this._selectedColorMode, value))
+            {
+                this.ApplyColorModeToSegments(value);
+            }
+        }
+    }
+
     /// <summary>
     /// Gets or sets a value indicating whether debug mode is enabled.
     /// </summary>
@@ -455,6 +475,7 @@ public class OptionsPageViewModel : ObservableObject
     {
         this.BrowseForExternalEditorCommand = new DispatchedDelegateCommand(this.ExecuteBrowseForExternalEditorCommand);
         this.BrowseForTerminalCommand = new DispatchedDelegateCommand(this.ExecuteBrowseForTerminalCommand);
+        this.SelectedColorMode = EditorAppearanceHelper.GetCurrentMode();
         this.UpdateTerminalPresentation();
     }
 
@@ -514,34 +535,50 @@ public class OptionsPageViewModel : ObservableObject
             this.DoubleClickCtrlActionOnFileLabel = model.AlternateFileAction;
 
             this.SolutionRootSegment.IsVisible = model.ShowSolutionRoot;
-            this.SolutionRootSegment.ForegroundColor = model.SolutionForeground.ToMediaColor();
-            this.SolutionRootSegment.BackgroundColor = model.SolutionBackground.ToMediaColor();
-            this.NonSolutionRootSegment.ForegroundColor = model.NonSolutionRootForeground.ToMediaColor();
-            this.NonSolutionRootSegment.BackgroundColor = model.NonSolutionRootBackground.ToMediaColor();
+            this.SolutionRootSegment.DarkForegroundColor = model.SolutionForeground.ToMediaColor();
+            this.SolutionRootSegment.DarkBackgroundColor = model.SolutionBackground.ToMediaColor();
+            this.SolutionRootSegment.LightForegroundColor = model.LightSolutionForeground.ToMediaColor();
+            this.SolutionRootSegment.LightBackgroundColor = model.LightSolutionBackground.ToMediaColor();
+            this.NonSolutionRootSegment.DarkForegroundColor = model.NonSolutionRootForeground.ToMediaColor();
+            this.NonSolutionRootSegment.DarkBackgroundColor = model.NonSolutionRootBackground.ToMediaColor();
+            this.NonSolutionRootSegment.LightForegroundColor = model.LightNonSolutionRootForeground.ToMediaColor();
+            this.NonSolutionRootSegment.LightBackgroundColor = model.LightNonSolutionRootBackground.ToMediaColor();
 
             this.SolutionFolderSegment.IsVisible = model.ShowSolutionFolders;
-            this.SolutionFolderSegment.ForegroundColor = model.SolutionFolderForeground.ToMediaColor();
-            this.SolutionFolderSegment.BackgroundColor = model.SolutionFolderBackground.ToMediaColor();
+            this.SolutionFolderSegment.DarkForegroundColor = model.SolutionFolderForeground.ToMediaColor();
+            this.SolutionFolderSegment.DarkBackgroundColor = model.SolutionFolderBackground.ToMediaColor();
+            this.SolutionFolderSegment.LightForegroundColor = model.LightSolutionFolderForeground.ToMediaColor();
+            this.SolutionFolderSegment.LightBackgroundColor = model.LightSolutionFolderBackground.ToMediaColor();
 
             this.ProjectNameSegment.IsVisible = model.ShowProject;
-            this.ProjectNameSegment.ForegroundColor = model.ProjectForeground.ToMediaColor();
-            this.ProjectNameSegment.BackgroundColor = model.ProjectBackground.ToMediaColor();
+            this.ProjectNameSegment.DarkForegroundColor = model.ProjectForeground.ToMediaColor();
+            this.ProjectNameSegment.DarkBackgroundColor = model.ProjectBackground.ToMediaColor();
+            this.ProjectNameSegment.LightForegroundColor = model.LightProjectForeground.ToMediaColor();
+            this.ProjectNameSegment.LightBackgroundColor = model.LightProjectBackground.ToMediaColor();
 
             this.ProjectFolderSegments.IsVisible = model.ShowProjectFolders;
-            this.ProjectFolderSegments.ForegroundColor = model.ProjectFoldersForeground.ToMediaColor();
-            this.ProjectFolderSegments.BackgroundColor = model.ProjectFoldersBackground.ToMediaColor();
+            this.ProjectFolderSegments.DarkForegroundColor = model.ProjectFoldersForeground.ToMediaColor();
+            this.ProjectFolderSegments.DarkBackgroundColor = model.ProjectFoldersBackground.ToMediaColor();
+            this.ProjectFolderSegments.LightForegroundColor = model.LightProjectFoldersForeground.ToMediaColor();
+            this.ProjectFolderSegments.LightBackgroundColor = model.LightProjectFoldersBackground.ToMediaColor();
 
             this.ParentFolderSegment.IsVisible = model.ShowParentFolder;
-            this.ParentFolderSegment.ForegroundColor = model.ParentFolderForeground.ToMediaColor();
-            this.ParentFolderSegment.BackgroundColor = model.ParentFolderBackground.ToMediaColor();
+            this.ParentFolderSegment.DarkForegroundColor = model.ParentFolderForeground.ToMediaColor();
+            this.ParentFolderSegment.DarkBackgroundColor = model.ParentFolderBackground.ToMediaColor();
+            this.ParentFolderSegment.LightForegroundColor = model.LightParentFolderForeground.ToMediaColor();
+            this.ParentFolderSegment.LightBackgroundColor = model.LightParentFolderBackground.ToMediaColor();
 
             this.FileSegment.IsVisible = model.ShowFileNameBreadcrumb;
-            this.FileSegment.ForegroundColor = model.FileBreadcrumbForeground.ToMediaColor();
-            this.FileSegment.BackgroundColor = model.FileBreadcrumbBackground.ToMediaColor();
+            this.FileSegment.DarkForegroundColor = model.FileBreadcrumbForeground.ToMediaColor();
+            this.FileSegment.DarkBackgroundColor = model.FileBreadcrumbBackground.ToMediaColor();
+            this.FileSegment.LightForegroundColor = model.LightFileBreadcrumbForeground.ToMediaColor();
+            this.FileSegment.LightBackgroundColor = model.LightFileBreadcrumbBackground.ToMediaColor();
 
             this.CodeStructureSegment.IsVisible = model.ShowCodeStructureBreadcrumbs;
-            this.CodeStructureSegment.ForegroundColor = model.StructureBreadcrumbForeground.ToMediaColor();
-            this.CodeStructureSegment.BackgroundColor = model.StructureBreadcrumbBackground.ToMediaColor();
+            this.CodeStructureSegment.DarkForegroundColor = model.StructureBreadcrumbForeground.ToMediaColor();
+            this.CodeStructureSegment.DarkBackgroundColor = model.StructureBreadcrumbBackground.ToMediaColor();
+            this.CodeStructureSegment.LightForegroundColor = model.LightStructureBreadcrumbForeground.ToMediaColor();
+            this.CodeStructureSegment.LightBackgroundColor = model.LightStructureBreadcrumbBackground.ToMediaColor();
 
             this.ExternalEditorPath = model.ExternalEditorCommand ?? string.Empty;
             this.ExternalEditorArguments = model.ExternalEditorCommandArguments ?? string.Empty;
@@ -586,34 +623,50 @@ public class OptionsPageViewModel : ObservableObject
             model.AlternateFileAction = this.DoubleClickCtrlActionOnFileLabel;
 
             model.ShowSolutionRoot = this.SolutionRootSegment.IsVisible;
-            model.SolutionForeground = this.SolutionRootSegment.ForegroundColor.ToDrawingColor();
-            model.SolutionBackground = this.SolutionRootSegment.BackgroundColor.ToDrawingColor();
-            model.NonSolutionRootForeground = this.NonSolutionRootSegment.ForegroundColor.ToDrawingColor();
-            model.NonSolutionRootBackground = this.NonSolutionRootSegment.BackgroundColor.ToDrawingColor();
+            model.SolutionForeground = this.SolutionRootSegment.DarkForegroundColor.ToDrawingColor();
+            model.SolutionBackground = this.SolutionRootSegment.DarkBackgroundColor.ToDrawingColor();
+            model.LightSolutionForeground = this.SolutionRootSegment.LightForegroundColor.ToDrawingColor();
+            model.LightSolutionBackground = this.SolutionRootSegment.LightBackgroundColor.ToDrawingColor();
+            model.NonSolutionRootForeground = this.NonSolutionRootSegment.DarkForegroundColor.ToDrawingColor();
+            model.NonSolutionRootBackground = this.NonSolutionRootSegment.DarkBackgroundColor.ToDrawingColor();
+            model.LightNonSolutionRootForeground = this.NonSolutionRootSegment.LightForegroundColor.ToDrawingColor();
+            model.LightNonSolutionRootBackground = this.NonSolutionRootSegment.LightBackgroundColor.ToDrawingColor();
 
             model.ShowSolutionFolders = this.SolutionFolderSegment.IsVisible;
-            model.SolutionFolderForeground = this.SolutionFolderSegment.ForegroundColor.ToDrawingColor();
-            model.SolutionFolderBackground = this.SolutionFolderSegment.BackgroundColor.ToDrawingColor();
+            model.SolutionFolderForeground = this.SolutionFolderSegment.DarkForegroundColor.ToDrawingColor();
+            model.SolutionFolderBackground = this.SolutionFolderSegment.DarkBackgroundColor.ToDrawingColor();
+            model.LightSolutionFolderForeground = this.SolutionFolderSegment.LightForegroundColor.ToDrawingColor();
+            model.LightSolutionFolderBackground = this.SolutionFolderSegment.LightBackgroundColor.ToDrawingColor();
 
             model.ShowProject = this.ProjectNameSegment.IsVisible;
-            model.ProjectForeground = this.ProjectNameSegment.ForegroundColor.ToDrawingColor();
-            model.ProjectBackground = this.ProjectNameSegment.BackgroundColor.ToDrawingColor();
+            model.ProjectForeground = this.ProjectNameSegment.DarkForegroundColor.ToDrawingColor();
+            model.ProjectBackground = this.ProjectNameSegment.DarkBackgroundColor.ToDrawingColor();
+            model.LightProjectForeground = this.ProjectNameSegment.LightForegroundColor.ToDrawingColor();
+            model.LightProjectBackground = this.ProjectNameSegment.LightBackgroundColor.ToDrawingColor();
 
             model.ShowProjectFolders = this.ProjectFolderSegments.IsVisible;
-            model.ProjectFoldersForeground = this.ProjectFolderSegments.ForegroundColor.ToDrawingColor();
-            model.ProjectFoldersBackground = this.ProjectFolderSegments.BackgroundColor.ToDrawingColor();
+            model.ProjectFoldersForeground = this.ProjectFolderSegments.DarkForegroundColor.ToDrawingColor();
+            model.ProjectFoldersBackground = this.ProjectFolderSegments.DarkBackgroundColor.ToDrawingColor();
+            model.LightProjectFoldersForeground = this.ProjectFolderSegments.LightForegroundColor.ToDrawingColor();
+            model.LightProjectFoldersBackground = this.ProjectFolderSegments.LightBackgroundColor.ToDrawingColor();
 
             model.ShowParentFolder = this.ParentFolderSegment.IsVisible;
-            model.ParentFolderForeground = this.ParentFolderSegment.ForegroundColor.ToDrawingColor();
-            model.ParentFolderBackground = this.ParentFolderSegment.BackgroundColor.ToDrawingColor();
+            model.ParentFolderForeground = this.ParentFolderSegment.DarkForegroundColor.ToDrawingColor();
+            model.ParentFolderBackground = this.ParentFolderSegment.DarkBackgroundColor.ToDrawingColor();
+            model.LightParentFolderForeground = this.ParentFolderSegment.LightForegroundColor.ToDrawingColor();
+            model.LightParentFolderBackground = this.ParentFolderSegment.LightBackgroundColor.ToDrawingColor();
 
             model.ShowFileNameBreadcrumb = this.FileSegment.IsVisible;
-            model.FileBreadcrumbForeground = this.FileSegment.ForegroundColor.ToDrawingColor();
-            model.FileBreadcrumbBackground = this.FileSegment.BackgroundColor.ToDrawingColor();
+            model.FileBreadcrumbForeground = this.FileSegment.DarkForegroundColor.ToDrawingColor();
+            model.FileBreadcrumbBackground = this.FileSegment.DarkBackgroundColor.ToDrawingColor();
+            model.LightFileBreadcrumbForeground = this.FileSegment.LightForegroundColor.ToDrawingColor();
+            model.LightFileBreadcrumbBackground = this.FileSegment.LightBackgroundColor.ToDrawingColor();
 
             model.ShowCodeStructureBreadcrumbs = this.CodeStructureSegment.IsVisible;
-            model.StructureBreadcrumbForeground = this.CodeStructureSegment.ForegroundColor.ToDrawingColor();
-            model.StructureBreadcrumbBackground = this.CodeStructureSegment.BackgroundColor.ToDrawingColor();
+            model.StructureBreadcrumbForeground = this.CodeStructureSegment.DarkForegroundColor.ToDrawingColor();
+            model.StructureBreadcrumbBackground = this.CodeStructureSegment.DarkBackgroundColor.ToDrawingColor();
+            model.LightStructureBreadcrumbForeground = this.CodeStructureSegment.LightForegroundColor.ToDrawingColor();
+            model.LightStructureBreadcrumbBackground = this.CodeStructureSegment.LightBackgroundColor.ToDrawingColor();
 
             model.ExternalEditorCommand = (this.ExternalEditorPath ?? string.Empty).Trim();
             model.ExternalEditorCommandArguments = (this.ExternalEditorArguments ?? string.Empty).Trim();
@@ -634,6 +687,18 @@ public class OptionsPageViewModel : ObservableObject
     private void NotifyTerminalPresentationChanged()
     {
         this.UpdateTerminalPresentation();
+    }
+
+    private void ApplyColorModeToSegments(EditorColorMode colorMode)
+    {
+        this.SolutionRootSegment.ActiveColorMode = colorMode;
+        this.NonSolutionRootSegment.ActiveColorMode = colorMode;
+        this.SolutionFolderSegment.ActiveColorMode = colorMode;
+        this.ProjectNameSegment.ActiveColorMode = colorMode;
+        this.ProjectFolderSegments.ActiveColorMode = colorMode;
+        this.ParentFolderSegment.ActiveColorMode = colorMode;
+        this.FileSegment.ActiveColorMode = colorMode;
+        this.CodeStructureSegment.ActiveColorMode = colorMode;
     }
 
     private void UpdateTerminalPresentation()
