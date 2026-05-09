@@ -247,8 +247,8 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                 FileSystemProjectInfo fsProject when fsProject.DirectoryPath != null => new PhysicalDirectoryBreadcrumbModel(
                     new PhysicalDirectoryModel(fsProject.DisplayName, fsProject.DirectoryPath),
                     fsProject.DisplayName,
-                        colors.NonSolutionRootBackground,
-                        colors.NonSolutionRootForeground)
+                    colors.NonSolutionRootBackground,
+                    colors.NonSolutionRootForeground)
                 {
                     AssociatedDirectory = fsProject.DirectoryPath,
                     TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateDirectoryItemsAsync(fsProject.DirectoryPath),

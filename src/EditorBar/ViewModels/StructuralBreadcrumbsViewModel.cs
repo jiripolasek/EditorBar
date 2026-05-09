@@ -96,6 +96,7 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
                 static (structureProvider, settings) => structureProvider.Select(state => (state, settings)))
             .LogAndRetry("Combine active structure provider and settings")
             .Switch()
+            .ObserveOnDispatcher()
             .Subscribe(tuple => this.UpdateFileStructure(tuple.state, tuple.settings!))
             .AddTo(this._disposables);
 
