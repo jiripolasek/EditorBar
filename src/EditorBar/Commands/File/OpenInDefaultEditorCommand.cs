@@ -6,7 +6,6 @@
 
 using Community.VisualStudio.Toolkit;
 using JPSoftworks.EditorBar.Helpers;
-using Microsoft.VisualStudio.Text;
 
 namespace JPSoftworks.EditorBar.Commands;
 
@@ -17,9 +16,9 @@ namespace JPSoftworks.EditorBar.Commands;
 [Command(PackageGuids.EditorBarCmdSetString, PackageIds.EditorBarFileAction_OpenFileInDefaultEditorCommand)]
 internal sealed class OpenInDefaultEditorCommand : BaseFileActionMenuContextCommand<OpenInDefaultEditorCommand>
 {
-    protected override Task ExecuteCoreAsync(ITextDocument currentDocument)
+    protected override Task ExecuteCoreAsync(string filePath)
     {
-        Launcher.OpenInDefaultEditor(currentDocument.FilePath);
+        Launcher.OpenInDefaultEditor(filePath);
         return Task.CompletedTask;
     }
 }

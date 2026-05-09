@@ -198,6 +198,7 @@
                     <EventSetter Event="Expanded" Handler="TreeViewItem_OnExpanded" />
                     <EventSetter Event="Loaded" Handler="TreeViewItem_OnLoaded" />
                     <EventSetter Event="PreviewMouseLeftButtonUp" Handler="TreeViewItem_OnPreviewMouseLeftButtonUp" />
+                    <EventSetter Event="PreviewMouseRightButtonUp" Handler="TreeViewItem_OnPreviewMouseRightButtonUp" />
                 </Style>
             </TreeView.ItemContainerStyle>
         </TreeView>

@@ -12,6 +12,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using JPSoftworks.EditorBar.Options;
 using JPSoftworks.EditorBar.ViewModels;
+using Microsoft.VisualStudio.Threading;
 
 namespace JPSoftworks.EditorBar.Controls;
 
@@ -128,25 +129,33 @@ public partial class MemberList : UserControl
         this.SelectFirstItemForFocusedList();
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD100:Avoid async void methods", Justification = "Event handler")]
     private async void FilterTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        var view = this._collectionViewSource.View;
-        var shouldReturnFocusToList = string.IsNullOrEmpty(this.FilterTextBox!.Text);
-
-        if (shouldReturnFocusToList)
+        try
         {
-            this.ApplyEmptyFilterVisibilityPreference();
+            var view = this._collectionViewSource.View;
+            var shouldReturnFocusToList = string.IsNullOrEmpty(this.FilterTextBox!.Text);
+
+            if (shouldReturnFocusToList)
+            {
+                this.ApplyEmptyFilterVisibilityPreference();
+            }
+
+            this.UpdateFilterPredicate();
+            view?.Refresh();
+
+            if (shouldReturnFocusToList)
+            {
+                // Return focus only after the refreshed view is in place, otherwise selection can be cleared again.
+                await Task.Yield();
+                this.ListBox!.Focus();
+                this.SelectFirstItemForFocusedList();
+            }
         }
-
-        this.UpdateFilterPredicate();
-        view?.Refresh();
-
-        if (shouldReturnFocusToList)
+        catch (Exception ex)
         {
-            // Return focus only after the refreshed view is in place, otherwise selection can be cleared again.
-            await Task.Yield();
-            this.ListBox!.Focus();
-            this.SelectFirstItemForFocusedList();
+            await ex.LogAsync();
         }
     }
 

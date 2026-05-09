@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Windows.Input;
 using Community.VisualStudio.Toolkit;
+using JPSoftworks.EditorBar.Commands;
 using JPSoftworks.EditorBar.Commands.Abstractions;
 using JPSoftworks.EditorBar.Services.LocationProviders;
 using JPSoftworks.EditorBar.ViewModels;
@@ -17,6 +18,7 @@ using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Text.Editor;
 using Project = Community.VisualStudio.Toolkit.Project;
 
 namespace JPSoftworks.EditorBar.Helpers;
@@ -25,23 +27,24 @@ internal static class LocationBreadcrumbTreeBuilder
 {
     private static readonly FileNameToImageMonikerConverter FileNameToImageMonikerConverter = new();
 
-    public static async Task<IList<MemberTreeItemViewModel>> CreateSolutionRootItemsAsync()
+    public static async Task<IList<MemberTreeItemViewModel>> CreateSolutionRootItemsAsync(IWpfTextView currentTextView)
     {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
         var solution = await VS.Solutions.GetCurrentSolutionAsync();
         if (solution != null)
         {
-            return CreateSolutionItems(solution.Children.OfType<SolutionItem>());
+            return CreateSolutionItems(solution.Children.OfType<SolutionItem>(), currentTextView);
         }
 
         var rootItems = await VS.Solutions.GetAllProjectsAsync(ProjectStateFilter.All);
-        return CreateSolutionItems(rootItems.OfType<SolutionItem>());
+        return CreateSolutionItems(rootItems.OfType<SolutionItem>(), currentTextView);
     }
 
     public static async Task<IList<MemberTreeItemViewModel>> CreateProjectItemsAsync(
         GenericProjectInfo projectInfo,
-        ICommand? switchProjectCommand)
+        ICommand? switchProjectCommand,
+        IWpfTextView currentTextView)
     {
         Requires.NotNull(projectInfo);
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -53,18 +56,22 @@ internal static class LocationBreadcrumbTreeBuilder
             items.AddRange(CreateAlternativeProjectNodes(projectInfo, switchProjectCommand));
         }
 
-        items.AddRange(CreateSolutionItems(projectInfo.Project.Children.OfType<SolutionItem>()));
+        items.AddRange(CreateSolutionItems(projectInfo.Project.Children.OfType<SolutionItem>(), currentTextView));
         return items;
     }
 
-    public static async Task<IList<MemberTreeItemViewModel>> CreateSolutionItemChildrenAsync(SolutionItem solutionItem)
+    public static async Task<IList<MemberTreeItemViewModel>> CreateSolutionItemChildrenAsync(
+        SolutionItem solutionItem,
+        IWpfTextView currentTextView)
     {
         Requires.NotNull(solutionItem);
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-        return CreateSolutionItems(solutionItem.Children.OfType<SolutionItem>());
+        return CreateSolutionItems(solutionItem.Children.OfType<SolutionItem>(), currentTextView);
     }
 
-    public static Task<IList<MemberTreeItemViewModel>> CreateDirectoryItemsAsync(string directoryPath)
+    public static Task<IList<MemberTreeItemViewModel>> CreateDirectoryItemsAsync(
+        string directoryPath,
+        IWpfTextView currentTextView)
     {
         Requires.NotNullOrWhiteSpace(directoryPath);
 
@@ -75,20 +82,22 @@ internal static class LocationBreadcrumbTreeBuilder
 
         var directories = Directory.EnumerateDirectories(directoryPath)
             .OrderBy(static path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase)
-            .Select(CreateDirectoryNode);
+            .Select(path => CreateDirectoryNode(path, currentTextView));
 
         var files = Directory.EnumerateFiles(directoryPath)
             .OrderBy(static path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase)
-            .Select(CreateFileNode);
+            .Select(path => CreateFileNode(path, currentTextView));
 
         return Task.FromResult<IList<MemberTreeItemViewModel>>([.. directories, .. files]);
     }
 
-    private static List<MemberTreeItemViewModel> CreateSolutionItems(IEnumerable<SolutionItem> solutionItems)
+    private static List<MemberTreeItemViewModel> CreateSolutionItems(
+        IEnumerable<SolutionItem> solutionItems,
+        IWpfTextView currentTextView)
     {
         return solutionItems
             .Where(ShouldIncludeSolutionItem)
-            .Select(CreateSolutionItemNode)
+            .Select(item => CreateSolutionItemNode(item, currentTextView))
             .ToList();
     }
 
@@ -108,7 +117,7 @@ internal static class LocationBreadcrumbTreeBuilder
             });
     }
 
-    private static MemberTreeItemViewModel CreateSolutionItemNode(SolutionItem item)
+    private static MemberTreeItemViewModel CreateSolutionItemNode(SolutionItem item, IWpfTextView currentTextView)
     {
         Requires.NotNull(item);
 
@@ -119,9 +128,10 @@ internal static class LocationBreadcrumbTreeBuilder
             PrimaryName = primaryName,
             SearchText = string.Join(" ", new[] { primaryName, item.Name, item.FullPath }.Where(static value => !string.IsNullOrWhiteSpace(value))),
             ImageMoniker = GetSolutionItemMoniker(item),
-            ChildrenProvider = canHaveChildren ? () => CreateSolutionItemChildrenAsync(item) : null,
+            ChildrenProvider = canHaveChildren ? () => CreateSolutionItemChildrenAsync(item, currentTextView) : null,
             ExpandOnActivate = ShouldExpandOnActivate(item, canHaveChildren),
             Command = canHaveChildren && !IsActivatableFileItem(item) ? null : CreateLeafCommand(item),
+            ContextCommand = CreateContextCommand(item, primaryName, currentTextView),
             InvokeOnActivate = IsActivatableFileItem(item)
         };
 
@@ -129,31 +139,61 @@ internal static class LocationBreadcrumbTreeBuilder
         return node;
     }
 
-    private static MemberTreeItemViewModel CreateDirectoryNode(string directoryPath)
+    private static MemberTreeItemViewModel CreateDirectoryNode(string directoryPath, IWpfTextView currentTextView)
     {
         var hasEntries = Directory.EnumerateFileSystemEntries(directoryPath).Any();
+        var directoryName = Path.GetFileName(directoryPath);
+        var model = new PhysicalDirectoryModel(string.IsNullOrWhiteSpace(directoryName) ? directoryPath : directoryName, directoryPath);
         var node = new MemberTreeItemViewModel
         {
-            PrimaryName = Path.GetFileName(directoryPath),
+            PrimaryName = model.Name,
             SearchText = directoryPath,
             ImageMoniker = KnownMonikers.FolderOpened,
             ExpandOnActivate = true,
-            ChildrenProvider = hasEntries ? () => CreateDirectoryItemsAsync(directoryPath) : null
+            ChildrenProvider = hasEntries ? () => CreateDirectoryItemsAsync(directoryPath, currentTextView) : null,
+            ContextCommand = new DispatchedDelegateCommand(_ => new LocationBreadcrumbMenuContext(model, currentTextView).ShowMenu())
         };
 
         node.PrepareForDisplay();
         return node;
     }
 
-    private static MemberTreeItemViewModel CreateFileNode(string filePath)
+    private static MemberTreeItemViewModel CreateFileNode(string filePath, IWpfTextView currentTextView)
     {
         return new MemberTreeItemViewModel
         {
             PrimaryName = Path.GetFileName(filePath),
             SearchText = filePath,
             ImageMoniker = GetFileMoniker(filePath),
-            Command = new DispatchedDelegateCommand(_ => OpenDocumentAsync(filePath).FireAndForget())
+            Command = new DispatchedDelegateCommand(_ => OpenDocumentAsync(filePath).FireAndForget()),
+            ContextCommand = new DispatchedDelegateCommand(_ => new FileActionMenuContext(filePath).ShowMenu())
         };
+    }
+
+    private static ICommand? CreateContextCommand(SolutionItem item, string primaryName, IWpfTextView currentTextView)
+    {
+        if (item is Project project)
+        {
+            return new DispatchedDelegateCommand(_ => ShowProjectMenuAsync(project, currentTextView).FireAndForget());
+        }
+
+        if (item.Type == SolutionItemType.SolutionFolder)
+        {
+            return new DispatchedDelegateCommand(_ => new SolutionFolderBreadcrumbMenuContext(item, currentTextView).ShowMenu());
+        }
+
+        if (IsActivatableFileItem(item))
+        {
+            return new DispatchedDelegateCommand(_ => new FileActionMenuContext(item.FullPath).ShowMenu());
+        }
+
+        if (!string.IsNullOrWhiteSpace(item.FullPath) && Directory.Exists(item.FullPath))
+        {
+            var model = new PhysicalDirectoryModel(primaryName, item.FullPath);
+            return new DispatchedDelegateCommand(_ => new LocationBreadcrumbMenuContext(model, currentTextView).ShowMenu());
+        }
+
+        return null;
     }
 
     private static ICommand CreateLeafCommand(SolutionItem item)
@@ -263,5 +303,11 @@ internal static class LocationBreadcrumbTreeBuilder
     private static async Task OpenDocumentAsync(string filePath)
     {
         await VS.Documents.OpenAsync(filePath);
+    }
+
+    private static async Task ShowProjectMenuAsync(Project project, IWpfTextView currentTextView)
+    {
+        var projectInfo = await GenericProjectInfo.CreateFromProjectAsync(project);
+        new LocationBreadcrumbMenuContext(projectInfo, currentTextView).ShowMenu();
     }
 }
