@@ -347,6 +347,10 @@
                 <StackPanel>
                     <CheckBox
                         Margin="{StaticResource UIElementMargin}"
+                        Content="Show _Locate in Solution Explorer button"
+                        IsChecked="{Binding ViewModel.DisplayLocateInSolutionExplorerButton}" />
+                    <CheckBox
+                        Margin="{StaticResource UIElementMargin}"
                         Content="Show _Open in Default Editor button"
                         IsChecked="{Binding ViewModel.DisplayOpenDefaultEditorButton}" />
                     <CheckBox

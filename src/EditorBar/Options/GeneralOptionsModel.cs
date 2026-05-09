@@ -132,6 +132,12 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     public bool Enabled { get; set; } = true;
 
     [Category(ToolbarCategoryName)]
+    [DisplayName("Show locate in Solution Explorer button")]
+    [Description("Determines if the Locate in Solution Explorer button is visible on the Editor Bar toolbar.")]
+    [DefaultValue(true)]
+    public bool ShowLocateInSolutionExplorerButton { get; set; } = true;
+
+    [Category(ToolbarCategoryName)]
     [DisplayName("Show open in default editor button")]
     [Description("Determines if the Open in Default Editor button is visible on the Editor Bar toolbar.")]
     [DefaultValue(true)]

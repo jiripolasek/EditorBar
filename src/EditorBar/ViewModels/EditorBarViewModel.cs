@@ -46,6 +46,8 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
 
     public ICommand ShowDebugInformationCommand { get; }
 
+    public ICommand LocateInSolutionExplorerCommand { get; }
+
     public ICommand OpenContainingFolderCommand { get; }
 
     public ICommand OpenTerminalCommand { get; }
@@ -117,6 +119,8 @@ internal class EditorBarViewModel : ObservableObject, IDisposable
         }
 
         this.ShowDebugInformationCommand = new DispatchedDelegateCommand(this.ExecuteShowDebugInfo);
+        this.LocateInSolutionExplorerCommand = new DispatchedDelegateCommand(
+            _ => ProjectProperties.SelectInSolutionExplorerAsync(textDocument.FilePath).FireAndForget());
         this.OpenContainingFolderCommand
             = new DispatchedDelegateCommand(_ => Launcher.OpenContaingFolder(textDocument.FilePath));
         this.OpenTerminalCommand

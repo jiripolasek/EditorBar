@@ -46,6 +46,8 @@ public class GeneralOptionPageSettings
 
     public bool Enabled { get; set; }
 
+    public bool ShowLocateInSolutionExplorerButton { get; set; }
+
     public bool ShowOpenDefaultEditorButton { get; set; }
 
     public bool ShowOpenExternalEditorButton { get; set; }
@@ -151,6 +153,7 @@ public class GeneralOptionPageSettings
         this.ShowCodeStructureBreadcrumbs = model.ShowCodeStructureBreadcrumbs;
         this.ShowFileNameBreadcrumb = model.ShowFileNameBreadcrumb;
         this.Enabled = model.Enabled;
+        this.ShowLocateInSolutionExplorerButton = model.ShowLocateInSolutionExplorerButton;
         this.ShowOpenDefaultEditorButton = model.ShowOpenDefaultEditorButton;
         this.ShowOpenExternalEditorButton = model.ShowOpenExternalEditorButton;
         this.ShowOpenContainingFolderButton = model.ShowOpenContainingFolderButton;
@@ -213,6 +216,7 @@ public class GeneralOptionPageSettings
         model.ShowCodeStructureBreadcrumbs = this.ShowCodeStructureBreadcrumbs;
         model.ShowFileNameBreadcrumb = this.ShowFileNameBreadcrumb;
         model.Enabled = this.Enabled;
+        model.ShowLocateInSolutionExplorerButton = this.ShowLocateInSolutionExplorerButton;
         model.ShowOpenDefaultEditorButton = this.ShowOpenDefaultEditorButton;
         model.ShowOpenExternalEditorButton = this.ShowOpenExternalEditorButton;
         model.ShowOpenContainingFolderButton = this.ShowOpenContainingFolderButton;

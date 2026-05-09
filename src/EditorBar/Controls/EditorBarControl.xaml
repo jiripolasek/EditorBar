@@ -36,10 +36,19 @@
                         KeyboardNavigation.TabNavigation="Local"
                         Orientation="Horizontal">
                         <Button
-                            Command="{Binding ShowDebugInformationCommand}"
+                            x:Name="LocateInSolutionExplorerButton"
+                            Command="{Binding LocateInSolutionExplorerCommand}"
                             PreviewGotKeyboardFocus="UIElement_OnPreviewGotKeyboardFocus"
                             Style="{DynamicResource NoBorderButtonStyle}"
                             TabIndex="2"
+                            ToolTip="Locate in Solution Explorer">
+                            <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.SwitchSourceOrTarget}" />
+                        </Button>
+                        <Button
+                            Command="{Binding ShowDebugInformationCommand}"
+                            PreviewGotKeyboardFocus="UIElement_OnPreviewGotKeyboardFocus"
+                            Style="{DynamicResource NoBorderButtonStyle}"
+                            TabIndex="3"
                             ToolTip="Debug"
                             Visibility="{Binding IsDevelopmentModeEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" />
@@ -49,7 +58,7 @@
                             Command="{Binding OpenDefaultEditorCommand}"
                             PreviewGotKeyboardFocus="UIElement_OnPreviewGotKeyboardFocus"
                             Style="{DynamicResource NoBorderButtonStyle}"
-                            TabIndex="3"
+                            TabIndex="4"
                             ToolTip="Open in Default Editor">
                             <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.OpenFileDialog}" />
                         </Button>
