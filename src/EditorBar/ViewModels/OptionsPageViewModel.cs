@@ -28,6 +28,7 @@ public class OptionsPageViewModel : ObservableObject
     private bool _displayInDiffViews;
     private bool _displayInNonEditableDocuments;
     private bool _displayInTemp;
+    private bool _displayLocateInSolutionExplorerButton;
     private bool _displayMemberListFilterBoxWhenEmpty;
     private bool _displayOpenContainingFolderButton;
     private bool _displayOpenDefaultEditorButton;
@@ -233,6 +234,15 @@ public class OptionsPageViewModel : ObservableObject
     {
         get => this._displayInTemp;
         set => this.SetProperty(ref this._displayInTemp, value);
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the Locate in Solution Explorer toolbar button is visible.
+    /// </summary>
+    public bool DisplayLocateInSolutionExplorerButton
+    {
+        get => this._displayLocateInSolutionExplorerButton;
+        set => this.SetProperty(ref this._displayLocateInSolutionExplorerButton, value);
     }
 
     /// <summary>
@@ -609,6 +619,7 @@ public class OptionsPageViewModel : ObservableObject
             this.DisplayInBlame = model.DisplayInBlame;
             this.DisplayInTemp = model.DisplayInTempFiles;
             this.DisplayMemberListFilterBoxWhenEmpty = model.ShowMemberListFilterBoxWhenEmpty;
+            this.DisplayLocateInSolutionExplorerButton = model.ShowLocateInSolutionExplorerButton;
             this.DisplayOpenDefaultEditorButton = model.ShowOpenDefaultEditorButton;
             this.DisplayOpenExternalEditorButton = model.ShowOpenExternalEditorButton;
             this.DisplayOpenContainingFolderButton = model.ShowOpenContainingFolderButton;
@@ -728,6 +739,7 @@ public class OptionsPageViewModel : ObservableObject
         model.DisplayInBlame = this.DisplayInBlame;
         model.DisplayInTempFiles = this.DisplayInTemp;
         model.ShowMemberListFilterBoxWhenEmpty = this.DisplayMemberListFilterBoxWhenEmpty;
+        model.ShowLocateInSolutionExplorerButton = this.DisplayLocateInSolutionExplorerButton;
         model.ShowOpenDefaultEditorButton = this.DisplayOpenDefaultEditorButton;
         model.ShowOpenExternalEditorButton = this.DisplayOpenExternalEditorButton;
         model.ShowOpenContainingFolderButton = this.DisplayOpenContainingFolderButton;

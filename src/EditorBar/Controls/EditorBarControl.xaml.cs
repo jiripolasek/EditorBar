@@ -83,6 +83,10 @@ internal partial class EditorBarControl : IDisposable
     {
         var options = GeneralOptionsModel.Instance;
 
+        this.LocateInSolutionExplorerButton!.Visibility = options.ShowLocateInSolutionExplorerButton
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
         this.OpenDefaultEditorButton!.Visibility = options.ShowOpenDefaultEditorButton
             ? Visibility.Visible
             : Visibility.Collapsed;
