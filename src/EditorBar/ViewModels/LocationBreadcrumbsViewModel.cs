@@ -41,6 +41,7 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
     private readonly LocationBreadcrumbEventAggregator _locationBreadcrumbEventAggregator;
     private readonly DispatchedDelegateCommand _openMenuOnPhysicalCrumb;
     private readonly DispatchedDelegateCommand _openMenuOnProjectCrumb;
+    private readonly DispatchedDelegateCommand _openMenuOnSolutionFolderCrumb;
     private readonly EditorBarViewModel _parent;
     private readonly SettingsRefreshAggregator _settingsRefreshAggregator;
 
@@ -87,6 +88,7 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
         this._switchProjectCommand = new DispatchedDelegateCommand(this.SwitchProject);
         this._openMenuOnProjectCrumb = new DispatchedDelegateCommand(this.OpenContextMenuOnProjectCrumb);
         this._openMenuOnPhysicalCrumb = new DispatchedDelegateCommand(this.OpenContextMenuOnPhysicalBreadcrumb);
+        this._openMenuOnSolutionFolderCrumb = new DispatchedDelegateCommand(this.OpenContextMenuOnSolutionFolderCrumb);
 
         return;
 
@@ -267,7 +269,8 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                         options.SolutionFolderBackground,
                         options.SolutionFolderForeground)
                     {
-                        TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateSolutionItemChildrenAsync(folder)
+                        TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateSolutionItemChildrenAsync(folder),
+                        ContextCommand = this._openMenuOnSolutionFolderCrumb
                     }));
         }
 
@@ -410,6 +413,17 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
         }
 
         new LocationBreadcrumbMenuContext(breadcrumbModel.Model, this._textView).ShowMenu();
+    }
+
+    private void OpenContextMenuOnSolutionFolderCrumb(object obj)
+    {
+        var breadcrumbModel = (obj as FrameworkElement)?.DataContext as BreadcrumbModel<SolutionItem>;
+        if (breadcrumbModel?.Model == null)
+        {
+            return;
+        }
+
+        new SolutionFolderBreadcrumbMenuContext(breadcrumbModel.Model, this._textView).ShowMenu();
     }
 
     private static string? GetSolutionRootPath(BaseSolutionProjectInfo project)

@@ -89,6 +89,9 @@ namespace JPSoftworks.EditorBar
         public const int EditorBarPhysicalDirectoryMenu_OpenContainingFolderCommand = 0x7012;
         public const int EditorBarPhysicalDirectoryMenu_LocateInSolutionExplorerCommand = 0x7013;
         public const int EditorBarPhysicalDirectoryMenu_OpenTerminalCommand = 0x7014;
+        public const int EditorBarSolutionFolderMenu = 0x7100;
+        public const int EditorBarSolutionFolderMenu_LocateGroup = 0x7101;
+        public const int EditorBarSolutionFolderMenu_LocateInSolutionExplorerCommand = 0x7110;
         public const int EditorBarSettingsMenu = 0x8000;
         public const int EditorBarSettingsMenu_ToggleGroup = 0x8001;
         public const int EditorBarSettingsMenu_LayoutGroup = 0x8002;

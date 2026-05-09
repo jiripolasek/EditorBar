@@ -61,6 +61,13 @@
 				</Strings>
 			</Menu>
 
+			<!-- Solution folder context menu -->
+			<Menu guid="EditorBarCmdSet" id="EditorBarSolutionFolderMenu" type="Context">
+				<Strings>
+					<ButtonText>Solution Folder Menu</ButtonText>
+				</Strings>
+			</Menu>
+
 
 			<!-- Settings context menu -->
 			<Menu guid="EditorBarCmdSet" id="EditorBarSettingsMenu" type="Context">
@@ -177,6 +184,11 @@
 			</Group>
 			<Group guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_LocateGroup" priority="0x300">
 				<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu" />
+			</Group>
+
+			<!-- Solution folder context menu -->
+			<Group guid="EditorBarCmdSet" id="EditorBarSolutionFolderMenu_LocateGroup" priority="0x100">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSolutionFolderMenu" />
 			</Group>
 
 
@@ -563,6 +575,20 @@
 				</Strings>
 			</Button>
 
+			<!-- solution folder context menu -->
+			<Button guid="EditorBarCmdSet" id="EditorBarSolutionFolderMenu_LocateInSolutionExplorerCommand">
+				<Icon guid="ImageCatalogGuid" id="SwitchSourceOrTarget" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Locate in Solution Explorer</ButtonText>
+					<CommandName>Locate in Solution Explorer</CommandName>
+					<CanonicalName>EditorBar.SolutionFolder.LocateInSolutionExplorer</CanonicalName>
+					<LocCanonicalName>EditorBar.SolutionFolder.LocateInSolutionExplorer</LocCanonicalName>
+				</Strings>
+			</Button>
+
 
 			<!-- Settings context menu commands -->
 			<Button guid="EditorBarCmdSet" id="EditorBarSettings_ToggleEditorBarCommand" priority="0x0100" type="Button">
@@ -770,6 +796,10 @@
 		                  priority="0x0300">
 			<Parent guid="EditorBarCmdSet" id="EditorBarPhysicalDirectoryMenu_ContainerGroup" />
 		</CommandPlacement>
+		<CommandPlacement guid="EditorBarCmdSet" id="EditorBarSolutionFolderMenu_LocateInSolutionExplorerCommand"
+		                  priority="0x0100">
+			<Parent guid="EditorBarCmdSet" id="EditorBarSolutionFolderMenu_LocateGroup" />
+		</CommandPlacement>
 
 	</CommandPlacements>
 
@@ -859,6 +889,9 @@
 			<IDSymbol name="EditorBarPhysicalDirectoryMenu_OpenContainingFolderCommand" value="0x7012" />
 			<IDSymbol name="EditorBarPhysicalDirectoryMenu_LocateInSolutionExplorerCommand" value="0x7013" />
 			<IDSymbol name="EditorBarPhysicalDirectoryMenu_OpenTerminalCommand" value="0x7014" />
+			<IDSymbol name="EditorBarSolutionFolderMenu" value="0x7100" />
+			<IDSymbol name="EditorBarSolutionFolderMenu_LocateGroup" value="0x7101" />
+			<IDSymbol name="EditorBarSolutionFolderMenu_LocateInSolutionExplorerCommand" value="0x7110" />
 
 
 			<!-- context menu: settings -->
