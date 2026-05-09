@@ -16,6 +16,7 @@ internal sealed class LocatePhysicalDirectoryInSolutionExplorerCommand :
 {
     protected override async Task ExecuteCoreAsync(PhysicalDirectoryModel physicalDirectory)
     {
-        await ProjectProperties.SelectInSolutionExplorerAsync(physicalDirectory.FullPath);
+        await ProjectProperties.SelectInSolutionExplorerAsync(
+            physicalDirectory.SolutionExplorerPath ?? physicalDirectory.FullPath);
     }
 }

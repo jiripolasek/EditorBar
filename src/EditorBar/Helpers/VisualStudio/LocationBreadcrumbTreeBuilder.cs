@@ -160,8 +160,9 @@ internal static class LocationBreadcrumbTreeBuilder
     {
         return new DispatchedDelegateCommand(_ =>
         {
-            var fullPath = item.FullPath;
-            if (!string.IsNullOrWhiteSpace(fullPath) && File.Exists(fullPath) && item is not Project)
+            if (item is not Project &&
+                item.FullPath is { Length: > 0 } fullPath &&
+                File.Exists(fullPath))
             {
                 OpenDocumentAsync(fullPath).FireAndForget();
                 return;
@@ -225,8 +226,7 @@ internal static class LocationBreadcrumbTreeBuilder
 
     private static StackedImageMoniker GetSolutionItemMoniker(SolutionItem item)
     {
-        var fullPath = item.FullPath;
-        if (!string.IsNullOrWhiteSpace(fullPath))
+        if (item.FullPath is { Length: > 0 } fullPath)
         {
             if (Directory.Exists(fullPath))
             {
