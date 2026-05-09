@@ -186,6 +186,9 @@
     <Compile Include="Controls\MemberListPopup.xaml.cs">
       <DependentUpon>MemberListPopup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\MemberTree.xaml.cs">
+      <DependentUpon>MemberTree.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SymbolChevronButton.cs" />
     <Compile Include="Helpers\Matchers.cs" />
     <Compile Include="Helpers\VisualStudio\ProjectProperties.cs" />
@@ -220,6 +223,7 @@
     </Compile>
     <Compile Include="Services\Abstractions\FileStructureElementModel.cs" />
     <Compile Include="ViewModels\MemberListItemViewModel.cs" />
+    <Compile Include="ViewModels\MemberTreeItemViewModel.cs" />
     <Compile Include="ViewModels\Breadcrumbs\ProjectContainerBreadcrumbModel.cs" />
     <Compile Include="ViewModels\SeparatorListItemViewModel.cs" />
     <Compile Include="ViewModels\Breadcrumbs\StructureBreadcrumbViewModel.cs" />
@@ -321,6 +325,7 @@
     <Compile Include="ViewModels\EditorSegmentOptionsViewModel.cs" />
     <Compile Include="ViewModels\OptionsPageViewModel.cs" />
     <Compile Include="Helpers\VisualStudio\NavigationBarHelper.cs" />
+    <Compile Include="Helpers\VisualStudio\LocationBreadcrumbTreeBuilder.cs" />
     <Compile Include="Helpers\VisualStudio\VisualStudioHelper.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -435,6 +440,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\MemberListPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\MemberTree.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

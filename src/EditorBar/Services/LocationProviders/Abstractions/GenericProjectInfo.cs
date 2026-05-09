@@ -47,15 +47,24 @@ public class GenericProjectInfo : BaseSolutionProjectInfo, IHasSolutionFolders
     /// </summary>
     public IReadOnlyList<string> SolutionFolders { get; }
 
-    private GenericProjectInfo(ToolkitProject project, TookitSolution? solution, IReadOnlyList<string> solutionFolders)
+    /// <summary>
+    /// Gets the solution folder items.
+    /// </summary>
+    public IReadOnlyList<SolutionItem> SolutionFolderItems { get; }
+
+    private GenericProjectInfo(
+        ToolkitProject project,
+        TookitSolution? solution,
+        IReadOnlyList<SolutionItem> solutionFolderItems)
         : base(project.Name, Path.GetDirectoryName(project.FullPath!))
     {
         Requires.NotNull(project);
-        Requires.NotNull(solutionFolders);
+        Requires.NotNull(solutionFolderItems);
 
         this.Project = project;
         this.Solution = solution!;
-        this.SolutionFolders = solutionFolders;
+        this.SolutionFolderItems = solutionFolderItems;
+        this.SolutionFolders = solutionFolderItems.Select(static item => item.Name).ToList();
     }
 
     /// <summary>
@@ -68,8 +77,8 @@ public class GenericProjectInfo : BaseSolutionProjectInfo, IHasSolutionFolders
         Requires.NotNull(project);
 
         var solution = await VS.Solutions.GetCurrentSolutionAsync();
-        var solutionFolders = await GetSolutionFoldersAsync(project);
-        return new GenericProjectInfo(project, solution, solutionFolders);
+        var solutionFolderItems = await GetSolutionFolderItemsAsync(project);
+        return new GenericProjectInfo(project, solution, solutionFolderItems);
     }
 
     /// <summary>
@@ -94,8 +103,8 @@ public class GenericProjectInfo : BaseSolutionProjectInfo, IHasSolutionFolders
         }
     }
 
-    private static async Task<List<string>> GetSolutionFoldersAsync(SolutionItem? solutionItem)
+    private static async Task<List<SolutionItem>> GetSolutionFolderItemsAsync(SolutionItem? solutionItem)
     {
-        return solutionItem == null ? [] : await VisualStudioHelper.GetSolutionFolderPathAsync(solutionItem);
+        return solutionItem == null ? [] : await VisualStudioHelper.GetSolutionFolderItemsAsync(solutionItem);
     }
 }

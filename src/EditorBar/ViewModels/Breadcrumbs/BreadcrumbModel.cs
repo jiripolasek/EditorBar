@@ -45,7 +45,9 @@ public class BreadcrumbModel
 
     public Func<Task<IList<MemberListItemViewModel>>>? ItemsProvider { get; init; }
 
-    public bool CanHaveChildren => this.ItemsProvider != null;
+    public Func<Task<IList<MemberTreeItemViewModel>>>? TreeItemsProvider { get; init; }
+
+    public bool CanHaveChildren => this.ItemsProvider != null || this.TreeItemsProvider != null;
 
     public BreadcrumbModel(string text, Brush background, Brush foreground)
     {
