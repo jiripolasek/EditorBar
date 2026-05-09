@@ -221,7 +221,12 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
             {
                 BaseSolutionProjectInfo s => GetSolutionRootPath(s) is { } solutionRootPath
                     ? new PhysicalDirectoryBreadcrumbModel(
-                        new PhysicalDirectoryModel("\\", solutionRootPath),
+                        new PhysicalDirectoryModel("\\", solutionRootPath)
+                        {
+                            SolutionExplorerPath = s is GenericProjectInfo genericProject
+                                ? genericProject.Solution?.FullPath
+                                : null
+                        },
                         "\\",
                         options.SolutionBackground,
                         options.SolutionForeground)

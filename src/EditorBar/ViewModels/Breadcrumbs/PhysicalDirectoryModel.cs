@@ -4,4 +4,7 @@
 
 namespace JPSoftworks.EditorBar.ViewModels;
 
-public record struct PhysicalDirectoryModel(string Name, string FullPath);
+public record struct PhysicalDirectoryModel(string Name, string FullPath)
+{
+    public string? SolutionExplorerPath { get; init; }
+}

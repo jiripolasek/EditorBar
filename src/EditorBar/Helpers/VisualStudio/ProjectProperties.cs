@@ -112,7 +112,16 @@ public static class ProjectProperties
         // Ensure we're on the main thread for solution operations
         await ThreadHelper.JoinableTaskFactory!.SwitchToMainThreadAsync();
 
-        // 1) Search in loaded projects
+        // 1) Check the solution root itself
+        {
+            if (await VS.Solutions.GetCurrentSolutionAsync() is { FullPath: { } currentSolutionFullPath } currentSolution &&
+                currentSolutionFullPath.Equals(path, PathUtils.LocalPathComparison))
+            {
+                return currentSolution;
+            }
+        }
+
+        // 2) Search in loaded projects
         {
             // Retrieve all top-level projects and solution folders
             var rootItems = await VS.Solutions.GetAllProjectsAsync();
@@ -128,7 +137,7 @@ public static class ProjectProperties
             }
         }
 
-        // 2) Check unloaded project names
+        // 3) Check unloaded project names
         {
             // Retrieve all unloaded projects
             var unloadedProjects = await VS.Solutions.GetAllProjectsAsync(ProjectStateFilter.Unloaded);
@@ -140,7 +149,7 @@ public static class ProjectProperties
             }
         }
 
-        // 3) Check miscellaneous items (e.g., Solution Items folder)
+        // 4) Check miscellaneous items (e.g., Solution Items folder)
         {
             var found = await VirtualProjectFinder.FindItemsInVirtualProjectsByPathAsync(path);
             if (found != null)
