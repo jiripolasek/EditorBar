@@ -7,6 +7,7 @@
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using JPSoftworks.EditorBar.Options;
@@ -145,9 +146,9 @@ public partial class MemberTree : UserControl
         e.Handled = true;
     }
 
-    private void TreeViewItem_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void TreeViewItem_OnPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (e.ClickCount != 2)
+        if (e.ClickCount != 1)
         {
             return;
         }
@@ -158,6 +159,11 @@ public partial class MemberTree : UserControl
         }
 
         if (!ReferenceEquals(this.FindNearestTreeViewItem(e.OriginalSource as DependencyObject), container))
+        {
+            return;
+        }
+
+        if (this.FindNearestAncestor<ToggleButton>(e.OriginalSource as DependencyObject) != null)
         {
             return;
         }
@@ -444,6 +450,23 @@ public partial class MemberTree : UserControl
             if (current is TreeViewItem treeViewItem)
             {
                 return treeViewItem;
+            }
+
+            current = VisualTreeHelper.GetParent(current) ?? LogicalTreeHelper.GetParent(current);
+        }
+
+        return null;
+    }
+
+    private T? FindNearestAncestor<T>(DependencyObject? source)
+        where T : DependencyObject
+    {
+        var current = source;
+        while (current != null)
+        {
+            if (current is T match)
+            {
+                return match;
             }
 
             current = VisualTreeHelper.GetParent(current) ?? LogicalTreeHelper.GetParent(current);
