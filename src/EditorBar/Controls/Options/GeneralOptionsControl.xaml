@@ -373,6 +373,30 @@
 
             <GroupBox Header="Member List">
                 <StackPanel>
+                    <Grid Margin="{StaticResource UIElementMargin}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" MinWidth="160" />
+                            <ColumnDefinition Width="Auto" MinWidth="240" />
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            VerticalAlignment="Stretch"
+                            VerticalContentAlignment="Center"
+                            Content="Filtered tree results"
+                            Target="{Binding ElementName=MemberTreeSearchResultViewComboBox}" />
+                        <ComboBox
+                            x:Name="MemberTreeSearchResultViewComboBox"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            DisplayMemberPath="DisplayName"
+                            ItemsSource="{Binding ViewModel.MemberTreeSearchResultViews}"
+                            SelectedValue="{Binding ViewModel.MemberTreeSearchResultViewDefault, Mode=TwoWay}"
+                            SelectedValuePath="Value" />
+                    </Grid>
+                    <TextBlock Margin="0,0,0,12" Style="{StaticResource HintTextBlockStyle}">
+                        Choose whether filtered member tree popups open in the tree, switch to a flat list, or reuse the last manually selected view.
+                    </TextBlock>
                     <CheckBox
                         Margin="{StaticResource UIElementMargin}"
                         Content="Show member list _filter box when empty"

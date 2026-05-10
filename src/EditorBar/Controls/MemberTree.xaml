@@ -46,6 +46,39 @@
                 </Grid>
             </HierarchicalDataTemplate>
 
+            <DataTemplate
+                x:Key="ResultsListItemTemplate"
+                DataType="{x:Type viewModels:MemberTreeItemViewModel}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="18" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="*" SharedSizeGroup="C1" />
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="C2" />
+                    </Grid.ColumnDefinitions>
+                    <controls:IconDisplay
+                        VerticalAlignment="Center"
+                        Icon="{x:Null}"
+                        ImageMoniker="{Binding ImageMoniker}" />
+                    <TextBlock
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}"
+                        Text="{Binding PrimaryName}"
+                        TextTrimming="CharacterEllipsis" />
+                    <TextBlock
+                        Grid.Column="3"
+                        Margin="{StaticResource PopupMemberSecondaryTextMargin}"
+                        VerticalAlignment="Center"
+                        FontSize="{DynamicResource {x:Static shell:VsFonts.Environment90PercentFontSizeKey}}"
+                        Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextInactiveKey}}"
+                        Text="{Binding SecondaryName}"
+                        TextTrimming="CharacterEllipsis"
+                        TextAlignment="Right"
+                        Visibility="{Binding SecondaryName, Converter={StaticResource NullToCollapsedConverter}}" />
+                </Grid>
+            </DataTemplate>
+
             <Style x:Key="TreeItemExpanderStyle" TargetType="ToggleButton">
                 <Setter Property="Focusable" Value="False" />
                 <Setter Property="Width" Value="16" />
@@ -83,6 +116,132 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+
+            <Style x:Key="ResultsViewToggleButtonStyle" TargetType="ToggleButton">
+                <Setter Property="Width" Value="28" />
+                <Setter Property="Height" Value="28" />
+                <Setter Property="Margin" Value="0,1,1,1" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.ToolWindowBorderBrushKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextInactiveKey}}" />
+                <Setter Property="ToolTip" Value="Toggle between tree and list results" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <Border
+                                x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                SnapsToDevicePixels="True">
+                                <Grid>
+                                    <Path
+                                        x:Name="TreeIcon"
+                                        Width="14"
+                                        Height="14"
+                                        Data="M 2 2 H 6 V 5 H 2 Z M 8 2 H 12 V 5 H 8 Z M 5 7 H 9 V 11 H 5 Z M 4 5 V 7 M 10 5 V 7 M 4 7 H 7 M 10 7 H 7"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Stroke="{TemplateBinding Foreground}"
+                                        StrokeEndLineCap="Square"
+                                        StrokeLineJoin="Round"
+                                        StrokeStartLineCap="Square"
+                                        StrokeThickness="1.1" />
+                                    <Path
+                                        x:Name="ListIcon"
+                                        Width="14"
+                                        Height="14"
+                                        Data="M 2 3 H 12 M 2 7 H 12 M 2 11 H 12"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Stroke="{TemplateBinding Foreground}"
+                                        StrokeEndLineCap="Round"
+                                        StrokeStartLineCap="Round"
+                                        StrokeThickness="1.5"
+                                        Visibility="Collapsed" />
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentLightBrushKey}}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentLightBrushKey}}" />
+                                    <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentLightBrushKey}}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentPaleBrushKey}}" />
+                                    <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentLightBrushKey}}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
+                                    <Setter TargetName="TreeIcon" Property="Visibility" Value="Collapsed" />
+                                    <Setter TargetName="ListIcon" Property="Visibility" Value="Visible" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="ResultsListItemContainerStyle" TargetType="ListBoxItem">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Focusable" Value="True" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="Margin" Value="{StaticResource PopupMemberListItemMargin}" />
+                <Setter Property="Padding" Value="{StaticResource PopupMemberItemPadding}" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Border
+                                x:Name="ItemBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                SnapsToDevicePixels="True">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="10" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border
+                                        x:Name="SelectionIndicator"
+                                        Grid.Column="0"
+                                        Width="4"
+                                        Margin="{StaticResource PopupMemberListSelectionIndicatorMargin}"
+                                        HorizontalAlignment="Center"
+                                        Background="Transparent"
+                                        CornerRadius="2"
+                                        Visibility="Visible" />
+                                    <ContentPresenter
+                                        Grid.Column="1"
+                                        Margin="{TemplateBinding Padding}"
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentLightBrushKey}}" />
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentPaleBrushKey}}" />
+                                    <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentLightBrushKey}}" />
+                                    <Setter TargetName="SelectionIndicator" Property="Background" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentDarkBrushKey}}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <EventSetter Event="PreviewMouseLeftButtonUp" Handler="ResultsListBoxItem_OnPreviewMouseLeftButtonUp" />
+                <EventSetter Event="PreviewMouseRightButtonUp" Handler="ResultsListBoxItem_OnPreviewMouseRightButtonUp" />
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -92,136 +251,171 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBox
-            x:Name="FilterTextBox"
-            PreviewKeyDown="FilterTextBox_OnKeyDown"
-            Style="{StaticResource PopupFilterTextBoxStyle}"
-            Tag="Filter tree"
-            TextChanged="FilterTextBox_TextChanged"
-            Visibility="Collapsed" />
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-        <TreeView
-            x:Name="TreeView"
-            Grid.Row="1"
-            MinWidth="260"
-            Background="{DynamicResource {x:Static platformUI:ThemedDialogColors.ListBoxBrushKey}}"
-            platformUIImaging:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}"
-            BorderThickness="0"
-            Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}"
-            ItemTemplate="{StaticResource TreeItemTemplate}"
-            Loaded="TreeView_OnLoaded"
-            PreviewKeyDown="TreeView_OnPreviewKeyDown"
-            PreviewTextInput="TreeView_OnPreviewTextInput">
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="TreeViewItem">
-                    <Setter Property="Background" Value="Transparent" />
-                    <Setter Property="BorderBrush" Value="Transparent" />
-                    <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <Setter Property="Padding" Value="0" />
-                    <Setter Property="Margin" Value="{StaticResource PopupMemberTreeItemMargin}" />
-                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="TreeViewItem">
-                                <Grid SnapsToDevicePixels="True">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="18" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <Border
-                                        x:Name="SelectionBorder"
-                                        Grid.ColumnSpan="2"
-                                        Background="{TemplateBinding Background}"
-                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="6"
-                                        SnapsToDevicePixels="True">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="10" />
-                                                <ColumnDefinition Width="18" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Border
-                                                x:Name="SelectionIndicator"
-                                                Grid.Column="0"
-                                                Width="4"
-                                                Margin="{StaticResource PopupMemberTreeSelectionIndicatorMargin}"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Stretch"
-                                                Background="Transparent"
-                                                CornerRadius="2"
-                                                Visibility="Visible" />
-                                            <ToggleButton
-                                                x:Name="Expander"
-                                                Grid.Column="1"
-                                                Margin="{StaticResource PopupMemberTreeExpanderMargin}"
-                                                IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
-                                                Style="{StaticResource TreeItemExpanderStyle}" />
-                                            <ContentPresenter
-                                                x:Name="PART_Header"
-                                                Grid.Column="2"
-                                                ContentSource="Header"
-                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                                        </Grid>
-                                    </Border>
-                                    <ItemsPresenter
-                                        x:Name="ItemsHost"
-                                        Grid.Row="1"
-                                        Grid.Column="1" />
-                                </Grid>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="HasItems" Value="False">
-                                        <Setter TargetName="Expander" Property="Visibility" Value="Hidden" />
-                                    </Trigger>
-                                    <Trigger Property="IsExpanded" Value="False">
-                                        <Setter TargetName="ItemsHost" Property="Visibility" Value="Collapsed" />
-                                    </Trigger>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="SelectionBorder" Property="Background" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentLightBrushKey}}" />
-                                    </Trigger>
-                                    <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="SelectionBorder" Property="Background" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentPaleBrushKey}}" />
-                                        <Setter TargetName="SelectionBorder" Property="BorderBrush" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentLightBrushKey}}" />
-                                        <Setter TargetName="SelectionIndicator" Property="Background" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentDarkBrushKey}}" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                    <EventSetter Event="Expanded" Handler="TreeViewItem_OnExpanded" />
-                    <EventSetter Event="Loaded" Handler="TreeViewItem_OnLoaded" />
-                    <EventSetter Event="PreviewMouseLeftButtonUp" Handler="TreeViewItem_OnPreviewMouseLeftButtonUp" />
-                    <EventSetter Event="PreviewMouseRightButtonUp" Handler="TreeViewItem_OnPreviewMouseRightButtonUp" />
-                </Style>
-            </TreeView.ItemContainerStyle>
-        </TreeView>
+            <TextBox
+                x:Name="FilterTextBox"
+                Grid.Column="0"
+                PreviewKeyDown="FilterTextBox_OnKeyDown"
+                Style="{StaticResource PopupFilterTextBoxStyle}"
+                Tag="Filter tree"
+                TextChanged="FilterTextBox_TextChanged"
+                Visibility="Collapsed" />
 
-        <TextBlock
-            x:Name="EmptyPlaceholder"
-            Padding="16"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Grid.Row="1"
-            FontStyle="Italic"
-            Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextInactiveKey}}"
-            Text="No items found."
-            Visibility="Collapsed" />
-        <TextBlock
-            x:Name="FilteredPlaceholder"
-            Padding="16"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Grid.Row="1"
-            FontStyle="Italic"
-            Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextInactiveKey}}"
-            Text="No matches for current filter."
-            Visibility="Collapsed" />
+            <ToggleButton
+                x:Name="ResultsViewToggleButton"
+                Grid.Column="1"
+                Checked="ResultsViewToggleButton_OnChecked"
+                Style="{StaticResource ResultsViewToggleButtonStyle}"
+                Unchecked="ResultsViewToggleButton_OnUnchecked"
+                Visibility="Collapsed" />
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <TreeView
+                x:Name="TreeView"
+                MinWidth="260"
+                Background="{DynamicResource {x:Static platformUI:ThemedDialogColors.ListBoxBrushKey}}"
+                platformUIImaging:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}"
+                BorderThickness="0"
+                Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}"
+                ItemTemplate="{StaticResource TreeItemTemplate}"
+                Loaded="TreeView_OnLoaded"
+                PreviewKeyDown="TreeView_OnPreviewKeyDown"
+                PreviewTextInput="TreeView_OnPreviewTextInput">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderBrush" Value="Transparent" />
+                        <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Margin" Value="{StaticResource PopupMemberTreeItemMargin}" />
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TreeViewItem">
+                                    <Grid SnapsToDevicePixels="True">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Border
+                                            x:Name="SelectionBorder"
+                                            Grid.ColumnSpan="2"
+                                            Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="6"
+                                            SnapsToDevicePixels="True">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="10" />
+                                                    <ColumnDefinition Width="18" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border
+                                                    x:Name="SelectionIndicator"
+                                                    Grid.Column="0"
+                                                    Width="4"
+                                                    Margin="{StaticResource PopupMemberTreeSelectionIndicatorMargin}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Stretch"
+                                                    Background="Transparent"
+                                                    CornerRadius="2"
+                                                    Visibility="Visible" />
+                                                <ToggleButton
+                                                    x:Name="Expander"
+                                                    Grid.Column="1"
+                                                    Margin="{StaticResource PopupMemberTreeExpanderMargin}"
+                                                    IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                                    Style="{StaticResource TreeItemExpanderStyle}" />
+                                                <ContentPresenter
+                                                    x:Name="PART_Header"
+                                                    Grid.Column="2"
+                                                    ContentSource="Header"
+                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                            </Grid>
+                                        </Border>
+                                        <ItemsPresenter
+                                            x:Name="ItemsHost"
+                                            Grid.Row="1"
+                                            Grid.Column="1" />
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="HasItems" Value="False">
+                                            <Setter TargetName="Expander" Property="Visibility" Value="Hidden" />
+                                        </Trigger>
+                                        <Trigger Property="IsExpanded" Value="False">
+                                            <Setter TargetName="ItemsHost" Property="Visibility" Value="Collapsed" />
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="SelectionBorder" Property="Background" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentLightBrushKey}}" />
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="SelectionBorder" Property="Background" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentPaleBrushKey}}" />
+                                            <Setter TargetName="SelectionBorder" Property="BorderBrush" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentLightBrushKey}}" />
+                                            <Setter TargetName="SelectionIndicator" Property="Background" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentDarkBrushKey}}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <EventSetter Event="Expanded" Handler="TreeViewItem_OnExpanded" />
+                        <EventSetter Event="Loaded" Handler="TreeViewItem_OnLoaded" />
+                        <EventSetter Event="PreviewMouseLeftButtonUp" Handler="TreeViewItem_OnPreviewMouseLeftButtonUp" />
+                        <EventSetter Event="PreviewMouseRightButtonUp" Handler="TreeViewItem_OnPreviewMouseRightButtonUp" />
+                    </Style>
+                </TreeView.ItemContainerStyle>
+            </TreeView>
+
+            <ListBox
+                x:Name="ResultsListBox"
+                MinWidth="260"
+                Background="{DynamicResource {x:Static platformUI:ThemedDialogColors.ListBoxBrushKey}}"
+                platformUIImaging:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}"
+                BorderThickness="0"
+                Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}"
+                Grid.IsSharedSizeScope="True"
+                ItemContainerStyle="{StaticResource ResultsListItemContainerStyle}"
+                ItemTemplate="{StaticResource ResultsListItemTemplate}"
+                PreviewKeyDown="ResultsListBox_OnPreviewKeyDown"
+                PreviewTextInput="ResultsListBox_OnPreviewTextInput"
+                Visibility="Collapsed">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+
+            <TextBlock
+                x:Name="EmptyPlaceholder"
+                Padding="16"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontStyle="Italic"
+                Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextInactiveKey}}"
+                Text="No items found."
+                Visibility="Collapsed" />
+            <TextBlock
+                x:Name="FilteredPlaceholder"
+                Padding="16"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontStyle="Italic"
+                Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextInactiveKey}}"
+                Text="No matches for current filter."
+                Visibility="Collapsed" />
+        </Grid>
     </Grid>
 </UserControl>

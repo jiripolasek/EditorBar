@@ -281,7 +281,10 @@ internal class LocationBreadcrumbsViewModel : ObservableObject, IDisposable
                         colors.SolutionFolderBackground,
                         colors.SolutionFolderForeground)
                     {
-                        TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateSolutionItemChildrenAsync(folder, this._textView),
+                        TreeItemsProvider = () => LocationBreadcrumbTreeBuilder.CreateSolutionItemChildrenAsync(
+                            folder,
+                            this._textView,
+                            folder.FullPath),
                         ContextCommand = this._openMenuOnSolutionFolderCrumb
                     }));
         }

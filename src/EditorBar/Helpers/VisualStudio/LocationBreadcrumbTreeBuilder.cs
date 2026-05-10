@@ -34,7 +34,10 @@ internal static class LocationBreadcrumbTreeBuilder
         var solution = await VS.Solutions.GetCurrentSolutionAsync();
         if (solution != null)
         {
-            return CreateSolutionItems(solution.Children.OfType<SolutionItem>(), currentTextView);
+            var searchRootPath = solution.FullPath is { Length: > 0 } solutionFullPath
+                ? Path.GetDirectoryName(solutionFullPath)
+                : null;
+            return CreateSolutionItems(solution.Children.OfType<SolutionItem>(), currentTextView, searchRootPath);
         }
 
         var rootItems = await VS.Solutions.GetAllProjectsAsync(ProjectStateFilter.All);
@@ -56,22 +59,27 @@ internal static class LocationBreadcrumbTreeBuilder
             items.AddRange(CreateAlternativeProjectNodes(projectInfo, switchProjectCommand));
         }
 
-        items.AddRange(CreateSolutionItems(projectInfo.Project.Children.OfType<SolutionItem>(), currentTextView));
+        items.AddRange(CreateSolutionItems(
+            projectInfo.Project.Children.OfType<SolutionItem>(),
+            currentTextView,
+            projectInfo.DirectoryPath));
         return items;
     }
 
     public static async Task<IList<MemberTreeItemViewModel>> CreateSolutionItemChildrenAsync(
         SolutionItem solutionItem,
-        IWpfTextView currentTextView)
+        IWpfTextView currentTextView,
+        string? searchRootPath = null)
     {
         Requires.NotNull(solutionItem);
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-        return CreateSolutionItems(solutionItem.Children.OfType<SolutionItem>(), currentTextView);
+        return CreateSolutionItems(solutionItem.Children.OfType<SolutionItem>(), currentTextView, searchRootPath);
     }
 
     public static Task<IList<MemberTreeItemViewModel>> CreateDirectoryItemsAsync(
         string directoryPath,
-        IWpfTextView currentTextView)
+        IWpfTextView currentTextView,
+        string? searchRootPath = null)
     {
         Requires.NotNullOrWhiteSpace(directoryPath);
 
@@ -80,24 +88,27 @@ internal static class LocationBreadcrumbTreeBuilder
             return Task.FromResult<IList<MemberTreeItemViewModel>>([]);
         }
 
+        searchRootPath ??= directoryPath;
+
         var directories = Directory.EnumerateDirectories(directoryPath)
             .OrderBy(static path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase)
-            .Select(path => CreateDirectoryNode(path, currentTextView));
+            .Select(path => CreateDirectoryNode(path, currentTextView, searchRootPath));
 
         var files = Directory.EnumerateFiles(directoryPath)
             .OrderBy(static path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase)
-            .Select(path => CreateFileNode(path, currentTextView));
+            .Select(path => CreateFileNode(path, currentTextView, searchRootPath));
 
         return Task.FromResult<IList<MemberTreeItemViewModel>>([.. directories, .. files]);
     }
 
     private static List<MemberTreeItemViewModel> CreateSolutionItems(
         IEnumerable<SolutionItem> solutionItems,
-        IWpfTextView currentTextView)
+        IWpfTextView currentTextView,
+        string? searchRootPath = null)
     {
         return solutionItems
             .Where(ShouldIncludeSolutionItem)
-            .Select(item => CreateSolutionItemNode(item, currentTextView))
+            .Select(item => CreateSolutionItemNode(item, currentTextView, searchRootPath))
             .ToList();
     }
 
@@ -117,18 +128,25 @@ internal static class LocationBreadcrumbTreeBuilder
             });
     }
 
-    private static MemberTreeItemViewModel CreateSolutionItemNode(SolutionItem item, IWpfTextView currentTextView)
+    private static MemberTreeItemViewModel CreateSolutionItemNode(
+        SolutionItem item,
+        IWpfTextView currentTextView,
+        string? searchRootPath)
     {
         Requires.NotNull(item);
 
         var canHaveChildren = CanHaveChildren(item);
         var primaryName = string.IsNullOrWhiteSpace(item.Text) ? item.Name : item.Text;
+        var relativeSecondaryName = CreateRelativeSecondaryName(primaryName, item.FullPath, searchRootPath);
         var node = new MemberTreeItemViewModel
         {
             PrimaryName = primaryName,
-            SearchText = string.Join(" ", new[] { primaryName, item.Name, item.FullPath }.Where(static value => !string.IsNullOrWhiteSpace(value))),
+            SearchText = BuildSearchText(primaryName, item.Name, relativeSecondaryName),
+            SecondaryName = relativeSecondaryName,
             ImageMoniker = GetSolutionItemMoniker(item),
-            ChildrenProvider = canHaveChildren ? () => CreateSolutionItemChildrenAsync(item, currentTextView) : null,
+            ChildrenProvider = canHaveChildren
+                ? () => CreateSolutionItemChildrenAsync(item, currentTextView, searchRootPath)
+                : null,
             ExpandOnActivate = ShouldExpandOnActivate(item, canHaveChildren),
             Command = canHaveChildren && !IsActivatableFileItem(item) ? null : CreateLeafCommand(item),
             ContextCommand = CreateContextCommand(item, primaryName, currentTextView),
@@ -139,18 +157,25 @@ internal static class LocationBreadcrumbTreeBuilder
         return node;
     }
 
-    private static MemberTreeItemViewModel CreateDirectoryNode(string directoryPath, IWpfTextView currentTextView)
+    private static MemberTreeItemViewModel CreateDirectoryNode(
+        string directoryPath,
+        IWpfTextView currentTextView,
+        string searchRootPath)
     {
         var hasEntries = Directory.EnumerateFileSystemEntries(directoryPath).Any();
         var directoryName = Path.GetFileName(directoryPath);
         var model = new PhysicalDirectoryModel(string.IsNullOrWhiteSpace(directoryName) ? directoryPath : directoryName, directoryPath);
+        var relativeSecondaryName = CreateRelativeSecondaryName(model.Name, directoryPath, searchRootPath);
         var node = new MemberTreeItemViewModel
         {
             PrimaryName = model.Name,
-            SearchText = directoryPath,
+            SearchText = BuildSearchText(model.Name, null, relativeSecondaryName),
+            SecondaryName = relativeSecondaryName,
             ImageMoniker = KnownMonikers.FolderOpened,
             ExpandOnActivate = true,
-            ChildrenProvider = hasEntries ? () => CreateDirectoryItemsAsync(directoryPath, currentTextView) : null,
+            ChildrenProvider = hasEntries
+                ? () => CreateDirectoryItemsAsync(directoryPath, currentTextView, searchRootPath)
+                : null,
             ContextCommand = new DispatchedDelegateCommand(_ => new LocationBreadcrumbMenuContext(model, currentTextView).ShowMenu())
         };
 
@@ -158,16 +183,74 @@ internal static class LocationBreadcrumbTreeBuilder
         return node;
     }
 
-    private static MemberTreeItemViewModel CreateFileNode(string filePath, IWpfTextView currentTextView)
+    private static MemberTreeItemViewModel CreateFileNode(
+        string filePath,
+        IWpfTextView currentTextView,
+        string searchRootPath)
     {
+        var primaryName = Path.GetFileName(filePath);
+        var relativeSecondaryName = CreateRelativeSecondaryName(primaryName, filePath, searchRootPath);
         return new MemberTreeItemViewModel
         {
-            PrimaryName = Path.GetFileName(filePath),
-            SearchText = filePath,
+            PrimaryName = primaryName,
+            SearchText = BuildSearchText(primaryName, null, relativeSecondaryName),
+            SecondaryName = relativeSecondaryName,
             ImageMoniker = GetFileMoniker(filePath),
             Command = new DispatchedDelegateCommand(_ => OpenDocumentAsync(filePath).FireAndForget()),
             ContextCommand = new DispatchedDelegateCommand(_ => new FileActionMenuContext(filePath).ShowMenu())
         };
+    }
+
+    private static string BuildSearchText(
+        string primaryName,
+        string? secondaryName,
+        string? relativePath)
+    {
+        var searchParts = new List<string>(3)
+        {
+            primaryName
+        };
+
+        if (secondaryName is { Length: > 0 } normalizedSecondaryName &&
+            !string.Equals(primaryName, normalizedSecondaryName, StringComparison.OrdinalIgnoreCase))
+        {
+            searchParts.Add(normalizedSecondaryName);
+        }
+
+        if (relativePath is { Length: > 0 } normalizedRelativePath &&
+            !string.Equals(primaryName, normalizedRelativePath, StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(secondaryName, normalizedRelativePath, StringComparison.OrdinalIgnoreCase))
+        {
+            searchParts.Add(normalizedRelativePath);
+        }
+
+        return string.Join(" ", searchParts);
+    }
+
+    private static string? CreateRelativeSecondaryName(
+        string primaryName,
+        string? fullPath,
+        string? searchRootPath)
+    {
+        if (GetRelativeSearchPath(fullPath, searchRootPath) is not { Length: > 0 } relativePath)
+        {
+            return null;
+        }
+
+        return string.Equals(primaryName, relativePath, StringComparison.OrdinalIgnoreCase)
+            ? null
+            : relativePath;
+    }
+
+    private static string? GetRelativeSearchPath(string? fullPath, string? searchRootPath)
+    {
+        if (fullPath is not { Length: > 0 } normalizedFullPath ||
+            searchRootPath is not { Length: > 0 } normalizedSearchRootPath)
+        {
+            return null;
+        }
+
+        return PathUtils.GetRelativePath(normalizedSearchRootPath, normalizedFullPath);
     }
 
     private static ICommand? CreateContextCommand(SolutionItem item, string primaryName, IWpfTextView currentTextView)

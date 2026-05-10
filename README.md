@@ -55,6 +55,8 @@ In supported files, it also displays breadcrumbs for symbols or nodes up to the 
 
 - **Member search**
    - Quickly find and navigate to any member in the current file using a searchable dropdown.
+   - Supports glob-style wildcard filtering with `*` and `?`.
+   - Switch filtered member tree results between hierarchical tree and flat list views, with a configurable default mode.
    - Optionally show or hide the filter box in the member list.
    - Match the filter box background to the active Visual Studio theme.
 

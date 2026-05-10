@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Options;
 using JPSoftworks.EditorBar.ViewModels;
 using Microsoft.VisualStudio.Threading;
@@ -25,6 +26,7 @@ public partial class MemberList : UserControl
 
     private readonly CollectionViewSource _collectionViewSource;
     private readonly bool _showFilterBoxWhenEmpty;
+    private SearchPatternMatcher? _filterMatcher;
 
     public MemberList()
     {
@@ -295,13 +297,14 @@ public partial class MemberList : UserControl
             return;
         }
 
-        var filterText = this.FilterTextBox?.Text;
-        if (string.IsNullOrWhiteSpace(filterText))
+        if (this.FilterTextBox?.Text is not { Length: > 0 } filterText)
         {
+            this._filterMatcher = null;
             view.Filter = null;
         }
         else
         {
+            this._filterMatcher = new SearchPatternMatcher(filterText);
             view.Filter = this.FilterItem;
         }
 
@@ -352,8 +355,7 @@ public partial class MemberList : UserControl
 
     private bool FilterItem(object obj)
     {
-        var filter = this.FilterTextBox?.Text;
-        if (string.IsNullOrWhiteSpace(filter))
+        if (this._filterMatcher == null)
         {
             return true;
         }
@@ -366,7 +368,7 @@ public partial class MemberList : UserControl
         if (obj is MemberListItemViewModel model)
         {
             var searchText = model.SearchText ?? model.PrimaryName ?? string.Empty;
-            return searchText.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0;
+            return this._filterMatcher.IsMatch(searchText);
         }
 
         return true;

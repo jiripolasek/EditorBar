@@ -30,6 +30,7 @@ public class OptionsPageViewModel : ObservableObject
     private bool _displayInTemp;
     private bool _displayLocateInSolutionExplorerButton;
     private bool _displayMemberListFilterBoxWhenEmpty;
+    private MemberTreeSearchResultView _memberTreeSearchResultViewDefault;
     private bool _displayOpenContainingFolderButton;
     private bool _displayOpenDefaultEditorButton;
     private bool _displayOpenExternalEditorButton;
@@ -111,6 +112,16 @@ public class OptionsPageViewModel : ObservableObject
         new(FileAction.OpenInDefaultEditor, "Open in Default Editor"),
         new(FileAction.CopyRelativePath, "Copy Relative path"),
         new(FileAction.CopyAbsolutePath, "Copy Full path")
+    ];
+
+    /// <summary>
+    /// Gets the available default views for filtered member tree results.
+    /// </summary>
+    public ObservableCollection<EnumViewModel<MemberTreeSearchResultView>> MemberTreeSearchResultViews { get; } =
+    [
+        new(MemberTreeSearchResultView.Tree, "Tree"),
+        new(MemberTreeSearchResultView.List, "List"),
+        new(MemberTreeSearchResultView.RememberLastUsed, "Remember last used")
     ];
 
     /// <summary>
@@ -252,6 +263,15 @@ public class OptionsPageViewModel : ObservableObject
     {
         get => this._displayMemberListFilterBoxWhenEmpty;
         set => this.SetProperty(ref this._displayMemberListFilterBoxWhenEmpty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets the default presentation for filtered member tree results.
+    /// </summary>
+    public MemberTreeSearchResultView MemberTreeSearchResultViewDefault
+    {
+        get => this._memberTreeSearchResultViewDefault;
+        set => this.SetProperty(ref this._memberTreeSearchResultViewDefault, value);
     }
 
     /// <summary>
@@ -619,6 +639,7 @@ public class OptionsPageViewModel : ObservableObject
             this.DisplayInBlame = model.DisplayInBlame;
             this.DisplayInTemp = model.DisplayInTempFiles;
             this.DisplayMemberListFilterBoxWhenEmpty = model.ShowMemberListFilterBoxWhenEmpty;
+            this.MemberTreeSearchResultViewDefault = model.MemberTreeSearchResultViewDefault;
             this.DisplayLocateInSolutionExplorerButton = model.ShowLocateInSolutionExplorerButton;
             this.DisplayOpenDefaultEditorButton = model.ShowOpenDefaultEditorButton;
             this.DisplayOpenExternalEditorButton = model.ShowOpenExternalEditorButton;
@@ -739,6 +760,7 @@ public class OptionsPageViewModel : ObservableObject
         model.DisplayInBlame = this.DisplayInBlame;
         model.DisplayInTempFiles = this.DisplayInTemp;
         model.ShowMemberListFilterBoxWhenEmpty = this.DisplayMemberListFilterBoxWhenEmpty;
+        model.MemberTreeSearchResultViewDefault = this.MemberTreeSearchResultViewDefault;
         model.ShowLocateInSolutionExplorerButton = this.DisplayLocateInSolutionExplorerButton;
         model.ShowOpenDefaultEditorButton = this.DisplayOpenDefaultEditorButton;
         model.ShowOpenExternalEditorButton = this.DisplayOpenExternalEditorButton;

@@ -24,7 +24,7 @@ namespace JPSoftworks.EditorBar.Options;
 [ComVisible(true)]
 public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRatingConfig
 {
-    private const int CurrentConfigVersion = 8;
+    private const int CurrentConfigVersion = 9;
 
     private const string AppearanceCategoryName = "Appearance";
     private const string GeneralCategoryName = "General";
@@ -261,6 +261,13 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     [DefaultValue(false)]
     public bool ShowMemberListFilterBoxWhenEmpty { get; set; } = false;
 
+    [Category(MemberListCategoryName)]
+    [DisplayName("Filtered tree results view")]
+    [Description("Determines whether filtered member tree popups open in tree view, list view, or reuse the last manually selected view.")]
+    [DefaultValue(typeof(MemberTreeSearchResultView), nameof(MemberTreeSearchResultView.Tree))]
+    [TypeConverter(typeof(EnumToDescriptionConverter))]
+    public MemberTreeSearchResultView MemberTreeSearchResultViewDefault { get; set; } = MemberTreeSearchResultView.Tree;
+
     // -------------------------------------------
     // Debug category
     // -------------------------------------------
@@ -281,6 +288,9 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
 
     [Browsable(false)]
     public int RatingRequests { get; set; }
+
+    [Browsable(false)]
+    public bool LastUsedMemberTreeSearchResultViewIsList { get; set; }
 
     private static bool EqualColor(Color left, Color right)
     {
@@ -431,6 +441,12 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
             if (this.Version < 8 && this.HasLegacySharedDarkPalette())
             {
                 this.ApplyDarkThemeDefaults();
+            }
+
+            if (this.Version < 9)
+            {
+                this.MemberTreeSearchResultViewDefault = MemberTreeSearchResultView.Tree;
+                this.LastUsedMemberTreeSearchResultViewIsList = false;
             }
 
             this.Version = CurrentConfigVersion;
