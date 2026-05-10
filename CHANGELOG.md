@@ -1,12 +1,32 @@
 # Change Log
 
+## 4.0.0
+- [x] **Added: Child tree popup for location breadcrumbs.**
+- [x] **Added: Open in Terminal command.**
+- [x] **Added: Separate light and dark color settings and refreshed the options UI.**
+- [x] Added: Support for C# 14 extension blocks.
+- [x] Added: Settings to control toolbar button visibility.
+- [x] Added: Option to show or hide the member list filter box.
+- [x] Added: Context menu commands for solution folder and non-solution root breadcrumbs.
+- [x] Added: Quick toggle for the built-in VS navigation bar.
+- [x] Added: Options button is now a drop-down menu with quick access to some settings. 
+- [x] Changed: Upgraded code analysis integration in a backwards-compatible way to support both VS2022 and VS2026.
+- [x] Changed: Internal code quality improvements, including nullability and threading fixes, broader encapsulation, and style cleanup.
+- [x] Changed: Popups looks nicer and more in-line with VS2026 style.
+- [x] Fixed: Filter box background now follows the active theme.
+- [x] Fixed: Memory leak in `LegacyLabelViewModel` caused by a static event subscription.
+- [x] Fixed: Structural breadcrumbs now degrade gracefully when initialization fails.
+- [x] Fixed: Better handling for projects that do not expose their full name.
+- [x] Fixed: Locate in Solution Explorer for the root breadcrumb now selects the solution node.
+- [x] **Fixed: Editor Bar settings are now correctly included in Visual Studio import/export.**
+
 ## 3.0.1024
 - [x] Fixed: An issue where Visual Studio incorrectly changed focus when *Navigate Backwards* or *Navigate Forwards* commands were used to navigate between files.
 
 ## 3.0.0
 - [x] Added: Member list is now searchable - start typing to filter the list.
 - [x] Added: Support for Visual 2026.
-- [x] Updated: Editor bar is hidden in ReSharper windows (e.g., Find Results, Unit Test Sessions).
+- [x] Changed: Editor bar is hidden in ReSharper windows (e.g., Find Results, Unit Test Sessions).
 
 ## 2.0.2048
 
