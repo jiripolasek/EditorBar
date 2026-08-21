@@ -32,18 +32,17 @@ internal sealed class RoslynObservableStructureProvider : BaseStructureProvider
 
         this._legacyStructureProvider = new RoslynWorkspaceFileStructureProvider(textView);
 
-        this.UnifiedSource.Select(async _ =>
-            {
-                try
+        this.UnifiedSource
+            .Select(_ => Observable
+                .FromAsync(cancellationToken => this._legacyStructureProvider.GetFileStructureAsync(cancellationToken))
+                .Catch<StructureNavModel, OperationCanceledException>(static _ => Observable.Empty<StructureNavModel>())
+                .Catch<StructureNavModel, Exception>(static ex =>
                 {
-                    this.BreadcrumbsSource.OnNext(await this._legacyStructureProvider.GetFileStructureAsync());
-                }
-                catch (Exception ex)
-                {
-                    await ex.LogAsync();
-                }
-            })
-            .Subscribe()
+                    ex.Log("Update Roslyn structure breadcrumbs");
+                    return Observable.Empty<StructureNavModel>();
+                }))
+            .Switch()
+            .Subscribe(this.BreadcrumbsSource.OnNext)
             .AddTo(this._disposables);
     }
 

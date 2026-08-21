@@ -38,8 +38,10 @@ internal class RoslynWorkspaceFileStructureProvider
         this._textView = textView;
     }
 
-    public async Task<StructureNavModel> GetFileStructureAsync()
+    public async Task<StructureNavModel> GetFileStructureAsync(CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var sourceTextContainer = this._textView.TextBuffer!.AsTextContainer();
         if (this._textView.TextBuffer == null || !Workspace.TryGetWorkspace(sourceTextContainer, out var workspace))
         {
@@ -68,8 +70,10 @@ internal class RoslynWorkspaceFileStructureProvider
             ? await FileStructureHelper.GetStructureBreadcrumbsAsync(
                 this._textView.Caret!.Position,
                 document!,
-                CancellationToken.None)
+                cancellationToken)
             : [];
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         return new StructureNavModel(canHaveItems, breadcrumbs);
     }
