@@ -22,12 +22,41 @@
 
         <ResourceDictionary>
             <Thickness x:Key="PopupMemberItemPadding">8,5,8,5</Thickness>
-            <Thickness x:Key="PopupMemberListItemMargin">3,0</Thickness>
+            <Thickness x:Key="PopupMemberListItemMargin">0,0</Thickness>
             <Thickness x:Key="PopupMemberTreeItemMargin">0,0,0,0</Thickness>
             <Thickness x:Key="PopupMemberSecondaryTextMargin">12,0,0,0</Thickness>
             <Thickness x:Key="PopupMemberListSelectionIndicatorMargin">3,5,3,5</Thickness>
             <Thickness x:Key="PopupMemberTreeSelectionIndicatorMargin">3,3,3,3</Thickness>
             <Thickness x:Key="PopupMemberTreeExpanderMargin">1,0,1,0</Thickness>
+
+            <Style x:Key="PopupListBoxStyle" TargetType="ListBox">
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+                <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBox">
+                            <Border
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                <ScrollViewer
+                                    Focusable="False"
+                                    Padding="{TemplateBinding Padding}"
+                                    CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}"
+                                    HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                    VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+                                    <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                </ScrollViewer>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
             <!--  control button on the right  -->
             <Style x:Key="CommandBarBorderStyle" TargetType="Border">

@@ -98,6 +98,14 @@
     <Compile Include="Commands\Location\OpenProjectInTerminalCommand.cs" />
     <Compile Include="Commands\Location\OpenProjectPropertiesCommand.cs" />
     <Compile Include="Commands\Location\ProjectLocationHelper.cs" />
+    <Compile Include="Commands\MemberList\BaseMemberListOptionsMenuCommand`1.cs" />
+    <Compile Include="Commands\MemberList\MemberListOptionsMenuContext.cs" />
+    <Compile Include="Commands\MemberList\MemberListToggleShowFilterBoxWhenEmptyCommand.cs" />
+    <Compile Include="Commands\MemberTree\BaseMemberTreeResultsMenuCommand`1.cs" />
+    <Compile Include="Commands\MemberTree\MemberTreeResultsMenuContext.cs" />
+    <Compile Include="Commands\MemberTree\MemberTreeSetListResultsCommand.cs" />
+    <Compile Include="Commands\MemberTree\MemberTreeSetTreeResultsCommand.cs" />
+    <Compile Include="Commands\MemberTree\MemberTreeToggleShowFilterBoxWhenEmptyCommand.cs" />
     <Compile Include="Commands\Settings\SettingsMenuContext.cs" />
     <Compile Include="Commands\Settings\SettingsToggleEditorBarCommand.cs" />
     <Compile Include="Commands\Settings\SettingsToggleNavigationBarCommand.cs" />

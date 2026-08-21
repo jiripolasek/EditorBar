@@ -4,12 +4,16 @@
 
 #nullable enable
 
+using System.ComponentModel;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using JPSoftworks.EditorBar.Commands;
+using JPSoftworks.EditorBar.Commands.Abstractions;
 using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Options;
 using JPSoftworks.EditorBar.ViewModels;
@@ -23,18 +27,21 @@ public partial class MemberTree : UserControl
 
     private readonly List<MemberTreeItemViewModel> _items;
     private readonly bool _rememberResultsViewPreference;
-    private readonly bool _showFilterBoxWhenEmpty;
     private CancellationTokenSource? _filterDebounceCancellationTokenSource;
     private List<MemberTreeItemViewModel> _filteredListItems = [];
     private EventHandler? _pendingSelectFirstItemHandler;
     private EventHandler? _pendingSelectSpecificTreeItemHandler;
     private int _filterRequestVersion;
     private bool _preferListResultsView;
-    private bool _suppressResultsViewToggleStateChange;
+    private bool _showFilterBoxWhenEmpty;
 
     public event EventHandler? ItemInvoked;
 
+    public MemberListPopup? PopupHost { get; set; }
+
     public object? SelectedItem => this.IsListResultsViewActive ? this.ResultsListBox.SelectedItem : this.TreeView.SelectedItem;
+
+    internal bool ShowFilterBoxWhenEmpty => this._showFilterBoxWhenEmpty;
 
     public MemberTree(IEnumerable<MemberTreeItemViewModel> items)
     {
@@ -51,7 +58,6 @@ public partial class MemberTree : UserControl
             _ => false
         };
         this.TreeView.ItemsSource = this._items;
-        this.SyncResultsViewToggleState(this._preferListResultsView);
         this.ApplyEmptyFilterVisibilityPreference();
         this.UpdatePlaceholders(this._items.Count > 0);
     }
@@ -114,9 +120,34 @@ public partial class MemberTree : UserControl
             return;
         }
 
-        if (e.Key == Key.Down)
+        if (this.IsListResultsViewActive && IsCtrlEdgeNavigation(e))
         {
-            this.FocusCurrentResultsView();
+            this.MoveResultsListSelectionToEdge(e.Key == Key.Up);
+            e.Handled = true;
+        }
+        else if (this.IsListResultsViewActive && e.Key == Key.Down)
+        {
+            this.MoveResultsListSelection(1);
+            e.Handled = true;
+        }
+        else if (this.IsListResultsViewActive && e.Key == Key.Up)
+        {
+            this.MoveResultsListSelection(-1);
+            e.Handled = true;
+        }
+        else if (IsCtrlEdgeNavigation(e))
+        {
+            this.MoveTreeSelectionToEdge(e.Key == Key.Up);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Down)
+        {
+            this.MoveTreeSelection(1);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Up)
+        {
+            this.MoveTreeSelection(-1);
             e.Handled = true;
         }
         else if (e.Key == Key.Enter)
@@ -139,6 +170,21 @@ public partial class MemberTree : UserControl
         }
         else if (this.ShouldIgnoreHiddenEmptyFilterDeletion(e))
         {
+            e.Handled = true;
+        }
+        else if (IsCtrlEdgeNavigation(e))
+        {
+            this.MoveTreeSelectionToEdge(e.Key == Key.Up);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Down)
+        {
+            this.MoveTreeSelection(1);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Up)
+        {
+            this.MoveTreeSelection(-1);
             e.Handled = true;
         }
         else if (e.Key == Key.Enter)
@@ -182,6 +228,21 @@ public partial class MemberTree : UserControl
         }
         else if (this.ShouldIgnoreHiddenEmptyFilterDeletion(e))
         {
+            e.Handled = true;
+        }
+        else if (IsCtrlEdgeNavigation(e))
+        {
+            this.MoveResultsListSelectionToEdge(e.Key == Key.Up);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Down)
+        {
+            this.MoveResultsListSelection(1);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Up)
+        {
+            this.MoveResultsListSelection(-1);
             e.Handled = true;
         }
         else if (e.Key == Key.Enter)
@@ -284,7 +345,6 @@ public partial class MemberTree : UserControl
         {
             if (item.CanHaveChildren && item.ExpandOnActivate)
             {
-                this.SyncResultsViewToggleState(isChecked: false);
                 this.SelectTreeItem(item, expand: true);
                 return;
             }
@@ -340,7 +400,7 @@ public partial class MemberTree : UserControl
         }
 
         container.IsSelected = true;
-        item.ContextCommand.Execute(null);
+        this.ExecutePopupAwareContextCommand(item.ContextCommand);
         return true;
     }
 
@@ -352,8 +412,16 @@ public partial class MemberTree : UserControl
         }
 
         container.IsSelected = true;
-        item.ContextCommand.Execute(null);
+        this.ExecutePopupAwareContextCommand(item.ContextCommand);
         return true;
+    }
+
+    private void ExecutePopupAwareContextCommand(ICommand contextCommand)
+    {
+        using var popupMenuScope = this.PopupHost != null
+            ? MemberListPopup.EnterMenuInteraction(this.PopupHost)
+            : null;
+        contextCommand.Execute(null);
     }
 
     private async Task ApplyFilterWithDebounceAsync(int version, CancellationToken cancellationToken)
@@ -417,7 +485,6 @@ public partial class MemberTree : UserControl
         this._filteredListItems = flatListItems;
         this.ResultsListBox.ItemsSource = this._filteredListItems;
         this.UpdateResultsViewToggleVisibility(filterActive: true);
-        this.SyncResultsViewToggleState(this._preferListResultsView);
         this.SetResultsView(this._preferListResultsView);
         this.UpdatePlaceholders(this.IsListResultsViewActive ? this._filteredListItems.Count > 0 : filteredItems.Count > 0);
         this.SelectFirstItem();
@@ -665,6 +732,7 @@ public partial class MemberTree : UserControl
         if (this.FilterTextBox.Visibility != Visibility.Visible)
         {
             this.FilterTextBox.Visibility = Visibility.Visible;
+            this.MoreOptionsButton.Visibility = Visibility.Visible;
             this.FilterTextBox.Text = string.Empty;
         }
 
@@ -686,6 +754,12 @@ public partial class MemberTree : UserControl
         }
 
         return e.Key == Key.Back || e.Key == Key.Delete || Keyboard.Modifiers == ModifierKeys.None;
+    }
+
+    private static bool IsCtrlEdgeNavigation(KeyEventArgs e)
+    {
+        return (e.Key == Key.Up || e.Key == Key.Down) &&
+               (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
     }
 
     private bool ShouldIgnoreHiddenEmptyFilterDeletion(KeyEventArgs e)
@@ -733,41 +807,27 @@ public partial class MemberTree : UserControl
         this.FilterTextBox.Visibility = this._showFilterBoxWhenEmpty
             ? Visibility.Visible
             : Visibility.Collapsed;
+        this.MoreOptionsButton.Visibility = this.FilterTextBox.Visibility;
     }
 
-    private void ResultsViewToggleButton_OnChecked(object sender, RoutedEventArgs e)
+    private void MoreOptionsButton_OnClick(object sender, RoutedEventArgs e)
     {
-        if (this._suppressResultsViewToggleStateChange)
+        if (sender is not Button button)
         {
             return;
         }
 
-        this.UpdatePreferredResultsView(preferList: true);
-        this.SetResultsView(showList: true);
-        this.SelectFirstItem();
-    }
+        using var popupMenuScope = this.PopupHost != null
+            ? MemberListPopup.EnterMenuInteraction(this.PopupHost)
+            : null;
 
-    private void ResultsViewToggleButton_OnUnchecked(object sender, RoutedEventArgs e)
-    {
-        if (this._suppressResultsViewToggleStateChange)
-        {
-            return;
-        }
-
-        this.UpdatePreferredResultsView(preferList: false);
-        this.SetResultsView(showList: false);
-        this.SelectFirstItem();
+        new MemberTreeResultsMenuContext(this, GetMenuLocation(button)).ShowMenu();
+        e.Handled = true;
     }
 
     private void UpdateResultsViewToggleVisibility(bool filterActive)
     {
-        if (!filterActive)
-        {
-            this.ResultsViewToggleButton.Visibility = Visibility.Collapsed;
-            return;
-        }
-
-        this.ResultsViewToggleButton.Visibility = Visibility.Visible;
+        this.MoreOptionsButton.Visibility = this.FilterTextBox.Visibility;
     }
 
     private void SetResultsView(bool showList)
@@ -780,7 +840,9 @@ public partial class MemberTree : UserControl
         this.ResultsListBox.Visibility = canShowList ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    private bool IsListResultsViewActive => this.ResultsListBox.Visibility == Visibility.Visible;
+    internal bool IsListResultsViewActive => this.ResultsListBox.Visibility == Visibility.Visible;
+
+    internal bool PrefersListResultsView => this._preferListResultsView;
 
     private void FocusCurrentResultsView()
     {
@@ -793,9 +855,98 @@ public partial class MemberTree : UserControl
         this.TreeView.Focus();
     }
 
+    private void MoveTreeSelection(int delta)
+    {
+        var visibleItems = this.GetVisibleTreeItems();
+        if (visibleItems.Count == 0)
+        {
+            return;
+        }
+
+        var currentIndex = this.GetCurrentTreeSelectionIndex(visibleItems);
+        var targetIndex = currentIndex < 0
+            ? delta > 0 ? 0 : visibleItems.Count - 1
+            : (currentIndex + delta + visibleItems.Count) % visibleItems.Count;
+
+        this.SelectTreeContainer(visibleItems[targetIndex], expand: false);
+    }
+
+    private void MoveTreeSelectionToEdge(bool toFirst)
+    {
+        var visibleItems = this.GetVisibleTreeItems();
+        if (visibleItems.Count == 0)
+        {
+            return;
+        }
+
+        this.SelectTreeContainer(toFirst ? visibleItems[0] : visibleItems[visibleItems.Count - 1], expand: false);
+    }
+
+    private void MoveResultsListSelection(int delta)
+    {
+        var view = CollectionViewSource.GetDefaultView(this.ResultsListBox.ItemsSource);
+        if (view == null || view.IsEmpty)
+        {
+            return;
+        }
+
+        if (view.CurrentItem == null)
+        {
+            view.MoveCurrentToFirst();
+        }
+        else
+        {
+            var moved = delta > 0 ? view.MoveCurrentToNext() : view.MoveCurrentToPrevious();
+            if (!moved)
+            {
+                if (delta > 0)
+                {
+                    view.MoveCurrentToFirst();
+                }
+                else
+                {
+                    view.MoveCurrentToLast();
+                }
+            }
+        }
+
+        this.SyncResultsListSelection(view);
+    }
+
+    private void MoveResultsListSelectionToEdge(bool toFirst)
+    {
+        var view = CollectionViewSource.GetDefaultView(this.ResultsListBox.ItemsSource);
+        if (view == null || view.IsEmpty)
+        {
+            return;
+        }
+
+        if (toFirst)
+        {
+            view.MoveCurrentToFirst();
+        }
+        else
+        {
+            view.MoveCurrentToLast();
+        }
+
+        this.SyncResultsListSelection(view);
+    }
+
+    private void SyncResultsListSelection(ICollectionView view)
+    {
+        var current = view.CurrentItem;
+        if (current == null)
+        {
+            return;
+        }
+
+        this.ResultsListBox.SelectedItem = current;
+        this.ResultsListBox.ScrollIntoView(current);
+    }
+
     private void SelectTreeItem(MemberTreeItemViewModel item, bool expand)
     {
-        this.SyncResultsViewToggleState(isChecked: false);
         this.SetResultsView(showList: false);
 
         if (this.FindContainer(this.TreeView, item) is { } container)
@@ -834,6 +985,8 @@ public partial class MemberTree : UserControl
         {
             container.IsExpanded = true;
         }
+
+        container.BringIntoView();
 
         if (this.FilterTextBox.Visibility == Visibility.Visible && this.FilterTextBox.IsKeyboardFocused)
         {
@@ -914,11 +1067,58 @@ public partial class MemberTree : UserControl
         return this.ResultsListBox.ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
     }
 
-    private void SyncResultsViewToggleState(bool isChecked)
+    private List<TreeViewItem> GetVisibleTreeItems()
     {
-        this._suppressResultsViewToggleStateChange = true;
-        this.ResultsViewToggleButton.IsChecked = isChecked;
-        this._suppressResultsViewToggleStateChange = false;
+        var visibleItems = new List<TreeViewItem>();
+        this.CollectVisibleTreeItems(this.TreeView, visibleItems);
+        return visibleItems;
+    }
+
+    private void CollectVisibleTreeItems(ItemsControl parent, ICollection<TreeViewItem> visibleItems)
+    {
+        foreach (var child in parent.Items.Cast<object>())
+        {
+            if (parent.ItemContainerGenerator.ContainerFromItem(child) is not TreeViewItem container)
+            {
+                continue;
+            }
+
+            if (container.DataContext is not MemberTreeItemViewModel { IsPlaceholder: true })
+            {
+                visibleItems.Add(container);
+            }
+
+            if (container.IsExpanded)
+            {
+                this.CollectVisibleTreeItems(container, visibleItems);
+            }
+        }
+    }
+
+    private int GetCurrentTreeSelectionIndex(IReadOnlyList<TreeViewItem> visibleItems)
+    {
+        for (var index = 0; index < visibleItems.Count; index++)
+        {
+            if (visibleItems[index].IsSelected)
+            {
+                return index;
+            }
+        }
+
+        if (this.TreeView.SelectedItem is not MemberTreeItemViewModel selectedItem)
+        {
+            return -1;
+        }
+
+        for (var index = 0; index < visibleItems.Count; index++)
+        {
+            if (ReferenceEquals(visibleItems[index].DataContext, selectedItem))
+            {
+                return index;
+            }
+        }
+
+        return -1;
     }
 
     private void UpdatePreferredResultsView(bool preferList)
@@ -937,5 +1137,54 @@ public partial class MemberTree : UserControl
 
         options.LastUsedMemberTreeSearchResultViewIsList = preferList;
         options.Save();
+    }
+
+    private void ApplyPreferredResultsView(bool preferList)
+    {
+        this.UpdatePreferredResultsView(preferList);
+        this.SetResultsView(preferList);
+        this.SelectFirstItem();
+    }
+
+    internal void SetPreferredResultsView(bool preferList)
+    {
+        this.ApplyPreferredResultsView(preferList);
+    }
+
+    internal void SetShowFilterBoxWhenEmpty(bool showFilterBoxWhenEmpty)
+    {
+        if (this._showFilterBoxWhenEmpty == showFilterBoxWhenEmpty)
+        {
+            return;
+        }
+
+        var shouldMoveFocusToResults = !showFilterBoxWhenEmpty &&
+                                       string.IsNullOrEmpty(this.FilterTextBox?.Text) &&
+                                       this.FilterTextBox?.IsKeyboardFocusWithin == true;
+
+        this._showFilterBoxWhenEmpty = showFilterBoxWhenEmpty;
+
+        var options = GeneralOptionsModel.Instance;
+        if (options.ShowMemberListFilterBoxWhenEmpty != showFilterBoxWhenEmpty)
+        {
+            options.ShowMemberListFilterBoxWhenEmpty = showFilterBoxWhenEmpty;
+            options.Save();
+        }
+
+        if (string.IsNullOrEmpty(this.FilterTextBox?.Text))
+        {
+            this.ApplyEmptyFilterVisibilityPreference();
+        }
+
+        if (shouldMoveFocusToResults)
+        {
+            this.FocusCurrentResultsView();
+        }
+    }
+
+    private static System.Drawing.Point GetMenuLocation(FrameworkElement element)
+    {
+        var screenPoint = element.PointToScreen(new Point(0, element.ActualHeight));
+        return new System.Drawing.Point((int)Math.Round(screenPoint.X), (int)Math.Round(screenPoint.Y));
     }
 }

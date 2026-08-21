@@ -10,6 +10,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using JPSoftworks.EditorBar.Commands;
+using JPSoftworks.EditorBar.Commands.Abstractions;
 using JPSoftworks.EditorBar.Helpers;
 using JPSoftworks.EditorBar.Options;
 using JPSoftworks.EditorBar.ViewModels;
@@ -25,8 +27,8 @@ public partial class MemberList : UserControl
     public event EventHandler? ItemSelected;
 
     private readonly CollectionViewSource _collectionViewSource;
-    private readonly bool _showFilterBoxWhenEmpty;
     private SearchPatternMatcher? _filterMatcher;
+    private bool _showFilterBoxWhenEmpty;
 
     public MemberList()
     {
@@ -45,6 +47,10 @@ public partial class MemberList : UserControl
         this.ListBox!.ItemsSource = this._collectionViewSource.View;
         this.UpdateFilterPredicate();
     }
+
+    public MemberListPopup? PopupHost { get; set; }
+
+    internal bool ShowFilterBoxWhenEmpty => this._showFilterBoxWhenEmpty;
 
     private void ListBox_OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
@@ -104,6 +110,7 @@ public partial class MemberList : UserControl
         if (this.FilterTextBox!.Visibility != Visibility.Visible)
         {
             this.FilterTextBox.Visibility = Visibility.Visible;
+            this.MoreOptionsButton.Visibility = Visibility.Visible;
             this.FilterTextBox.Text = string.Empty;
         }
 
@@ -200,6 +207,21 @@ public partial class MemberList : UserControl
         }
     }
 
+    private void MoreOptionsButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button)
+        {
+            return;
+        }
+
+        using var popupMenuScope = this.PopupHost != null
+            ? MemberListPopup.EnterMenuInteraction(this.PopupHost)
+            : null;
+
+        new MemberListOptionsMenuContext(this, GetMenuLocation(button)).ShowMenu();
+        e.Handled = true;
+    }
+
     private void HandleEscape(KeyEventArgs e)
     {
         // If text present, clear and swallow; if already empty, let popup handle (close)
@@ -220,6 +242,7 @@ public partial class MemberList : UserControl
         if (this.FilterTextBox!.Visibility != Visibility.Visible)
         {
             this.FilterTextBox.Visibility = Visibility.Visible;
+            this.MoreOptionsButton.Visibility = Visibility.Visible;
             this.FilterTextBox.Text = string.Empty;
         }
 
@@ -391,6 +414,39 @@ public partial class MemberList : UserControl
         this.FilterTextBox.Visibility = this._showFilterBoxWhenEmpty
             ? Visibility.Visible
             : Visibility.Collapsed;
+        this.MoreOptionsButton.Visibility = this.FilterTextBox.Visibility;
+    }
+
+    internal void SetShowFilterBoxWhenEmpty(bool showFilterBoxWhenEmpty)
+    {
+        if (this._showFilterBoxWhenEmpty == showFilterBoxWhenEmpty)
+        {
+            return;
+        }
+
+        var shouldMoveFocusToList = !showFilterBoxWhenEmpty &&
+                                    string.IsNullOrEmpty(this.FilterTextBox?.Text) &&
+                                    this.FilterTextBox?.IsKeyboardFocusWithin == true;
+
+        this._showFilterBoxWhenEmpty = showFilterBoxWhenEmpty;
+
+        var options = GeneralOptionsModel.Instance;
+        if (options.ShowMemberListFilterBoxWhenEmpty != showFilterBoxWhenEmpty)
+        {
+            options.ShowMemberListFilterBoxWhenEmpty = showFilterBoxWhenEmpty;
+            options.Save();
+        }
+
+        if (string.IsNullOrEmpty(this.FilterTextBox?.Text))
+        {
+            this.ApplyEmptyFilterVisibilityPreference();
+        }
+
+        if (shouldMoveFocusToList)
+        {
+            this.ListBox?.Focus();
+            this.SelectFirstItemForFocusedList();
+        }
     }
 
     private void SelectFirstItemForFocusedList()
@@ -413,5 +469,11 @@ public partial class MemberList : UserControl
             this.ListBox.ScrollIntoView(this.ListBox.Items[i]);
             return;
         }
+    }
+
+    private static System.Drawing.Point GetMenuLocation(FrameworkElement element)
+    {
+        var screenPoint = element.PointToScreen(new Point(0, element.ActualHeight));
+        return new System.Drawing.Point((int)Math.Round(screenPoint.X), (int)Math.Round(screenPoint.Y));
     }
 }

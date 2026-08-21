@@ -20,16 +20,20 @@ internal abstract class BaseMenuContextCommand<TMenuContext, TCommand> : BaseCom
 {
     private IMenuContextService? _contextService;
 
-    protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
+    protected override async Task InitializeCompletedAsync()
+    {
+        await base.InitializeCompletedAsync();
+        this._contextService = await this.Package.GetServiceAsync<IMenuContextService, IMenuContextService>();
+    }
+
+    protected override void Execute(object sender, EventArgs e)
     {
         try
         {
-            this._contextService ??= await this.Package.GetServiceAsync<IMenuContextService, IMenuContextService>();
-
             var menuIdAttr = typeof(TMenuContext).GetCustomAttribute<MenuIdAttribute>();
             if (menuIdAttr == null)
             {
-                await new Exception($"Context type {typeof(TMenuContext).Name} missing MenuId attribute").LogAsync();
+                new Exception($"Context type {typeof(TMenuContext).Name} missing MenuId attribute").Log();
                 return;
             }
 
@@ -40,6 +44,20 @@ internal abstract class BaseMenuContextCommand<TMenuContext, TCommand> : BaseCom
                 return;
             }
 
+            // The menu service clears its active context as soon as this callback returns.
+            // Capture it above before starting any asynchronous command work.
+            this.ExecuteCapturedContextAsync(context).FireAndForget();
+        }
+        catch (Exception ex)
+        {
+            ex.Log();
+        }
+    }
+
+    private async Task ExecuteCapturedContextAsync(TMenuContext context)
+    {
+        try
+        {
             await this.ExecuteCoreAsync(context);
         }
         catch (Exception ex)

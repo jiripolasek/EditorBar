@@ -91,6 +91,20 @@
 					<ButtonText>Display Mode</ButtonText>
 				</Strings>
 			</Menu>
+
+			<!-- Member tree popup options menu -->
+			<Menu guid="EditorBarCmdSet" id="EditorBarMemberTreePopupMenu" type="Context">
+				<Strings>
+					<ButtonText>Member Tree Popup Menu</ButtonText>
+				</Strings>
+			</Menu>
+
+			<!-- Member list popup options menu -->
+			<Menu guid="EditorBarCmdSet" id="EditorBarMemberListPopupMenu" type="Context">
+				<Strings>
+					<ButtonText>Member List Popup Menu</ButtonText>
+				</Strings>
+			</Menu>
 		</Menus>
 
 		<Groups>
@@ -207,6 +221,19 @@
 			</Group>
 			<Group guid="EditorBarCmdSet" id="EditorBarSettingsMenu_DisplayModeSubMenuGroup" priority="0x0100">
 				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_DisplayModeSubMenu" />
+			</Group>
+
+			<!-- Member tree popup options menu -->
+			<Group guid="EditorBarCmdSet" id="EditorBarMemberTreePopupMenu_ResultsGroup" priority="0x0100">
+				<Parent guid="EditorBarCmdSet" id="EditorBarMemberTreePopupMenu" />
+			</Group>
+			<Group guid="EditorBarCmdSet" id="EditorBarMemberTreePopupMenu_FilterGroup" priority="0x0200">
+				<Parent guid="EditorBarCmdSet" id="EditorBarMemberTreePopupMenu" />
+			</Group>
+
+			<!-- Member list popup options menu -->
+			<Group guid="EditorBarCmdSet" id="EditorBarMemberListPopupMenu_FilterGroup" priority="0x0100">
+				<Parent guid="EditorBarCmdSet" id="EditorBarMemberListPopupMenu" />
 			</Group>
 		</Groups>
 
@@ -676,6 +703,59 @@
 					<LocCanonicalName>EditorBar.Settings.Options</LocCanonicalName>
 				</Strings>
 			</Button>
+
+			<!-- Member tree popup options menu commands -->
+			<Button guid="EditorBarCmdSet" id="EditorBarMemberTreePopupMenu_TreeResultsCommand" priority="0x0100" type="Button">
+				<Parent guid="EditorBarCmdSet" id="EditorBarMemberTreePopupMenu_ResultsGroup" />
+				<CommandFlag>TogglePatternAvailable</CommandFlag>
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Tree results</ButtonText>
+					<CommandName>Tree results</CommandName>
+					<CanonicalName>EditorBar.MemberTreePopup.TreeResults</CanonicalName>
+					<LocCanonicalName>EditorBar.MemberTreePopup.TreeResults</LocCanonicalName>
+				</Strings>
+			</Button>
+
+			<Button guid="EditorBarCmdSet" id="EditorBarMemberTreePopupMenu_ListResultsCommand" priority="0x0200" type="Button">
+				<Parent guid="EditorBarCmdSet" id="EditorBarMemberTreePopupMenu_ResultsGroup" />
+				<CommandFlag>TogglePatternAvailable</CommandFlag>
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>List results</ButtonText>
+					<CommandName>List results</CommandName>
+					<CanonicalName>EditorBar.MemberTreePopup.ListResults</CanonicalName>
+					<LocCanonicalName>EditorBar.MemberTreePopup.ListResults</LocCanonicalName>
+				</Strings>
+			</Button>
+
+			<Button guid="EditorBarCmdSet" id="EditorBarMemberTreePopupMenu_ShowFilterBoxWhenEmptyCommand" priority="0x0100" type="Button">
+				<Parent guid="EditorBarCmdSet" id="EditorBarMemberTreePopupMenu_FilterGroup" />
+				<CommandFlag>TogglePatternAvailable</CommandFlag>
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Show filter box when empty</ButtonText>
+					<CommandName>Show filter box when empty</CommandName>
+					<CanonicalName>EditorBar.MemberTreePopup.ShowFilterBoxWhenEmpty</CanonicalName>
+					<LocCanonicalName>EditorBar.MemberTreePopup.ShowFilterBoxWhenEmpty</LocCanonicalName>
+				</Strings>
+			</Button>
+
+			<Button guid="EditorBarCmdSet" id="EditorBarMemberListPopupMenu_ShowFilterBoxWhenEmptyCommand" priority="0x0100" type="Button">
+				<Parent guid="EditorBarCmdSet" id="EditorBarMemberListPopupMenu_FilterGroup" />
+				<CommandFlag>TogglePatternAvailable</CommandFlag>
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Show filter box when empty</ButtonText>
+					<CommandName>Show filter box when empty</CommandName>
+					<CanonicalName>EditorBar.MemberListPopup.ShowFilterBoxWhenEmpty</CanonicalName>
+					<LocCanonicalName>EditorBar.MemberListPopup.ShowFilterBoxWhenEmpty</LocCanonicalName>
+				</Strings>
+			</Button>
 		</Buttons>
 
 		<Bitmaps>
@@ -911,6 +991,19 @@
 			<IDSymbol name="EditorBarSettings_DisplayNormalCommand" value="0x8024" />
 			<IDSymbol name="EditorBarSettings_DisplayCompactCommand" value="0x8025" />
 			<IDSymbol name="EditorBarSettings_OpenOptionsCommand" value="0x8026" />
+
+			<!-- context menu: member tree popup -->
+			<IDSymbol name="EditorBarMemberTreePopupMenu" value="0x8100" />
+			<IDSymbol name="EditorBarMemberTreePopupMenu_ResultsGroup" value="0x8101" />
+			<IDSymbol name="EditorBarMemberTreePopupMenu_FilterGroup" value="0x8102" />
+			<IDSymbol name="EditorBarMemberTreePopupMenu_TreeResultsCommand" value="0x8110" />
+			<IDSymbol name="EditorBarMemberTreePopupMenu_ListResultsCommand" value="0x8111" />
+			<IDSymbol name="EditorBarMemberTreePopupMenu_ShowFilterBoxWhenEmptyCommand" value="0x8112" />
+
+			<!-- context menu: member list popup -->
+			<IDSymbol name="EditorBarMemberListPopupMenu" value="0x8200" />
+			<IDSymbol name="EditorBarMemberListPopupMenu_FilterGroup" value="0x8201" />
+			<IDSymbol name="EditorBarMemberListPopupMenu_ShowFilterBoxWhenEmptyCommand" value="0x8210" />
 		</GuidSymbol>
 
 		<!-- Image Lists -->

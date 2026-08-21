@@ -46,7 +46,7 @@ internal class MenuContextService : IMenuContextService
         this.SetActiveContext(context);
         try
         {
-            var point = Cursor.Position;
+            var point = context.ScreenLocation ?? Cursor.Position;
             var shell = await VS.Services.GetUIShellAsync();
             var menuId = context.MenuId;
 

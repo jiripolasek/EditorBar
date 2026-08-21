@@ -4,6 +4,7 @@
 
 #nullable enable
 
+using System.Drawing;
 using System.Reflection;
 
 namespace JPSoftworks.EditorBar.Commands.Abstractions;
@@ -19,6 +20,11 @@ internal abstract record MenuContext
     public virtual MenuId MenuId =>
         this.GetType().GetCustomAttribute<MenuIdAttribute>()?.MenuId
         ?? throw new InvalidOperationException($"Context type {this.GetType().Name} is missing MenuId attribute");
+
+    /// <summary>
+    /// Gets an optional screen location where the menu should be shown.
+    /// </summary>
+    public virtual Point? ScreenLocation => null;
 
     /// <summary>
     /// Validates the context before use.

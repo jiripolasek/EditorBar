@@ -4,6 +4,7 @@
 
 #nullable enable
 
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -17,8 +18,13 @@ namespace JPSoftworks.EditorBar.Controls;
 /// </summary>
 public partial class MemberListPopup : Popup
 {
+    private static readonly AsyncLocal<MemberListPopup?> CurrentMenuInteractionPopupHolder = new();
+    private int _suspendAutoCloseCount;
+
     public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(
         nameof(Content), typeof(UIElement), typeof(MemberListPopup), new PropertyMetadata(default(UIElement)));
+
+    internal static MemberListPopup? CurrentMenuInteractionPopup => CurrentMenuInteractionPopupHolder.Value;
 
     public UIElement Content
     {
@@ -44,6 +50,8 @@ public partial class MemberListPopup : Popup
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);
+        this._suspendAutoCloseCount = 0;
+        this.StaysOpen = false;
         if (Equals(this, Mouse.Captured!))
         {
             Mouse.Capture(null!);
@@ -75,5 +83,64 @@ public partial class MemberListPopup : Popup
 
         //symbolChevronButton.AcquireWin32Focus(out _);
         symbolChevronButton.FocusButton();
+    }
+
+    internal IDisposable SuspendAutoClose()
+    {
+        this._suspendAutoCloseCount++;
+        this.StaysOpen = true;
+        return new SuspendAutoCloseScope(this);
+    }
+
+    internal static IDisposable EnterMenuInteraction(MemberListPopup popup)
+    {
+        var previousPopup = CurrentMenuInteractionPopupHolder.Value;
+        CurrentMenuInteractionPopupHolder.Value = popup;
+        return new MenuInteractionScope(previousPopup);
+    }
+
+    private void ResumeAutoClose()
+    {
+        if (this._suspendAutoCloseCount > 0)
+        {
+            this._suspendAutoCloseCount--;
+        }
+
+        if (this._suspendAutoCloseCount == 0)
+        {
+            this.StaysOpen = false;
+        }
+    }
+
+    private sealed class SuspendAutoCloseScope(MemberListPopup popup) : IDisposable
+    {
+        private bool _disposed;
+
+        public void Dispose()
+        {
+            if (this._disposed)
+            {
+                return;
+            }
+
+            popup.ResumeAutoClose();
+            this._disposed = true;
+        }
+    }
+
+    private sealed class MenuInteractionScope(MemberListPopup? previousPopup) : IDisposable
+    {
+        private bool _disposed;
+
+        public void Dispose()
+        {
+            if (this._disposed)
+            {
+                return;
+            }
+
+            CurrentMenuInteractionPopupHolder.Value = previousPopup;
+            this._disposed = true;
+        }
     }
 }

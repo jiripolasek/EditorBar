@@ -270,9 +270,9 @@ internal static class LocationBreadcrumbTreeBuilder
             return new DispatchedDelegateCommand(_ => new FileActionMenuContext(item.FullPath).ShowMenu());
         }
 
-        if (!string.IsNullOrWhiteSpace(item.FullPath) && Directory.Exists(item.FullPath))
+        if (item.FullPath is { Length: > 0 } fullPath && Directory.Exists(fullPath))
         {
-            var model = new PhysicalDirectoryModel(primaryName, item.FullPath);
+            var model = new PhysicalDirectoryModel(primaryName, fullPath);
             return new DispatchedDelegateCommand(_ => new LocationBreadcrumbMenuContext(model, currentTextView).ShowMenu());
         }
 
