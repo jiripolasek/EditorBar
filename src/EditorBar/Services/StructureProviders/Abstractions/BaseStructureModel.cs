@@ -67,7 +67,8 @@ public abstract class BaseStructureModel : IEquatable<BaseStructureModel>
             return true;
         }
 
-        return this.AnchorPoint.FilePath == other.AnchorPoint.FilePath
+        return this.CanHaveChildren == other.CanHaveChildren
+               && this.AnchorPoint.FilePath == other.AnchorPoint.FilePath
                && this.DisplayName == other.DisplayName
                && Equals(this.AnchorPoint, other.AnchorPoint);
     }
@@ -103,7 +104,11 @@ public abstract class BaseStructureModel : IEquatable<BaseStructureModel>
     /// <returns>An integer hash code.</returns>
     public override int GetHashCode()
     {
-        return HashCode.Combine(this.AnchorPoint.FilePath, this.DisplayName, this.AnchorPoint);
+        return HashCode.Combine(
+            this.CanHaveChildren,
+            this.AnchorPoint.FilePath,
+            this.DisplayName,
+            this.AnchorPoint);
     }
 
     /// <summary>

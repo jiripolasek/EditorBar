@@ -289,6 +289,7 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
 
     public Task InitializeAsync()
     {
+        this.UpdateFileStructureProvider();
         return Task.CompletedTask;
     }
 
