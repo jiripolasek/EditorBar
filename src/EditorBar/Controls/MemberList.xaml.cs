@@ -110,7 +110,6 @@ public partial class MemberList : UserControl
         if (this.FilterTextBox!.Visibility != Visibility.Visible)
         {
             this.FilterTextBox.Visibility = Visibility.Visible;
-            this.MoreOptionsButton.Visibility = Visibility.Visible;
             this.FilterTextBox.Text = string.Empty;
         }
 
@@ -242,7 +241,6 @@ public partial class MemberList : UserControl
         if (this.FilterTextBox!.Visibility != Visibility.Visible)
         {
             this.FilterTextBox.Visibility = Visibility.Visible;
-            this.MoreOptionsButton.Visibility = Visibility.Visible;
             this.FilterTextBox.Text = string.Empty;
         }
 
@@ -414,7 +412,6 @@ public partial class MemberList : UserControl
         this.FilterTextBox.Visibility = this._showFilterBoxWhenEmpty
             ? Visibility.Visible
             : Visibility.Collapsed;
-        this.MoreOptionsButton.Visibility = this.FilterTextBox.Visibility;
     }
 
     internal void SetShowFilterBoxWhenEmpty(bool showFilterBoxWhenEmpty)

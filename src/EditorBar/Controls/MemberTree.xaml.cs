@@ -100,7 +100,6 @@ public partial class MemberTree : UserControl
 
         if (string.IsNullOrEmpty(this.FilterTextBox.Text))
         {
-            this.UpdateResultsViewToggleVisibility(filterActive: false);
             this.SetResultsView(showList: false);
             this.ApplyEmptyFilterVisibilityPreference();
             this.FocusCurrentResultsView();
@@ -456,7 +455,6 @@ public partial class MemberTree : UserControl
             this._filteredListItems = [];
             this.ResultsListBox.ItemsSource = this._filteredListItems;
             this.UpdatePlaceholders(this._items.Count > 0);
-            this.UpdateResultsViewToggleVisibility(filterActive: false);
             this.SetResultsView(showList: false);
             this.SelectFirstItem();
             return;
@@ -484,7 +482,6 @@ public partial class MemberTree : UserControl
         this.TreeView.ItemsSource = filteredItems;
         this._filteredListItems = flatListItems;
         this.ResultsListBox.ItemsSource = this._filteredListItems;
-        this.UpdateResultsViewToggleVisibility(filterActive: true);
         this.SetResultsView(this._preferListResultsView);
         this.UpdatePlaceholders(this.IsListResultsViewActive ? this._filteredListItems.Count > 0 : filteredItems.Count > 0);
         this.SelectFirstItem();
@@ -732,7 +729,6 @@ public partial class MemberTree : UserControl
         if (this.FilterTextBox.Visibility != Visibility.Visible)
         {
             this.FilterTextBox.Visibility = Visibility.Visible;
-            this.MoreOptionsButton.Visibility = Visibility.Visible;
             this.FilterTextBox.Text = string.Empty;
         }
 
@@ -807,7 +803,6 @@ public partial class MemberTree : UserControl
         this.FilterTextBox.Visibility = this._showFilterBoxWhenEmpty
             ? Visibility.Visible
             : Visibility.Collapsed;
-        this.MoreOptionsButton.Visibility = this.FilterTextBox.Visibility;
     }
 
     private void MoreOptionsButton_OnClick(object sender, RoutedEventArgs e)
@@ -823,11 +818,6 @@ public partial class MemberTree : UserControl
 
         new MemberTreeResultsMenuContext(this, GetMenuLocation(button)).ShowMenu();
         e.Handled = true;
-    }
-
-    private void UpdateResultsViewToggleVisibility(bool filterActive)
-    {
-        this.MoreOptionsButton.Visibility = this.FilterTextBox.Visibility;
     }
 
     private void SetResultsView(bool showList)

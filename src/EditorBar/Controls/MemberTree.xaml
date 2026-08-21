@@ -117,46 +117,6 @@
                 </Setter>
             </Style>
 
-            <Style x:Key="ResultsViewMenuButtonStyle" TargetType="Button">
-                <Setter Property="Width" Value="28" />
-                <Setter Property="Height" Value="28" />
-                <Setter Property="Margin" Value="3,1,1,1" />
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.ToolWindowBorderBrushKey}}" />
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextInactiveKey}}" />
-                <Setter Property="ToolTip" Value="More options" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border
-                                x:Name="ButtonBorder"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                SnapsToDevicePixels="True">
-                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Ellipse Width="3" Height="3" Fill="{TemplateBinding Foreground}" Margin="0,0,2,0" />
-                                    <Ellipse Width="3" Height="3" Fill="{TemplateBinding Foreground}" Margin="0,0,2,0" />
-                                    <Ellipse Width="3" Height="3" Fill="{TemplateBinding Foreground}" />
-                                </StackPanel>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentLightBrushKey}}" />
-                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
-                                </Trigger>
-                                <Trigger Property="IsKeyboardFocused" Value="True">
-                                    <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentLightBrushKey}}" />
-                                    <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{DynamicResource {x:Static platformUI:EnvironmentColors.AccentLightBrushKey}}" />
-                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
             <Style x:Key="ResultsListItemContainerStyle" TargetType="ListBoxItem">
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="BorderBrush" Value="Transparent" />
@@ -234,17 +194,18 @@
                 Grid.Column="0"
                 PreviewKeyDown="FilterTextBox_OnKeyDown"
                 Style="{StaticResource PopupFilterTextBoxStyle}"
+                TabIndex="0"
                 Tag="Filter tree"
                 TextChanged="FilterTextBox_TextChanged"
                 Visibility="Collapsed" />
 
             <Button
-                x:Name="MoreOptionsButton"
+                x:Name="ExpandedMoreOptionsButton"
                 Grid.Column="1"
                 AutomationProperties.Name="More options"
                 Click="MoreOptionsButton_OnClick"
-                Style="{StaticResource ResultsViewMenuButtonStyle}"
-                Visibility="Collapsed" />
+                Style="{StaticResource ExpandedMoreOptionsButtonStyle}"
+                TabIndex="2" />
         </Grid>
 
         <Grid Grid.Row="1" Margin="1,0,1,1">
@@ -258,7 +219,8 @@
                 ItemTemplate="{StaticResource TreeItemTemplate}"
                 Loaded="TreeView_OnLoaded"
                 PreviewKeyDown="TreeView_OnPreviewKeyDown"
-                PreviewTextInput="TreeView_OnPreviewTextInput">
+                PreviewTextInput="TreeView_OnPreviewTextInput"
+                TabIndex="0">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="TreeViewItem">
                         <Setter Property="Background" Value="Transparent" />
@@ -364,6 +326,7 @@
                 ItemTemplate="{StaticResource ResultsListItemTemplate}"
                 PreviewKeyDown="ResultsListBox_OnPreviewKeyDown"
                 PreviewTextInput="ResultsListBox_OnPreviewTextInput"
+                TabIndex="0"
                 Visibility="Collapsed">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -391,5 +354,16 @@
                 Text="No matches for current filter."
                 Visibility="Collapsed" />
         </Grid>
+
+        <Button
+            x:Name="CompactMoreOptionsButton"
+            Grid.Row="1"
+            Panel.ZIndex="1"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            AutomationProperties.Name="More options"
+            Click="MoreOptionsButton_OnClick"
+            Style="{StaticResource CompactMoreOptionsButtonStyle}"
+            TabIndex="2" />
     </Grid>
 </UserControl>

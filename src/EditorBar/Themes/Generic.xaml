@@ -152,6 +152,122 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+
+            <Style x:Key="MoreOptionsButtonStyle" TargetType="Button">
+                <Setter Property="Width" Value="22" />
+                <Setter Property="Height" Value="20" />
+                <Setter Property="Margin" Value="0,1,1,1" />
+                <Setter Property="Opacity" Value="0.65" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextInactiveKey}}" />
+                <Setter Property="ToolTip" Value="More options" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border
+                                x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                SnapsToDevicePixels="True">
+                                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <StackPanel x:Name="CompactGlyph" Orientation="Horizontal">
+                                        <Ellipse
+                                            Width="2"
+                                            Height="2"
+                                            Margin="0,0,1.5,0"
+                                            Fill="{TemplateBinding Foreground}" />
+                                        <Ellipse
+                                            Width="2"
+                                            Height="2"
+                                            Margin="0,0,1.5,0"
+                                            Fill="{TemplateBinding Foreground}" />
+                                        <Ellipse
+                                            Width="2"
+                                            Height="2"
+                                            Fill="{TemplateBinding Foreground}" />
+                                    </StackPanel>
+                                    <StackPanel x:Name="ExpandedGlyph" Orientation="Horizontal" Visibility="Collapsed">
+                                        <Ellipse
+                                            Width="3"
+                                            Height="3"
+                                            Margin="0,0,2,0"
+                                            Fill="{TemplateBinding Foreground}" />
+                                        <Ellipse
+                                            Width="3"
+                                            Height="3"
+                                            Margin="0,0,2,0"
+                                            Fill="{TemplateBinding Foreground}" />
+                                        <Ellipse
+                                            Width="3"
+                                            Height="3"
+                                            Fill="{TemplateBinding Foreground}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="Width" Value="28">
+                                    <Setter TargetName="CompactGlyph" Property="Visibility" Value="Collapsed" />
+                                    <Setter TargetName="ExpandedGlyph" Property="Visibility" Value="Visible" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource {x:Static platformUIShell:EnvironmentColors.AccentLightBrushKey}}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource {x:Static platformUIShell:EnvironmentColors.AccentLightBrushKey}}" />
+                                    <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{DynamicResource {x:Static platformUIShell:EnvironmentColors.AccentLightBrushKey}}" />
+                                    <Setter TargetName="ButtonBorder" Property="BorderThickness" Value="1" />
+                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Visibility, ElementName=FilterTextBox}" Value="Visible">
+                        <Setter Property="Width" Value="28" />
+                        <Setter Property="Height" Value="28" />
+                        <Setter Property="Margin" Value="3,1,1,1" />
+                        <Setter Property="Opacity" Value="1" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUIShell:EnvironmentColors.ToolWindowBorderBrushKey}}" />
+                        <Setter Property="BorderThickness" Value="1" />
+                    </DataTrigger>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Opacity" Value="1" />
+                    </Trigger>
+                    <Trigger Property="IsKeyboardFocused" Value="True">
+                        <Setter Property="Opacity" Value="1" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style
+                x:Key="ExpandedMoreOptionsButtonStyle"
+                BasedOn="{StaticResource MoreOptionsButtonStyle}"
+                TargetType="Button">
+                <Setter Property="Visibility" Value="Collapsed" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Visibility, ElementName=FilterTextBox}" Value="Visible">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style
+                x:Key="CompactMoreOptionsButtonStyle"
+                BasedOn="{StaticResource MoreOptionsButtonStyle}"
+                TargetType="Button">
+                <Setter Property="Margin" Value="0" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Visibility, ElementName=FilterTextBox}" Value="Visible">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
         </ResourceDictionary>
 
         <ResourceDictionary Source="pack://application:,,,/EditorBar;component/Themes/EditorBar.Normal.xaml" />
