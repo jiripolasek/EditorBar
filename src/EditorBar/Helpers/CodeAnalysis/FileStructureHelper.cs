@@ -60,6 +60,13 @@ internal static class FileStructureHelper
             return ImmutableArray<SymbolAnchorPoint>.Empty; // empty list
         }
 
+        // Enum separators fall outside member spans
+        if (TryGetEnumMemberAroundSeparator(token, sourceText, position, out var enumMember))
+        {
+            position = enumMember.Span.End - 1;
+            token = enumMember.GetLastToken();
+        }
+
         // 2) Walk upward through the syntax node ancestors, looking for declared symbols
         var commentOwnerResolved = false;
         foreach (var node in token.Parent?.AncestorsAndSelf() ?? [])
@@ -116,6 +123,51 @@ internal static class FileStructureHelper
         }
 
         return declarations.ToImmutableArray();
+    }
+
+    private static bool TryGetEnumMemberAroundSeparator(
+        SyntaxToken token,
+        SourceText sourceText,
+        int position,
+        out EnumMemberDeclarationSyntax enumMember)
+    {
+        // The direct-parent check excludes commas inside member initializers
+        if (token is
+            {
+                RawKind: (int)CSharpSyntaxKind.CommaToken,
+                Parent: EnumDeclarationSyntax enumDeclaration
+            })
+        {
+            var memberIndex = 0;
+            foreach (var separator in enumDeclaration.Members.GetSeparators())
+            {
+                if (separator == token && memberIndex < enumDeclaration.Members.Count)
+                {
+                    // The comma belongs to the preceding member
+                    enumMember = enumDeclaration.Members[memberIndex];
+
+                    // Same-line context after it belongs to the next member
+                    if (position >= separator.Span.End &&
+                        memberIndex + 1 < enumDeclaration.Members.Count)
+                    {
+                        var nextMember = enumDeclaration.Members[memberIndex + 1];
+                        var separatorLine = sourceText.Lines.GetLineFromPosition(separator.SpanStart).LineNumber;
+                        var nextMemberLine = sourceText.Lines.GetLineFromPosition(nextMember.SpanStart).LineNumber;
+                        if (separatorLine == nextMemberLine && position <= nextMember.SpanStart)
+                        {
+                            enumMember = nextMember;
+                        }
+                    }
+
+                    return enumMember.Span.Length > 0;
+                }
+
+                memberIndex++;
+            }
+        }
+
+        enumMember = null!;
+        return false;
     }
 
     private static bool TryGetDeclarationCommentOwnerToken(
