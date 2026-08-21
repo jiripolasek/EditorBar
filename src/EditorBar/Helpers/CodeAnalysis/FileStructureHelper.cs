@@ -13,7 +13,11 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Text.Editor;
+using CSharpDocumentationCommentTriviaSyntax = Microsoft.CodeAnalysis.CSharp.Syntax.DocumentationCommentTriviaSyntax;
+using CSharpSyntaxKind = Microsoft.CodeAnalysis.CSharp.SyntaxKind;
+using VisualBasicDocumentationCommentTriviaSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.DocumentationCommentTriviaSyntax;
 using VisualBasicFieldDeclarationSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.FieldDeclarationSyntax;
+using VisualBasicSyntaxKind = Microsoft.CodeAnalysis.VisualBasic.SyntaxKind;
 
 namespace JPSoftworks.EditorBar.Helpers;
 
@@ -23,8 +27,9 @@ internal static class FileStructureHelper
 
     /// <summary>
     /// Finds the nearest semantic symbol under (or near) the given caret position,
-    /// walking up ancestor nodes if necessary. Extends single-name field declarations
-    /// to their full span and promotes positional record parameters to their properties.
+    /// walking up ancestor nodes if necessary. Treats comments and same-line trailing trivia as
+    /// declaration context, extends single-name field declarations to their full span, and promotes
+    /// positional record parameters to their properties.
     /// </summary>
     /// <param name="semanticModel">A fresh SemanticModel for the current Document.</param>
     /// <param name="root">SyntaxRoot of the Document.</param>
@@ -41,19 +46,31 @@ internal static class FileStructureHelper
     {
         var declarations = new List<SymbolAnchorPoint>();
 
-        position = GetDeclarationLookupPosition(root, sourceText, position);
+        var isDeclarationComment =
+            TryGetDeclarationCommentOwnerToken(root, position, out var token);
+        if (!isDeclarationComment)
+        {
+            position = GetDeclarationLookupPosition(root, sourceText, position);
+            token = root.FindToken(position, true);
+        }
 
         // 1) Find the token at (or just before) the specified position.
-        var token = root.FindToken(position, true);
         if (token == default)
         {
             return ImmutableArray<SymbolAnchorPoint>.Empty; // empty list
         }
 
         // 2) Walk upward through the syntax node ancestors, looking for declared symbols
+        var commentOwnerResolved = false;
         foreach (var node in token.Parent?.AncestorsAndSelf() ?? [])
         {
-            var declarationNode = TryGetSoleFieldSymbolDeclaration(node, position, out var fieldDeclaration)
+            var containsPosition = node.Span.Contains(position);
+            if (!containsPosition && (!isDeclarationComment || commentOwnerResolved))
+            {
+                continue;
+            }
+
+            var declarationNode = TryGetSoleFieldSymbolDeclaration(node, out var fieldDeclaration)
                 ? fieldDeclaration
                 : node;
 
@@ -71,6 +88,11 @@ internal static class FileStructureHelper
 
             if (declaredSymbol is not null)
             {
+                if (!containsPosition)
+                {
+                    commentOwnerResolved = true;
+                }
+
                 if (declaredSymbol is IMethodSymbol
                     {
                         MethodKind: MethodKind.PropertyGet or MethodKind.PropertySet,
@@ -94,6 +116,71 @@ internal static class FileStructureHelper
         }
 
         return declarations.ToImmutableArray();
+    }
+
+    private static bool TryGetDeclarationCommentOwnerToken(
+        SyntaxNode root,
+        int position,
+        out SyntaxToken ownerToken)
+    {
+        ownerToken = root.FindToken(position, false);
+        if (TokenOwnsDeclarationCommentAtPosition(ownerToken, position))
+        {
+            return true;
+        }
+
+        if (position > 0)
+        {
+            var precedingToken = root.FindToken(position - 1, false);
+            if (TokenOwnsDeclarationCommentAtPosition(precedingToken, position))
+            {
+                ownerToken = precedingToken;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool TokenOwnsDeclarationCommentAtPosition(SyntaxToken token, int position)
+    {
+        return TriviaListContainsCommentAtPosition(token.LeadingTrivia, position) ||
+               TriviaListContainsCommentAtPosition(token.TrailingTrivia, position);
+    }
+
+    private static bool TriviaListContainsCommentAtPosition(SyntaxTriviaList triviaList, int position)
+    {
+        foreach (var trivia in triviaList)
+        {
+            if ((!trivia.FullSpan.Contains(position) &&
+                 (position <= 0 || !trivia.FullSpan.Contains(position - 1))) ||
+                !IsCommentTrivia(trivia))
+            {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsCommentTrivia(SyntaxTrivia trivia)
+    {
+        if (trivia.HasStructure &&
+            trivia.GetStructure() is CSharpDocumentationCommentTriviaSyntax or VisualBasicDocumentationCommentTriviaSyntax)
+        {
+            return true;
+        }
+
+        return trivia.Token.Language switch
+        {
+            LanguageNames.CSharp => trivia.RawKind is
+                (int)CSharpSyntaxKind.SingleLineCommentTrivia or
+                (int)CSharpSyntaxKind.MultiLineCommentTrivia,
+            LanguageNames.VisualBasic => trivia.RawKind == (int)VisualBasicSyntaxKind.CommentTrivia,
+            _ => false
+        };
     }
 
     private static int GetDeclarationLookupPosition(SyntaxNode root, SourceText sourceText, int position)
@@ -135,19 +222,16 @@ internal static class FileStructureHelper
 
     private static bool TryGetSoleFieldSymbolDeclaration(
         SyntaxNode node,
-        int position,
         out SyntaxNode declaration)
     {
         if (node is BaseFieldDeclarationSyntax csharpFieldDeclaration &&
-            csharpFieldDeclaration.Span.Contains(position) &&
             csharpFieldDeclaration.Declaration.Variables.Count == 1)
         {
             declaration = csharpFieldDeclaration.Declaration.Variables[0];
             return true;
         }
 
-        if (node is VisualBasicFieldDeclarationSyntax visualBasicFieldDeclaration &&
-            visualBasicFieldDeclaration.Span.Contains(position))
+        if (node is VisualBasicFieldDeclarationSyntax visualBasicFieldDeclaration)
         {
             SyntaxNode? soleName = null;
             foreach (var declarator in visualBasicFieldDeclaration.Declarators)
