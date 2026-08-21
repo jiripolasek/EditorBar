@@ -93,14 +93,23 @@
                 </Style.Triggers>
             </Style>
 
+            <Style x:Key="PopupFilterHeaderStyle" TargetType="Grid">
+                <Setter Property="Background" Value="Transparent" />
+                <Style.Triggers>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource {x:Static platformUIShell:CommonControlsColors.TextBoxBackgroundFocusedBrushKey}}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
             <Style x:Key="PopupFilterTextBoxStyle" TargetType="TextBox">
                 <Setter Property="MinHeight" Value="28" />
-                <Setter Property="Margin" Value="1" />
+                <Setter Property="Margin" Value="0" />
                 <Setter Property="Padding" Value="0" />
-                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUIShell:CommonControlsColors.TextBoxBorderBrushKey}}" />
-                <Setter Property="Background" Value="{DynamicResource {x:Static platformUIShell:CommonControlsColors.TextBoxBackgroundBrushKey}}" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="Background" Value="Transparent" />
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static platformUIShell:CommonControlsColors.TextBoxTextBrushKey}}" />
                 <Setter Property="Template">
                     <Setter.Value>
@@ -109,7 +118,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4"
+                                CornerRadius="0"
                                 SnapsToDevicePixels="True">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -141,7 +150,6 @@
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsKeyboardFocused" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource {x:Static platformUIShell:CommonControlsColors.TextBoxBackgroundFocusedBrushKey}}" />
                                     <Setter Property="Foreground" Value="{DynamicResource {x:Static platformUIShell:CommonControlsColors.TextBoxTextFocusedBrushKey}}" />
                                 </Trigger>
                                 <Trigger Property="Text" Value="">
@@ -157,7 +165,7 @@
                 <Setter Property="Width" Value="22" />
                 <Setter Property="Height" Value="20" />
                 <Setter Property="Margin" Value="0,1,1,1" />
-                <Setter Property="Opacity" Value="0.65" />
+                <Setter Property="Opacity" Value="1" />
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="BorderBrush" Value="Transparent" />
                 <Setter Property="BorderThickness" Value="0" />
@@ -171,10 +179,10 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4"
+                                CornerRadius="0,6,0,4"
                                 SnapsToDevicePixels="True">
                                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <StackPanel x:Name="CompactGlyph" Orientation="Horizontal">
+                                    <StackPanel x:Name="CompactGlyph" Opacity="0.65" Orientation="Horizontal">
                                         <Ellipse
                                             Width="2"
                                             Height="2"
@@ -210,17 +218,20 @@
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="Width" Value="28">
+                                    <Setter TargetName="ButtonBorder" Property="CornerRadius" Value="4" />
                                     <Setter TargetName="CompactGlyph" Property="Visibility" Value="Collapsed" />
                                     <Setter TargetName="ExpandedGlyph" Property="Visibility" Value="Visible" />
                                 </Trigger>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource {x:Static platformUIShell:EnvironmentColors.AccentLightBrushKey}}" />
+                                    <Setter TargetName="CompactGlyph" Property="Opacity" Value="1" />
                                     <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
                                 </Trigger>
                                 <Trigger Property="IsKeyboardFocused" Value="True">
                                     <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource {x:Static platformUIShell:EnvironmentColors.AccentLightBrushKey}}" />
                                     <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{DynamicResource {x:Static platformUIShell:EnvironmentColors.AccentLightBrushKey}}" />
                                     <Setter TargetName="ButtonBorder" Property="BorderThickness" Value="1" />
+                                    <Setter TargetName="CompactGlyph" Property="Opacity" Value="1" />
                                     <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
@@ -231,17 +242,8 @@
                     <DataTrigger Binding="{Binding Visibility, ElementName=FilterTextBox}" Value="Visible">
                         <Setter Property="Width" Value="28" />
                         <Setter Property="Height" Value="28" />
-                        <Setter Property="Margin" Value="3,1,1,1" />
-                        <Setter Property="Opacity" Value="1" />
-                        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUIShell:EnvironmentColors.ToolWindowBorderBrushKey}}" />
-                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="Margin" Value="0" />
                     </DataTrigger>
-                    <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Opacity" Value="1" />
-                    </Trigger>
-                    <Trigger Property="IsKeyboardFocused" Value="True">
-                        <Setter Property="Opacity" Value="1" />
-                    </Trigger>
                 </Style.Triggers>
             </Style>
 
@@ -261,7 +263,10 @@
                 x:Key="CompactMoreOptionsButtonStyle"
                 BasedOn="{StaticResource MoreOptionsButtonStyle}"
                 TargetType="Button">
-                <Setter Property="Margin" Value="0" />
+                <Setter Property="Margin" Value="0,-4,-4,0" />
+                <Setter Property="Background" Value="{DynamicResource {x:Static platformUIShell:ThemedDialogColors.ListBoxBrushKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUIShell:ThemedDialogColors.ListBoxBorderBrushKey}}" />
+                <Setter Property="BorderThickness" Value="1,0,0,1" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Visibility, ElementName=FilterTextBox}" Value="Visible">
                         <Setter Property="Visibility" Value="Collapsed" />

@@ -156,11 +156,17 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
+        <Grid
+            Grid.Row="0"
+            Style="{StaticResource PopupFilterHeaderStyle}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
             <TextBox
                 x:Name="FilterTextBox"
@@ -178,6 +184,15 @@
                 Click="MoreOptionsButton_OnClick"
                 Style="{StaticResource ExpandedMoreOptionsButtonStyle}"
                 TabIndex="2" />
+
+            <Border
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                Height="1"
+                Background="{DynamicResource {x:Static platformUI:CommonControlsColors.TextBoxBorderBrushKey}}"
+                IsHitTestVisible="False"
+                SnapsToDevicePixels="True"
+                Visibility="{Binding Visibility, ElementName=FilterTextBox}" />
         </Grid>
 
         <!--  Content area with list and placeholders overlayed  -->
