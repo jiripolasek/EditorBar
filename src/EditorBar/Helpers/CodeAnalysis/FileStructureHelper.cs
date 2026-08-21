@@ -11,7 +11,9 @@ using JPSoftworks.EditorBar.Services.StructureProviders;
 using JPSoftworks.EditorBar.Services.StructureProviders.Roslyn;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Text.Editor;
+using VisualBasicFieldDeclarationSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.FieldDeclarationSyntax;
 
 namespace JPSoftworks.EditorBar.Helpers;
 
@@ -21,21 +23,25 @@ internal static class FileStructureHelper
 
     /// <summary>
     /// Finds the nearest semantic symbol under (or near) the given caret position,
-    /// walking up ancestor nodes if necessary. Also promotes property accessors
-    /// (e.g., get/set methods) to the actual property symbol.
+    /// walking up ancestor nodes if necessary. Extends single-name field declarations
+    /// to their full span and promotes positional record parameters to their properties.
     /// </summary>
     /// <param name="semanticModel">A fresh SemanticModel for the current Document.</param>
     /// <param name="root">SyntaxRoot of the Document.</param>
+    /// <param name="sourceText">Source text of the Document.</param>
     /// <param name="position">Caret position in the source text.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The nearest symbol if found, otherwise null.</returns>
     private static ImmutableArray<SymbolAnchorPoint> FindDeclarationsUnderPosition(
         SemanticModel semanticModel,
         SyntaxNode root,
+        SourceText sourceText,
         int position,
         CancellationToken cancellationToken)
     {
         var declarations = new List<SymbolAnchorPoint>();
+
+        position = GetDeclarationLookupPosition(root, sourceText, position);
 
         // 1) Find the token at (or just before) the specified position.
         var token = root.FindToken(position, true);
@@ -47,8 +53,22 @@ internal static class FileStructureHelper
         // 2) Walk upward through the syntax node ancestors, looking for declared symbols
         foreach (var node in token.Parent?.AncestorsAndSelf() ?? [])
         {
+            var declarationNode = TryGetSoleFieldSymbolDeclaration(node, position, out var fieldDeclaration)
+                ? fieldDeclaration
+                : node;
+
             // Try to get a declared symbol (method, property, class, etc.)
-            var declaredSymbol = semanticModel.GetDeclaredSymbol(node, cancellationToken);
+            var declaredSymbol = semanticModel.GetDeclaredSymbol(declarationNode, cancellationToken);
+            var declarationLocation = declarationNode.GetLocation();
+
+            if (declaredSymbol is IParameterSymbol parameterSymbol &&
+                node is ParameterSyntax parameterSyntax &&
+                GetAssociatedSynthesizedRecordProperty(parameterSymbol, parameterSyntax) is { } propertySymbol)
+            {
+                declaredSymbol = propertySymbol;
+                declarationLocation = parameterSyntax.Identifier.GetLocation();
+            }
+
             if (declaredSymbol is not null)
             {
                 if (declaredSymbol is IMethodSymbol
@@ -68,12 +88,122 @@ internal static class FileStructureHelper
                         continue;
                     }
 
-                    declarations.Add(new SymbolAnchorPoint(declaredSymbol, node.GetLocation()));
+                    declarations.Add(new SymbolAnchorPoint(declaredSymbol, declarationLocation));
                 }
             }
         }
 
         return declarations.ToImmutableArray();
+    }
+
+    private static int GetDeclarationLookupPosition(SyntaxNode root, SourceText sourceText, int position)
+    {
+        if (position <= 0)
+        {
+            return position;
+        }
+
+        var line = sourceText.Lines.GetLineFromPosition(position);
+
+        // Only look backward when the caret is in trailing whitespace or at the end of the line.
+        // This prevents a caret on a blank following line from inheriting the previous declaration.
+        for (var index = position; index < line.End; index++)
+        {
+            if (!char.IsWhiteSpace(sourceText[index]))
+            {
+                return position;
+            }
+        }
+
+        var probePosition = Math.Min(position - 1, line.End - 1);
+        if (probePosition < line.Start)
+        {
+            return position;
+        }
+
+        var precedingToken = root.FindToken(probePosition, true);
+        if (precedingToken == default || precedingToken.Span.Length == 0)
+        {
+            return position;
+        }
+
+        var tokenPosition = precedingToken.Span.End - 1;
+        return tokenPosition >= line.Start && tokenPosition < line.End
+            ? tokenPosition
+            : position;
+    }
+
+    private static bool TryGetSoleFieldSymbolDeclaration(
+        SyntaxNode node,
+        int position,
+        out SyntaxNode declaration)
+    {
+        if (node is BaseFieldDeclarationSyntax csharpFieldDeclaration &&
+            csharpFieldDeclaration.Span.Contains(position) &&
+            csharpFieldDeclaration.Declaration.Variables.Count == 1)
+        {
+            declaration = csharpFieldDeclaration.Declaration.Variables[0];
+            return true;
+        }
+
+        if (node is VisualBasicFieldDeclarationSyntax visualBasicFieldDeclaration &&
+            visualBasicFieldDeclaration.Span.Contains(position))
+        {
+            SyntaxNode? soleName = null;
+            foreach (var declarator in visualBasicFieldDeclaration.Declarators)
+            {
+                foreach (var name in declarator.Names)
+                {
+                    if (soleName is not null)
+                    {
+                        declaration = null!;
+                        return false;
+                    }
+
+                    soleName = name;
+                }
+            }
+
+            if (soleName is not null)
+            {
+                declaration = soleName;
+                return true;
+            }
+        }
+
+        declaration = null!;
+        return false;
+    }
+
+    private static IPropertySymbol? GetAssociatedSynthesizedRecordProperty(
+        IParameterSymbol parameterSymbol,
+        ParameterSyntax parameterSyntax)
+    {
+        if (parameterSyntax.Parent?.Parent is not RecordDeclarationSyntax ||
+            parameterSymbol.ContainingSymbol is not IMethodSymbol { MethodKind: MethodKind.Constructor } ||
+            parameterSymbol.ContainingType is not { IsRecord: true } recordType)
+        {
+            return null;
+        }
+
+        foreach (var member in recordType.GetMembers(parameterSymbol.Name))
+        {
+            if (member is not IPropertySymbol propertySymbol)
+            {
+                continue;
+            }
+
+            foreach (var syntaxReference in propertySymbol.DeclaringSyntaxReferences)
+            {
+                if (syntaxReference.SyntaxTree == parameterSyntax.SyntaxTree &&
+                    syntaxReference.Span == parameterSyntax.Span)
+                {
+                    return propertySymbol;
+                }
+            }
+        }
+
+        return null;
     }
 
     public static async Task<IList<INamedTypeSymbol>> GetAllTypesAsync(Workspace workspace, DocumentId documentId)
@@ -166,16 +296,9 @@ internal static class FileStructureHelper
             return ImmutableList<BaseStructureModel>.Empty;
         }
 
-        // Find the token under (or just before) the caret
-        var token = syntaxRoot.FindToken(position);
-        if (token == default)
-        {
-            return ImmutableList<BaseStructureModel>.Empty;
-        }
-
         // Determine which symbol we’re on
         var declarationsAncherPoints =
-            FindDeclarationsUnderPosition(semanticModel, syntaxRoot, position, cancellationToken);
+            FindDeclarationsUnderPosition(semanticModel, syntaxRoot, sourceText, position, cancellationToken);
         if (declarationsAncherPoints.Length == 0)
         {
             return ImmutableList<BaseStructureModel>.Empty;
