@@ -11,6 +11,7 @@ using JPSoftworks.EditorBar.Services.StructureProviders;
 using JPSoftworks.EditorBar.Services.StructureProviders.Roslyn;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using VisualBasicFieldDeclarationSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.FieldDeclarationSyntax;
 
@@ -27,16 +28,20 @@ internal static class FileStructureHelper
     /// </summary>
     /// <param name="semanticModel">A fresh SemanticModel for the current Document.</param>
     /// <param name="root">SyntaxRoot of the Document.</param>
+    /// <param name="sourceText">Source text of the Document.</param>
     /// <param name="position">Caret position in the source text.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The nearest symbol if found, otherwise null.</returns>
     private static ImmutableArray<SymbolAnchorPoint> FindDeclarationsUnderPosition(
         SemanticModel semanticModel,
         SyntaxNode root,
+        SourceText sourceText,
         int position,
         CancellationToken cancellationToken)
     {
         var declarations = new List<SymbolAnchorPoint>();
+
+        position = GetDeclarationLookupPosition(root, sourceText, position);
 
         // 1) Find the token at (or just before) the specified position.
         var token = root.FindToken(position, true);
@@ -89,6 +94,43 @@ internal static class FileStructureHelper
         }
 
         return declarations.ToImmutableArray();
+    }
+
+    private static int GetDeclarationLookupPosition(SyntaxNode root, SourceText sourceText, int position)
+    {
+        if (position <= 0)
+        {
+            return position;
+        }
+
+        var line = sourceText.Lines.GetLineFromPosition(position);
+
+        // Only look backward when the caret is in trailing whitespace or at the end of the line.
+        // This prevents a caret on a blank following line from inheriting the previous declaration.
+        for (var index = position; index < line.End; index++)
+        {
+            if (!char.IsWhiteSpace(sourceText[index]))
+            {
+                return position;
+            }
+        }
+
+        var probePosition = Math.Min(position - 1, line.End - 1);
+        if (probePosition < line.Start)
+        {
+            return position;
+        }
+
+        var precedingToken = root.FindToken(probePosition, true);
+        if (precedingToken == default || precedingToken.Span.Length == 0)
+        {
+            return position;
+        }
+
+        var tokenPosition = precedingToken.Span.End - 1;
+        return tokenPosition >= line.Start && tokenPosition < line.End
+            ? tokenPosition
+            : position;
     }
 
     private static bool TryGetSoleFieldSymbolDeclaration(
@@ -254,16 +296,9 @@ internal static class FileStructureHelper
             return ImmutableList<BaseStructureModel>.Empty;
         }
 
-        // Find the token under (or just before) the caret
-        var token = syntaxRoot.FindToken(position);
-        if (token == default)
-        {
-            return ImmutableList<BaseStructureModel>.Empty;
-        }
-
         // Determine which symbol we’re on
         var declarationsAncherPoints =
-            FindDeclarationsUnderPosition(semanticModel, syntaxRoot, position, cancellationToken);
+            FindDeclarationsUnderPosition(semanticModel, syntaxRoot, sourceText, position, cancellationToken);
         if (declarationsAncherPoints.Length == 0)
         {
             return ImmutableList<BaseStructureModel>.Empty;
