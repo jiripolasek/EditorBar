@@ -5,6 +5,7 @@
 #nullable enable
 
 using Community.VisualStudio.Toolkit;
+using JPSoftworks.EditorBar.Controls;
 using Microsoft.VisualStudio.Shell;
 
 namespace JPSoftworks.EditorBar.Commands.Abstractions;
@@ -21,6 +22,7 @@ internal static class MenuExtensions
     {
         ThreadHelper.JoinableTaskFactory!.RunAsync(async () =>
         {
+            using var popupDismissSuspension = MemberListPopup.CurrentMenuInteractionPopup?.SuspendAutoClose();
             try
             {
                 var contextService = await VS.GetRequiredServiceAsync<IMenuContextService, IMenuContextService>();

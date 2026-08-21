@@ -20,6 +20,8 @@ public sealed class MemberTreeItemViewModel
 
     public required string SearchText { get; init; }
 
+    public string? SecondaryName { get; init; }
+
     public ICommand? Command { get; init; }
 
     public object? CommandParameter { get; init; }

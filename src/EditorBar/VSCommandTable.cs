@@ -107,6 +107,15 @@ namespace JPSoftworks.EditorBar
         public const int EditorBarSettings_DisplayNormalCommand = 0x8024;
         public const int EditorBarSettings_DisplayCompactCommand = 0x8025;
         public const int EditorBarSettings_OpenOptionsCommand = 0x8026;
+        public const int EditorBarMemberTreePopupMenu = 0x8100;
+        public const int EditorBarMemberTreePopupMenu_ResultsGroup = 0x8101;
+        public const int EditorBarMemberTreePopupMenu_FilterGroup = 0x8102;
+        public const int EditorBarMemberTreePopupMenu_TreeResultsCommand = 0x8110;
+        public const int EditorBarMemberTreePopupMenu_ListResultsCommand = 0x8111;
+        public const int EditorBarMemberTreePopupMenu_ShowFilterBoxWhenEmptyCommand = 0x8112;
+        public const int EditorBarMemberListPopupMenu = 0x8200;
+        public const int EditorBarMemberListPopupMenu_FilterGroup = 0x8201;
+        public const int EditorBarMemberListPopupMenu_ShowFilterBoxWhenEmptyCommand = 0x8210;
         public const int bmpToggleEditorBar = 0x0001;
     }
 }

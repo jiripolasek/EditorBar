@@ -98,6 +98,14 @@
     <Compile Include="Commands\Location\OpenProjectInTerminalCommand.cs" />
     <Compile Include="Commands\Location\OpenProjectPropertiesCommand.cs" />
     <Compile Include="Commands\Location\ProjectLocationHelper.cs" />
+    <Compile Include="Commands\MemberList\BaseMemberListOptionsMenuCommand`1.cs" />
+    <Compile Include="Commands\MemberList\MemberListOptionsMenuContext.cs" />
+    <Compile Include="Commands\MemberList\MemberListToggleShowFilterBoxWhenEmptyCommand.cs" />
+    <Compile Include="Commands\MemberTree\BaseMemberTreeResultsMenuCommand`1.cs" />
+    <Compile Include="Commands\MemberTree\MemberTreeResultsMenuContext.cs" />
+    <Compile Include="Commands\MemberTree\MemberTreeSetListResultsCommand.cs" />
+    <Compile Include="Commands\MemberTree\MemberTreeSetTreeResultsCommand.cs" />
+    <Compile Include="Commands\MemberTree\MemberTreeToggleShowFilterBoxWhenEmptyCommand.cs" />
     <Compile Include="Commands\Settings\SettingsMenuContext.cs" />
     <Compile Include="Commands\Settings\SettingsToggleEditorBarCommand.cs" />
     <Compile Include="Commands\Settings\SettingsToggleNavigationBarCommand.cs" />
@@ -193,6 +201,7 @@
     </Compile>
     <Compile Include="Controls\SymbolChevronButton.cs" />
     <Compile Include="Helpers\Matchers.cs" />
+    <Compile Include="Helpers\SearchPatternMatcher.cs" />
     <Compile Include="Helpers\VisualStudio\ProjectProperties.cs" />
     <Compile Include="Helpers\CodeAnalysis\WorkspaceExtensions.cs" />
     <Compile Include="Helpers\CodeAnalysis\SourceTextExtensions.cs" />
@@ -305,6 +314,7 @@
     <Compile Include="Polyfill\NullabilityPolyfills.cs" />
     <Compile Include="Helpers\Launcher.cs" />
     <Compile Include="Options\FileAction.cs" />
+    <Compile Include="Options\MemberTreeSearchResultView.cs" />
     <Compile Include="Options\TerminalProfile.cs" />
     <Compile Include="Options\EnumToDescriptionConverter.cs" />
     <Compile Include="Options\BarPosition.cs" />

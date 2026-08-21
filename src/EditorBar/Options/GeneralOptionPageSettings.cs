@@ -72,6 +72,8 @@ public class GeneralOptionPageSettings
 
     public bool ShowMemberListFilterBoxWhenEmpty { get; set; }
 
+    public MemberTreeSearchResultView MemberTreeSearchResultViewDefault { get; set; }
+
     public bool DebugMode { get; set; }
 
     public Color DarkSolutionBackground { get; set; }
@@ -166,6 +168,7 @@ public class GeneralOptionPageSettings
         this.FileAction = model.FileAction;
         this.AlternateFileAction = model.AlternateFileAction;
         this.ShowMemberListFilterBoxWhenEmpty = model.ShowMemberListFilterBoxWhenEmpty;
+        this.MemberTreeSearchResultViewDefault = model.MemberTreeSearchResultViewDefault;
         this.DebugMode = model.DebugMode;
         this.DarkSolutionBackground = model.SolutionBackground;
         this.DarkSolutionForeground = model.SolutionForeground;
@@ -229,6 +232,7 @@ public class GeneralOptionPageSettings
         model.FileAction = this.FileAction;
         model.AlternateFileAction = this.AlternateFileAction;
         model.ShowMemberListFilterBoxWhenEmpty = this.ShowMemberListFilterBoxWhenEmpty;
+        model.MemberTreeSearchResultViewDefault = this.MemberTreeSearchResultViewDefault;
         model.DebugMode = this.DebugMode;
         model.SolutionBackground = this.DarkSolutionBackground;
         model.SolutionForeground = this.DarkSolutionForeground;

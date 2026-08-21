@@ -22,12 +22,41 @@
 
         <ResourceDictionary>
             <Thickness x:Key="PopupMemberItemPadding">8,5,8,5</Thickness>
-            <Thickness x:Key="PopupMemberListItemMargin">3,0</Thickness>
+            <Thickness x:Key="PopupMemberListItemMargin">0,0</Thickness>
             <Thickness x:Key="PopupMemberTreeItemMargin">0,0,0,0</Thickness>
             <Thickness x:Key="PopupMemberSecondaryTextMargin">12,0,0,0</Thickness>
             <Thickness x:Key="PopupMemberListSelectionIndicatorMargin">3,5,3,5</Thickness>
             <Thickness x:Key="PopupMemberTreeSelectionIndicatorMargin">3,3,3,3</Thickness>
             <Thickness x:Key="PopupMemberTreeExpanderMargin">1,0,1,0</Thickness>
+
+            <Style x:Key="PopupListBoxStyle" TargetType="ListBox">
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+                <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBox">
+                            <Border
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                <ScrollViewer
+                                    Focusable="False"
+                                    Padding="{TemplateBinding Padding}"
+                                    CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}"
+                                    HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                    VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+                                    <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                </ScrollViewer>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
             <!--  control button on the right  -->
             <Style x:Key="CommandBarBorderStyle" TargetType="Border">
@@ -64,14 +93,23 @@
                 </Style.Triggers>
             </Style>
 
+            <Style x:Key="PopupFilterHeaderStyle" TargetType="Grid">
+                <Setter Property="Background" Value="Transparent" />
+                <Style.Triggers>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource {x:Static platformUIShell:CommonControlsColors.TextBoxBackgroundFocusedBrushKey}}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
             <Style x:Key="PopupFilterTextBoxStyle" TargetType="TextBox">
                 <Setter Property="MinHeight" Value="28" />
-                <Setter Property="Margin" Value="1" />
+                <Setter Property="Margin" Value="0" />
                 <Setter Property="Padding" Value="0" />
-                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUIShell:CommonControlsColors.TextBoxBorderBrushKey}}" />
-                <Setter Property="Background" Value="{DynamicResource {x:Static platformUIShell:CommonControlsColors.TextBoxBackgroundBrushKey}}" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="Background" Value="Transparent" />
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static platformUIShell:CommonControlsColors.TextBoxTextBrushKey}}" />
                 <Setter Property="Template">
                     <Setter.Value>
@@ -80,7 +118,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4"
+                                CornerRadius="0"
                                 SnapsToDevicePixels="True">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -112,7 +150,6 @@
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsKeyboardFocused" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource {x:Static platformUIShell:CommonControlsColors.TextBoxBackgroundFocusedBrushKey}}" />
                                     <Setter Property="Foreground" Value="{DynamicResource {x:Static platformUIShell:CommonControlsColors.TextBoxTextFocusedBrushKey}}" />
                                 </Trigger>
                                 <Trigger Property="Text" Value="">
@@ -122,6 +159,119 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+            </Style>
+
+            <Style x:Key="MoreOptionsButtonStyle" TargetType="Button">
+                <Setter Property="Width" Value="22" />
+                <Setter Property="Height" Value="20" />
+                <Setter Property="Margin" Value="0,1,1,1" />
+                <Setter Property="Opacity" Value="1" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextInactiveKey}}" />
+                <Setter Property="ToolTip" Value="More options" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border
+                                x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="0,6,0,4"
+                                SnapsToDevicePixels="True">
+                                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <StackPanel x:Name="CompactGlyph" Opacity="0.65" Orientation="Horizontal">
+                                        <Ellipse
+                                            Width="2"
+                                            Height="2"
+                                            Margin="0,0,1.5,0"
+                                            Fill="{TemplateBinding Foreground}" />
+                                        <Ellipse
+                                            Width="2"
+                                            Height="2"
+                                            Margin="0,0,1.5,0"
+                                            Fill="{TemplateBinding Foreground}" />
+                                        <Ellipse
+                                            Width="2"
+                                            Height="2"
+                                            Fill="{TemplateBinding Foreground}" />
+                                    </StackPanel>
+                                    <StackPanel x:Name="ExpandedGlyph" Orientation="Horizontal" Visibility="Collapsed">
+                                        <Ellipse
+                                            Width="3"
+                                            Height="3"
+                                            Margin="0,0,2,0"
+                                            Fill="{TemplateBinding Foreground}" />
+                                        <Ellipse
+                                            Width="3"
+                                            Height="3"
+                                            Margin="0,0,2,0"
+                                            Fill="{TemplateBinding Foreground}" />
+                                        <Ellipse
+                                            Width="3"
+                                            Height="3"
+                                            Fill="{TemplateBinding Foreground}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="Width" Value="28">
+                                    <Setter TargetName="ButtonBorder" Property="CornerRadius" Value="4" />
+                                    <Setter TargetName="CompactGlyph" Property="Visibility" Value="Collapsed" />
+                                    <Setter TargetName="ExpandedGlyph" Property="Visibility" Value="Visible" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource {x:Static platformUIShell:EnvironmentColors.AccentLightBrushKey}}" />
+                                    <Setter TargetName="CompactGlyph" Property="Opacity" Value="1" />
+                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource {x:Static platformUIShell:EnvironmentColors.AccentLightBrushKey}}" />
+                                    <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{DynamicResource {x:Static platformUIShell:EnvironmentColors.AccentLightBrushKey}}" />
+                                    <Setter TargetName="ButtonBorder" Property="BorderThickness" Value="1" />
+                                    <Setter TargetName="CompactGlyph" Property="Opacity" Value="1" />
+                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Visibility, ElementName=FilterTextBox}" Value="Visible">
+                        <Setter Property="Width" Value="28" />
+                        <Setter Property="Height" Value="28" />
+                        <Setter Property="Margin" Value="0" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style
+                x:Key="ExpandedMoreOptionsButtonStyle"
+                BasedOn="{StaticResource MoreOptionsButtonStyle}"
+                TargetType="Button">
+                <Setter Property="Visibility" Value="Collapsed" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Visibility, ElementName=FilterTextBox}" Value="Visible">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style
+                x:Key="CompactMoreOptionsButtonStyle"
+                BasedOn="{StaticResource MoreOptionsButtonStyle}"
+                TargetType="Button">
+                <Setter Property="Margin" Value="0,-4,-4,0" />
+                <Setter Property="Background" Value="{DynamicResource {x:Static platformUIShell:ThemedDialogColors.ListBoxBrushKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platformUIShell:ThemedDialogColors.ListBoxBorderBrushKey}}" />
+                <Setter Property="BorderThickness" Value="1,0,0,1" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Visibility, ElementName=FilterTextBox}" Value="Visible">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
             </Style>
         </ResourceDictionary>
 

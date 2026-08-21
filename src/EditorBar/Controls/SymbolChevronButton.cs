@@ -207,6 +207,7 @@ public class SymbolChevronButton : ChevronButton, IDisposable
     private Popup? EnsurePopupIsCreated(IEnumerable<MemberListItemViewModel> members)
     {
         var memberList = new MemberList(members);
+        memberList.PopupHost = this._popup;
         memberList.ItemSelected += OnMemberListOnItemSelected;
 
         if (this._popup == null)
@@ -235,6 +236,7 @@ public class SymbolChevronButton : ChevronButton, IDisposable
     private Popup? EnsureTreePopupIsCreated(IEnumerable<MemberTreeItemViewModel> items)
     {
         var memberTree = new MemberTree(items);
+        memberTree.PopupHost = this._popup;
         memberTree.ItemInvoked += OnMemberTreeOnItemInvoked;
 
         if (this._popup == null)
