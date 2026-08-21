@@ -42,6 +42,8 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
     private readonly IWpfTextView _textView;
     private readonly IWorkspaceMonitor _workspaceMonitor;
 
+    private IStructureProvider? _activeStructureProvider;
+    private bool _isDisposed;
     private List<BaseStructureModel> _previousStructure = [];
 
     public BulkObservableCollection<BreadcrumbModel> StructuralBreadcrumbs { get; } = [];
@@ -88,6 +90,7 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
             .CombineLatest(settingsChangesStream)
             .Replay(1)
             .RefCount()
+            .ObserveOnDispatcher()
             .Subscribe(_ => this.UpdateFileStructureProvider())
             .AddTo(this._disposables);
 
@@ -105,12 +108,27 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
+        if (this._isDisposed)
+        {
+            return;
+        }
+
+        this._isDisposed = true;
         this._disposables.Dispose();
+
+        if (this._activeStructureProvider != null &&
+            ReferenceEquals(this._textView.GetCurrentFileStructureProvider(), this._activeStructureProvider))
+        {
+            this._textView.SetCurrentFileStructureProvider(null);
+            this._activeStructureProvider.Dispose();
+        }
+
+        this._activeStructureProvider = null;
     }
 
     private void UpdateFileStructureProvider()
     {
-        if (this._textView.IsClosed)
+        if (this._isDisposed || this._textView.IsClosed)
         {
             return;
         }
@@ -123,6 +141,7 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
 
         currentProvider?.Dispose();
         this._textView.SetCurrentFileStructureProvider(provider);
+        this._activeStructureProvider = provider;
 
         var newBreadcrumbsSource = provider.BreadcrumbsChanged.CombineLatest(
                 this._pathChangesStream,

@@ -25,7 +25,13 @@ internal static class TextViewExtensions
     {
         Requires.NotNull(textView);
 
-        textView.Properties![typeof(IStructureProvider)] = provider!;
+        if (provider == null)
+        {
+            _ = textView.Properties!.RemoveProperty(typeof(IStructureProvider));
+            return;
+        }
+
+        textView.Properties![typeof(IStructureProvider)] = provider;
     }
 
     // get / set EditorBarControl
