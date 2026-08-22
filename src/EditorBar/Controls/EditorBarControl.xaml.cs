@@ -7,6 +7,7 @@
 using System.Reactive.Disposables;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using JPSoftworks.EditorBar.Commands;
@@ -49,6 +50,16 @@ internal partial class EditorBarControl : IDisposable
     /// Gets a value indicating whether file actions should use the standard toolbar surface.
     /// </summary>
     public bool UsesStandardToolbar => !this.UsesToolbarOverflow;
+
+    /// <summary>
+    /// Gets the placement direction for member popups hosted by this bar.
+    /// </summary>
+    public PlacementMode MemberPopupPlacement => this._position switch
+    {
+        BarPosition.Top => PlacementMode.Bottom,
+        BarPosition.Bottom or BarPosition.BottomControl => PlacementMode.Top,
+        _ => throw new ArgumentOutOfRangeException(nameof(this._position), this._position, null)
+    };
 
     public EditorBarControl(
         IWpfTextView textView,

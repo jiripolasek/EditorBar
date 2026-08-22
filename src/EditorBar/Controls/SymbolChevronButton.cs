@@ -27,6 +27,12 @@ public class SymbolChevronButton : ChevronButton, IDisposable
         typeof(SymbolChevronButton),
         new PropertyMetadata(null!));
 
+    public static readonly DependencyProperty PopupPlacementProperty = DependencyProperty.Register(
+        nameof(PopupPlacement),
+        typeof(PlacementMode),
+        typeof(SymbolChevronButton),
+        new PropertyMetadata(PlacementMode.Bottom, OnPopupPlacementChanged));
+
     public static readonly DependencyProperty TreeModelsAccessorProperty = DependencyProperty.Register(
         nameof(TreeModelsAccessor),
         typeof(Func<Task<IList<MemberTreeItemViewModel>>>),
@@ -91,6 +97,12 @@ public class SymbolChevronButton : ChevronButton, IDisposable
         set => this.SetValue(ModelsAccessorProperty, value!);
     }
 
+    public PlacementMode PopupPlacement
+    {
+        get => (PlacementMode)this.GetValue(PopupPlacementProperty);
+        set => this.SetValue(PopupPlacementProperty, value);
+    }
+
     public Func<Task<IList<MemberTreeItemViewModel>>>? TreeModelsAccessor
     {
         get => (Func<Task<IList<MemberTreeItemViewModel>>>?)this.GetValue(TreeModelsAccessorProperty);
@@ -131,6 +143,7 @@ public class SymbolChevronButton : ChevronButton, IDisposable
         this._popup = this.Template?.FindName(
             PartPopupName,
             this) as MemberListPopup;
+        this.UpdatePopupPlacement();
         this._buttonElement = this.Template?.FindName(
             PartButtonName,
             this) as Button;
@@ -142,6 +155,21 @@ public class SymbolChevronButton : ChevronButton, IDisposable
 
         this._buttonElement.Click += this.ButtonElementOnClick;
         this._buttonElement.MouseRightButtonUp += this.ButtonElementOnMouseRightButtonUp;
+    }
+
+    private static void OnPopupPlacementChanged(
+        DependencyObject dependencyObject,
+        DependencyPropertyChangedEventArgs eventArgs)
+    {
+        ((SymbolChevronButton)dependencyObject).UpdatePopupPlacement();
+    }
+
+    private void UpdatePopupPlacement()
+    {
+        if (this._popup != null)
+        {
+            this._popup.Placement = this.PopupPlacement;
+        }
     }
 
     private void ButtonElementOnClick(object sender, RoutedEventArgs e)
