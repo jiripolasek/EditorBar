@@ -53,8 +53,8 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="18" />
                         <ColumnDefinition Width="8" />
-                        <ColumnDefinition Width="*" SharedSizeGroup="C1" />
-                        <ColumnDefinition Width="Auto" SharedSizeGroup="C2" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <controls:IconDisplay
                         VerticalAlignment="Center"
@@ -335,7 +335,6 @@
                 platformUIImaging:ImageThemingUtilities.ImageBackgroundColor="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}"
                 BorderThickness="0"
                 Foreground="{DynamicResource {x:Static shell:VsBrushes.CommandBarTextActiveKey}}"
-                Grid.IsSharedSizeScope="True"
                 IsSynchronizedWithCurrentItem="True"
                 ItemContainerStyle="{StaticResource ResultsListItemContainerStyle}"
                 ItemTemplate="{StaticResource ResultsListItemTemplate}"

@@ -44,12 +44,22 @@ public partial class MemberListPopup : Popup
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);
+        this.PopupBorder.UpdateLayout();
+        var openSessionWidth = this.PopupBorder.ActualWidth;
+        if (openSessionWidth > 0)
+        {
+            // Filtering changes which items participate in measurement. Lock the opening
+            // width so those changes cannot resize the popup while it remains open.
+            this.PopupBorder.Width = openSessionWidth;
+        }
+
         this.Child?.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
     }
 
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);
+        this.PopupBorder.ClearValue(FrameworkElement.WidthProperty);
         this._suspendAutoCloseCount = 0;
         this.StaysOpen = false;
         if (Equals(this, Mouse.Captured!))
