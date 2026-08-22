@@ -6,6 +6,7 @@
 
 using System.Windows;
 using JPSoftworks.EditorBar.Helpers;
+using JPSoftworks.EditorBar.Options;
 using JPSoftworks.EditorBar.Services.StructureProviders;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Threading;
@@ -23,6 +24,7 @@ namespace JPSoftworks.EditorBar.Controls;
 internal partial class EditorBarControlContainer : IDisposable
 {
     private readonly JoinableTaskFactory _joinableTaskFactory;
+    private readonly BarPosition _position;
     private readonly IStructureProviderService _structureProviderService;
     private readonly IWpfTextView _textView;
 
@@ -30,11 +32,13 @@ internal partial class EditorBarControlContainer : IDisposable
         IWpfTextView textView,
         JoinableTaskFactory joinableTaskFactory,
         IStructureProviderService structureProviderService,
+        BarPosition position,
         bool visible)
     {
         this._textView = textView;
         this._joinableTaskFactory = joinableTaskFactory;
         this._structureProviderService = structureProviderService;
+        this._position = position;
         this.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
         this.InitializeComponent();
         this.RebuildUI(visible);
@@ -67,7 +71,8 @@ internal partial class EditorBarControlContainer : IDisposable
                         this._textView,
                         textDocument,
                         this._joinableTaskFactory,
-                        this._structureProviderService);
+                        this._structureProviderService,
+                        this._position);
                     return;
                 }
                 catch (Exception ex)

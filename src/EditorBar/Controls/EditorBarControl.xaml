@@ -29,7 +29,10 @@
         <Border x:Name="EditorBarBorder" Style="{DynamicResource EditorBarBorderStyle}">
             <DockPanel VerticalAlignment="Center" KeyboardNavigation.TabNavigation="Local">
 
-                <Border DockPanel.Dock="Right" Style="{StaticResource CommandBarBorderStyle}">
+                <Border
+                    DockPanel.Dock="Right"
+                    Style="{StaticResource CommandBarBorderStyle}"
+                    Visibility="{Binding ElementName=RootControl, Path=UsesStandardToolbar, Converter={StaticResource BooleanToVisibilityConverter}}">
 
                     <StackPanel
                         KeyboardNavigation.TabIndex="2"
@@ -85,6 +88,30 @@
                         </Button>
                         <Button
                             x:Name="SettingsMenuButton"
+                            Click="SettingsMenuButton_OnClick"
+                            Style="{DynamicResource NoBorderButtonStyle}"
+                            ToolTip="Options">
+                            <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.Settings}" />
+                        </Button>
+                    </StackPanel>
+
+                </Border>
+
+                <Border
+                    DockPanel.Dock="Right"
+                    Visibility="{Binding ElementName=RootControl, Path=UsesToolbarOverflow, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                    <StackPanel
+                        KeyboardNavigation.TabIndex="2"
+                        KeyboardNavigation.TabNavigation="Local"
+                        Orientation="Horizontal">
+                        <Button
+                            Click="FileActionsMenuButton_OnClick"
+                            Style="{DynamicResource NoBorderButtonStyle}"
+                            ToolTip="More file actions">
+                            <imaging:CrispImage Moniker="{x:Static catalog:KnownMonikers.Ellipsis}" />
+                        </Button>
+                        <Button
                             Click="SettingsMenuButton_OnClick"
                             Style="{DynamicResource NoBorderButtonStyle}"
                             ToolTip="Options">

@@ -666,6 +666,18 @@
 				</Strings>
 			</Button>
 
+			<Button guid="EditorBarCmdSet" id="EditorBarSettings_PositionBottomControlCommand" priority="0x0300" type="Button">
+				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_PositionSubMenuGroup" />
+				<CommandFlag>NoKeyCustomize</CommandFlag>
+				<CommandFlag>NoCustomize</CommandFlag>
+				<Strings>
+					<ButtonText>Bottom (next to Zoom)</ButtonText>
+					<CommandName>Position: Bottom (next to Zoom)</CommandName>
+					<CanonicalName>EditorBar.Settings.PositionBottomControl</CanonicalName>
+					<LocCanonicalName>EditorBar.Settings.PositionBottomControl</LocCanonicalName>
+				</Strings>
+			</Button>
+
 			<Button guid="EditorBarCmdSet" id="EditorBarSettings_DisplayNormalCommand" priority="0x0100" type="Button">
 				<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_DisplayModeSubMenuGroup" />
 				<CommandFlag>NoKeyCustomize</CommandFlag>
@@ -988,6 +1000,7 @@
 			<IDSymbol name="EditorBarSettings_ToggleNavigationBarCommand" value="0x8021" />
 			<IDSymbol name="EditorBarSettings_PositionTopCommand" value="0x8022" />
 			<IDSymbol name="EditorBarSettings_PositionBottomCommand" value="0x8023" />
+			<IDSymbol name="EditorBarSettings_PositionBottomControlCommand" value="0x8027" />
 			<IDSymbol name="EditorBarSettings_DisplayNormalCommand" value="0x8024" />
 			<IDSymbol name="EditorBarSettings_DisplayCompactCommand" value="0x8025" />
 			<IDSymbol name="EditorBarSettings_OpenOptionsCommand" value="0x8026" />

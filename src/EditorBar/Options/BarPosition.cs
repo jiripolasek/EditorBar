@@ -19,5 +19,10 @@ public enum BarPosition
     /// <summary>
     /// The bottom of the text view.
     /// </summary>
-    Bottom = 1
+    Bottom = 1,
+
+    /// <summary>
+    /// In the bottom editor controls, after the zoom control.
+    /// </summary>
+    BottomControl = 2
 }

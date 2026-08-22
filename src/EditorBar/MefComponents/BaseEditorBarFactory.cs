@@ -17,10 +17,9 @@ namespace JPSoftworks.EditorBar.MefComponents;
 /// Base for a factory for creating a margin that will hold the Editor bar.
 /// </summary>
 /// <seealso cref="Microsoft.VisualStudio.Text.Editor.IWpfTextViewMarginProvider" />
-internal abstract class BaseEditorBarFactory(BarPosition targetBarPosition) : IWpfTextViewMarginProvider
+internal abstract class BaseEditorBarFactory(BarPosition targetBarPosition, string marginName)
+    : IWpfTextViewMarginProvider
 {
-    private IWpfTextView? _textView;
-
     [Import]
     private JoinableTaskContext JoinableTaskContext { get; set; } = null!;
 
@@ -38,13 +37,14 @@ internal abstract class BaseEditorBarFactory(BarPosition targetBarPosition) : IW
             return null;
         }
 
-        this._textView = wpfTextViewHost.TextView;
+        var textView = wpfTextViewHost.TextView;
 
         return new EditorBarMargin(
-            this._textView,
+            textView,
             this.JoinableTaskContext.Factory,
             this.ServiceProvider,
             this.StructureProviderService,
-            targetBarPosition);
+            targetBarPosition,
+            marginName);
     }
 }

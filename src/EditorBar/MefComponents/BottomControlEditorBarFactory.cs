@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------
+// ------------------------------------------------------------
 // Copyright (c) Jiří Polášek. All rights reserved.
 // ------------------------------------------------------------
 
@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.Utilities;
 namespace JPSoftworks.EditorBar.MefComponents;
 
 /// <summary>
-/// Specialized class of editor bar factory for creating a margin on the top of the editor.
+/// Specialized class of editor bar factory for creating a margin beside the horizontal scroll bar.
 /// </summary>
 /// <remarks>
 /// We have to have separate classes since there can't be multiple <see cref="MarginContainerAttribute" /> on a
@@ -20,10 +20,10 @@ namespace JPSoftworks.EditorBar.MefComponents;
 /// </remarks>
 /// <seealso cref="BaseEditorBarFactory" />
 [Export(typeof(IWpfTextViewMarginProvider))]
-[Name(EditorBarMarginNames.Top)]
-[MarginContainer(PredefinedMarginNames.Top)]
-[Order(After = PredefinedMarginNames.HorizontalScrollBar)]
+[Name(EditorBarMarginNames.BottomControl)]
+[Order(After = PredefinedMarginNames.ZoomControl)]
+[MarginContainer(PredefinedMarginNames.BottomControl)]
 [ContentType(StandardContentTypeNames.Text)]
 [TextViewRole(PredefinedTextViewRoles.Document)]
-internal class TopEditorBarFactory()
-    : BaseEditorBarFactory(BarPosition.Top, EditorBarMarginNames.Top);
+internal class BottomControlEditorBarFactory()
+    : BaseEditorBarFactory(BarPosition.BottomControl, EditorBarMarginNames.BottomControl);

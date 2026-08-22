@@ -27,6 +27,9 @@ namespace JPSoftworks.EditorBar.MefComponents;
 /// </summary>
 internal class EditorBarMargin : IWpfTextViewMargin
 {
+    private const double BottomControlFallbackMaxWidth = 600;
+    private const double BottomControlMaxWidthRatio = 0.5;
+
     // collection of text view roles that are used in diff views
     private static readonly string[] DiffViews =
     [
@@ -38,6 +41,7 @@ internal class EditorBarMargin : IWpfTextViewMargin
 
     private readonly EditorBarControlContainer _editorBarControl;
     private readonly JoinableTaskFactory _joinableTaskFactory;
+    private readonly string _marginName;
     private readonly BarPosition _position;
     private readonly IServiceProvider _serviceProvider;
     private readonly IWpfTextView _textView;
@@ -51,7 +55,23 @@ internal class EditorBarMargin : IWpfTextViewMargin
     /// For a vertical margin this is the width of the margin, since the height will be determined by the
     /// <see cref="T:Microsoft.VisualStudio.Text.Editor.ITextView" />.
     /// </remarks>
-    public double MarginSize => this.Enabled ? this._editorBarControl.ActualHeight : 0;
+    public double MarginSize
+    {
+        get
+        {
+            if (!this.Enabled)
+            {
+                return 0;
+            }
+
+            return this._position switch
+            {
+                BarPosition.Top or BarPosition.Bottom => this._editorBarControl.ActualHeight,
+                BarPosition.BottomControl => this._editorBarControl.ActualWidth,
+                _ => throw new ArgumentOutOfRangeException(nameof(this._position), this._position, null)
+            };
+        }
+    }
 
     /// <summary>
     /// Gets a value indicating whether the margin is enabled.
@@ -71,22 +91,35 @@ internal class EditorBarMargin : IWpfTextViewMargin
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="structureProviderService">The structure provider service.</param>
     /// <param name="position">The position.</param>
+    /// <param name="marginName">The stable MEF name of this margin.</param>
     public EditorBarMargin(
         IWpfTextView textView,
         JoinableTaskFactory joinableTaskFactory,
         IServiceProvider serviceProvider,
         IStructureProviderService structureProviderService,
-        BarPosition position)
+        BarPosition position,
+        string marginName)
     {
         this._textView = textView;
         this._position = position;
+        this._marginName = marginName;
         this._joinableTaskFactory = joinableTaskFactory;
         this._editorBarControl = new EditorBarControlContainer(
             textView,
             joinableTaskFactory,
             structureProviderService,
+            position,
             false);
         this._serviceProvider = serviceProvider;
+
+        if (position == BarPosition.BottomControl)
+        {
+            // This margin shares a row with the horizontal scrollbar. Prevent it from consuming more than half of
+            // the viewport until customizable Editor Bar layouts replace this temporary sizing policy.
+            this._editorBarControl.ClipToBounds = true;
+            this.UpdateBottomControlMaxWidth();
+            this._textView.ViewportWidthChanged += this.TextViewOnViewportWidthChanged;
+        }
 
         GeneralOptionsModel.Saved += this.GeneralPageOnSaved;
         this.GeneralPageOnSaved(GeneralOptionsModel.Instance);
@@ -98,6 +131,7 @@ internal class EditorBarMargin : IWpfTextViewMargin
     public void Dispose()
     {
         GeneralOptionsModel.Saved -= this.GeneralPageOnSaved;
+        this._textView.ViewportWidthChanged -= this.TextViewOnViewportWidthChanged;
         this._editorBarControl.Dispose();
     }
 
@@ -116,15 +150,32 @@ internal class EditorBarMargin : IWpfTextViewMargin
     /// </remarks>
     public ITextViewMargin? GetTextViewMargin(string marginName)
     {
-        return marginName == "EditorBar-" + this._position ? this : null;
+        return string.Equals(marginName, this._marginName, StringComparison.OrdinalIgnoreCase) ? this : null;
     }
 
     private void GeneralPageOnSaved(GeneralOptionsModel generalOptionsModel)
     {
-        this.Enabled = generalOptionsModel.Enabled && generalOptionsModel.BarPosition == this._position;
-        this._editorBarControl.Visibility = this.Enabled && this.IsSupported(generalOptionsModel)
+        var shouldShow = generalOptionsModel.Enabled &&
+                         generalOptionsModel.BarPosition == this._position &&
+                         this.IsSupported(generalOptionsModel);
+
+        this.Enabled = shouldShow;
+        this._editorBarControl.Visibility = shouldShow
             ? Visibility.Visible
             : Visibility.Collapsed;
+    }
+
+    private void TextViewOnViewportWidthChanged(object sender, EventArgs e)
+    {
+        this.UpdateBottomControlMaxWidth();
+    }
+
+    private void UpdateBottomControlMaxWidth()
+    {
+        var viewportWidth = this._textView.ViewportWidth;
+        this._editorBarControl.MaxWidth = viewportWidth > 0
+            ? viewportWidth * BottomControlMaxWidthRatio
+            : BottomControlFallbackMaxWidth;
     }
 
     private bool IsSupported(GeneralOptionsModel generalOptionsModel)

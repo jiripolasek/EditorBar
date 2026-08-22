@@ -104,6 +104,7 @@ namespace JPSoftworks.EditorBar
         public const int EditorBarSettings_ToggleNavigationBarCommand = 0x8021;
         public const int EditorBarSettings_PositionTopCommand = 0x8022;
         public const int EditorBarSettings_PositionBottomCommand = 0x8023;
+        public const int EditorBarSettings_PositionBottomControlCommand = 0x8027;
         public const int EditorBarSettings_DisplayNormalCommand = 0x8024;
         public const int EditorBarSettings_DisplayCompactCommand = 0x8025;
         public const int EditorBarSettings_OpenOptionsCommand = 0x8026;
