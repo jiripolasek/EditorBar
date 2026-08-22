@@ -25,6 +25,8 @@ public record MemberListItemViewModel
 
     public object? CommandParameter { get; set; }
 
+    public ICommand? ContextCommand { get; set; }
+
     [Obsolete]
     public UIElement? Icon { get; set; }
 

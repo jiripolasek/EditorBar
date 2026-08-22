@@ -19,6 +19,7 @@ using JPSoftworks.EditorBar.Helpers.VisualStudio;
 using JPSoftworks.EditorBar.Options;
 using JPSoftworks.EditorBar.Services;
 using JPSoftworks.EditorBar.Services.StructureProviders;
+using JPSoftworks.EditorBar.Services.StructureProviders.Roslyn;
 using Microsoft;
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Language.Intellisense;
@@ -282,6 +283,16 @@ internal class StructuralBreadcrumbsViewModel : ObservableObject, IDisposable
             {
                 var viewModel = MemberListItemViewModel.FromModel(t);
                 viewModel.Command = new DispatchedDelegateCommand(_ => t.NavigationAction(this._textView));
+
+                if (t is SymbolFileStructureElementModel symbolModel &&
+                    symbolModel.TargetSymbol is { } targetSymbol &&
+                    symbolModel.Location is { IsInSource: true, SourceTree: not null } location &&
+                    FileStructureHelper.CreateStructureModel(new SymbolAnchorPoint(targetSymbol, location)) is { } structureModel)
+                {
+                    viewModel.ContextCommand = new DispatchedDelegateCommand(
+                        _ => new StructureBreadcrumbMenuContext(structureModel, this._textView).ShowMenu());
+                }
+
                 return viewModel;
             });
 
