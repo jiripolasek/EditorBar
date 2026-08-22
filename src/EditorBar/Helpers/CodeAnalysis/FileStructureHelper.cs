@@ -29,7 +29,7 @@ internal static class FileStructureHelper
     /// Finds the nearest semantic symbol under (or near) the given caret position,
     /// walking up ancestor nodes if necessary. Treats comments and same-line trailing trivia as
     /// declaration context, maps field declarations to their individual members, and promotes
-    /// positional record parameters to their properties.
+    /// positional record parameters and their separators to their properties.
     /// </summary>
     /// <param name="semanticModel">A fresh SemanticModel for the current Document.</param>
     /// <param name="root">SyntaxRoot of the Document.</param>
@@ -60,11 +60,16 @@ internal static class FileStructureHelper
             return ImmutableArray<SymbolAnchorPoint>.Empty; // empty list
         }
 
-        // Enum separators fall outside member spans
-        if (TryGetEnumMemberAroundSeparator(token, sourceText, position, out var enumMember))
+        // Separators can fall outside declaration spans
+        if (TryGetSeparatedDeclarationAroundPosition(
+                token,
+                sourceText,
+                position,
+                isDeclarationComment,
+                out var separatedDeclaration))
         {
-            position = enumMember.Span.End - 1;
-            token = enumMember.GetLastToken();
+            position = separatedDeclaration.Span.End - 1;
+            token = separatedDeclaration.GetLastToken();
         }
 
         // 2) Walk upward through the syntax node ancestors, looking for declared symbols
@@ -125,48 +130,90 @@ internal static class FileStructureHelper
         return declarations.ToImmutableArray();
     }
 
-    private static bool TryGetEnumMemberAroundSeparator(
+    private static bool TryGetSeparatedDeclarationAroundPosition(
         SyntaxToken token,
         SourceText sourceText,
         int position,
-        out EnumMemberDeclarationSyntax enumMember)
+        bool isDeclarationComment,
+        out SyntaxNode declaration)
     {
-        // The direct-parent check excludes commas inside member initializers
-        if (token is
-            {
-                RawKind: (int)CSharpSyntaxKind.CommaToken,
-                Parent: EnumDeclarationSyntax enumDeclaration
-            })
+        foreach (var node in token.Parent?.AncestorsAndSelf() ?? [])
         {
-            var memberIndex = 0;
-            foreach (var separator in enumDeclaration.Members.GetSeparators())
+            if (node is EnumDeclarationSyntax enumDeclaration &&
+                TryGetDeclarationInSeparatorContext(
+                    enumDeclaration.Members,
+                    token,
+                    sourceText,
+                    position,
+                    !isDeclarationComment,
+                    out var enumMember))
             {
-                if (separator == token && memberIndex < enumDeclaration.Members.Count)
-                {
-                    // The comma belongs to the preceding member
-                    enumMember = enumDeclaration.Members[memberIndex];
+                declaration = enumMember;
+                return true;
+            }
 
-                    // Same-line context after it belongs to the next member
-                    if (position >= separator.Span.End &&
-                        memberIndex + 1 < enumDeclaration.Members.Count)
-                    {
-                        var nextMember = enumDeclaration.Members[memberIndex + 1];
-                        var separatorLine = sourceText.Lines.GetLineFromPosition(separator.SpanStart).LineNumber;
-                        var nextMemberLine = sourceText.Lines.GetLineFromPosition(nextMember.SpanStart).LineNumber;
-                        if (separatorLine == nextMemberLine && position <= nextMember.SpanStart)
-                        {
-                            enumMember = nextMember;
-                        }
-                    }
-
-                    return enumMember.Span.Length > 0;
-                }
-
-                memberIndex++;
+            if (node is ParameterListSyntax { Parent: RecordDeclarationSyntax } parameterList &&
+                TryGetDeclarationInSeparatorContext(
+                    parameterList.Parameters,
+                    token,
+                    sourceText,
+                    position,
+                    !isDeclarationComment,
+                    out var recordParameter))
+            {
+                declaration = recordParameter;
+                return true;
             }
         }
 
-        enumMember = null!;
+        declaration = null!;
+        return false;
+    }
+
+    private static bool TryGetDeclarationInSeparatorContext<TNode>(
+        SeparatedSyntaxList<TNode> declarations,
+        SyntaxToken token,
+        SourceText sourceText,
+        int position,
+        bool includeInterDeclarationTrivia,
+        out TNode declaration)
+        where TNode : SyntaxNode
+    {
+        if (declarations.Count == 0)
+        {
+            declaration = null!;
+            return false;
+        }
+
+        declaration = declarations[0];
+        for (var index = 1; index < declarations.Count; index++)
+        {
+            var separator = declarations.GetSeparator(index - 1);
+            var nextDeclaration = declarations[index];
+            if (separator == token ||
+                (includeInterDeclarationTrivia &&
+                 position >= declaration.Span.End &&
+                 position < nextDeclaration.SpanStart))
+            {
+                declaration = GetDeclarationAroundSeparator(
+                    declaration,
+                    separator,
+                    nextDeclaration,
+                    sourceText,
+                    position);
+                return declaration.Span.Length > 0;
+            }
+
+            declaration = nextDeclaration;
+        }
+
+        if (declarations.SeparatorCount == declarations.Count &&
+            declarations.GetSeparator(declarations.Count - 1) == token)
+        {
+            return declaration.Span.Length > 0;
+        }
+
+        declaration = null!;
         return false;
     }
 
@@ -279,7 +326,7 @@ internal static class FileStructureHelper
         out SyntaxNode declaration)
     {
         if (node is BaseFieldDeclarationSyntax csharpFieldDeclaration &&
-            TryGetDeclarationAtPosition(
+            TryGetSeparatedDeclarationAtPosition(
                 csharpFieldDeclaration.Declaration.Variables,
                 sourceText,
                 position,
@@ -290,12 +337,12 @@ internal static class FileStructureHelper
         }
 
         if (node is VisualBasicFieldDeclarationSyntax visualBasicFieldDeclaration &&
-            TryGetDeclarationAtPosition(
+            TryGetSeparatedDeclarationAtPosition(
                 visualBasicFieldDeclaration.Declarators,
                 sourceText,
                 position,
                 out var visualBasicDeclarator) &&
-            TryGetDeclarationAtPosition(
+            TryGetSeparatedDeclarationAtPosition(
                 visualBasicDeclarator.Names,
                 sourceText,
                 position,
@@ -309,7 +356,7 @@ internal static class FileStructureHelper
         return false;
     }
 
-    private static bool TryGetDeclarationAtPosition<TNode>(
+    private static bool TryGetSeparatedDeclarationAtPosition<TNode>(
         SeparatedSyntaxList<TNode> declarations,
         SourceText sourceText,
         int position,
