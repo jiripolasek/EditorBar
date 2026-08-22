@@ -31,8 +31,8 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="18" />
                         <ColumnDefinition Width="8" />
-                        <ColumnDefinition Width="*" SharedSizeGroup="C1" />
-                        <ColumnDefinition Width="Auto" SharedSizeGroup="C2" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
                     <controls:IconDisplay
@@ -208,7 +208,6 @@
                 BorderThickness="0"
                 Focusable="True"
                 GotKeyboardFocus="ListBox_OnGotKeyboardFocus"
-                Grid.IsSharedSizeScope="True"
                 IsSynchronizedWithCurrentItem="True"
                 IsTextSearchCaseSensitive="False"
                 IsTextSearchEnabled="True"
