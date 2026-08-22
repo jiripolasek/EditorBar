@@ -67,7 +67,7 @@ public class OptionsPageViewModel : ObservableObject
     [
         new(BarPosition.Top, "Top"),
         new(BarPosition.Bottom, "Bottom"),
-        new(BarPosition.BottomControl, "Horizontal scroll bar")
+        new(BarPosition.BottomControl, "Bottom (next to Zoom)")
     ];
 
     /// <summary>

@@ -36,8 +36,19 @@ internal partial class EditorBarControl : IDisposable
     private readonly CompositeDisposable _disposables = [];
     private readonly JoinableTaskFactory _joinableTaskFactory;
     private readonly BarPosition _position;
+    private readonly ITextDocument _textDocument;
     private readonly IWpfTextView _textView;
     private readonly EditorBarViewModel _viewModel;
+
+    /// <summary>
+    /// Gets a value indicating whether file actions should use the compact overflow surface.
+    /// </summary>
+    public bool UsesToolbarOverflow => this._position == BarPosition.BottomControl;
+
+    /// <summary>
+    /// Gets a value indicating whether file actions should use the standard toolbar surface.
+    /// </summary>
+    public bool UsesStandardToolbar => !this.UsesToolbarOverflow;
 
     public EditorBarControl(
         IWpfTextView textView,
@@ -49,7 +60,7 @@ internal partial class EditorBarControl : IDisposable
         this._textView = Requires.NotNull(textView);
         this._joinableTaskFactory = Requires.NotNull(joinableTaskFactory);
         this._position = position;
-        Requires.NotNull(textDocument);
+        this._textDocument = Requires.NotNull(textDocument);
         Requires.NotNull(structureProviderService);
 
         this.DataContext = this._viewModel =
@@ -247,5 +258,10 @@ internal partial class EditorBarControl : IDisposable
     private void SettingsMenuButton_OnClick(object sender, RoutedEventArgs e)
     {
         new SettingsMenuContext(this._textView).ShowMenu();
+    }
+
+    private void FileActionsMenuButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        new FileActionMenuContext(this._textDocument).ShowMenu();
     }
 }

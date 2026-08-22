@@ -671,8 +671,8 @@
 				<CommandFlag>NoKeyCustomize</CommandFlag>
 				<CommandFlag>NoCustomize</CommandFlag>
 				<Strings>
-					<ButtonText>Horizontal Scroll Bar</ButtonText>
-					<CommandName>Position: Horizontal Scroll Bar</CommandName>
+					<ButtonText>Bottom (next to Zoom)</ButtonText>
+					<CommandName>Position: Bottom (next to Zoom)</CommandName>
 					<CanonicalName>EditorBar.Settings.PositionBottomControl</CanonicalName>
 					<LocCanonicalName>EditorBar.Settings.PositionBottomControl</LocCanonicalName>
 				</Strings>
