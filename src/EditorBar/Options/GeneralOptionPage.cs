@@ -23,6 +23,7 @@ public class GeneralOptionPage : UIElementDialogPage
     private readonly GeneralOptionPageSettings _settings = new();
 
     private GeneralOptionsControl? _control;
+    private bool _isSavingSettingsToStorage;
 
     /// <summary>
     /// Gets the automation object whose properties Visual Studio persists for roaming and Import/Export.
@@ -52,10 +53,7 @@ public class GeneralOptionPage : UIElementDialogPage
     /// </summary>
     public GeneralOptionPage()
     {
-        GeneralOptionsModel.Saved += _ =>
-        {
-            this._control?.Initialize();
-        };
+        GeneralOptionsModel.Saved += this.GeneralOptionsModelOnSaved;
     }
 
     /// <summary>
@@ -96,8 +94,48 @@ public class GeneralOptionPage : UIElementDialogPage
     /// </summary>
     public override void SaveSettingsToStorage()
     {
-        this._control?.Apply();
-        this._settings.CopyFromModel(GeneralOptionsModel.Instance);
-        base.SaveSettingsToStorage();
+        try
+        {
+            this._isSavingSettingsToStorage = true;
+            this._control?.Apply();
+            this._settings.CopyFromModel(GeneralOptionsModel.Instance);
+            base.SaveSettingsToStorage();
+        }
+        finally
+        {
+            this._isSavingSettingsToStorage = false;
+        }
+    }
+
+    private void GeneralOptionsModelOnSaved(GeneralOptionsModel model)
+    {
+        ThreadHelper.JoinableTaskFactory.Run(
+            async () =>
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                this._settings.CopyFromModel(model);
+                this.SaveAutomationSettingsToStorage();
+                this._control?.Initialize();
+            });
+    }
+
+    private void SaveAutomationSettingsToStorage()
+    {
+        ThreadHelper.ThrowIfNotOnUIThread();
+
+        if (this._isSavingSettingsToStorage)
+        {
+            return;
+        }
+
+        try
+        {
+            this._isSavingSettingsToStorage = true;
+            base.SaveSettingsToStorage();
+        }
+        finally
+        {
+            this._isSavingSettingsToStorage = false;
+        }
     }
 }
