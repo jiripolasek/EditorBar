@@ -15,14 +15,15 @@ namespace JPSoftworks.EditorBar.MefComponents;
 /// Specialized class of editor bar factory for creating a margin on the bottom of the editor.
 /// </summary>
 /// <remarks>
-/// We have to have two separate classes since there can't be multiple <see cref="MarginContainerAttribute" /> on a
+/// We have to have separate classes since there can't be multiple <see cref="MarginContainerAttribute" /> on a
 /// class.
 /// </remarks>
 /// <seealso cref="BaseEditorBarFactory" />
 [Export(typeof(IWpfTextViewMarginProvider))]
-[Name("EditorBar-Bottom")]
+[Name(EditorBarMarginNames.Bottom)]
 [MarginContainer(PredefinedMarginNames.Bottom)]
 [Order(After = PredefinedMarginNames.HorizontalScrollBar)]
 [ContentType(StandardContentTypeNames.Text)]
 [TextViewRole(PredefinedTextViewRoles.Document)]
-internal class BottomEditorBarFactory() : BaseEditorBarFactory(BarPosition.Bottom);
+internal class BottomEditorBarFactory()
+    : BaseEditorBarFactory(BarPosition.Bottom, EditorBarMarginNames.Bottom);

@@ -35,6 +35,7 @@ internal partial class EditorBarControl : IDisposable
     private readonly SingleActionGatedExecutor _delayedSettingsApplicator;
     private readonly CompositeDisposable _disposables = [];
     private readonly JoinableTaskFactory _joinableTaskFactory;
+    private readonly BarPosition _position;
     private readonly IWpfTextView _textView;
     private readonly EditorBarViewModel _viewModel;
 
@@ -42,10 +43,12 @@ internal partial class EditorBarControl : IDisposable
         IWpfTextView textView,
         ITextDocument textDocument,
         JoinableTaskFactory joinableTaskFactory,
-        IStructureProviderService structureProviderService)
+        IStructureProviderService structureProviderService,
+        BarPosition position)
     {
         this._textView = Requires.NotNull(textView);
         this._joinableTaskFactory = Requires.NotNull(joinableTaskFactory);
+        this._position = position;
         Requires.NotNull(textDocument);
         Requires.NotNull(structureProviderService);
 
@@ -108,38 +111,48 @@ internal partial class EditorBarControl : IDisposable
 
         this.ReloadThemeResources();
 
-        // allow to change background color of the editor bar
-        // in case of the top panel, we can follow the color of the editor so it integrates seamlessly;
-        // bottom panel is below the scrollbar, so it doesn't make sense to follow the editor color
-        if (GeneralOptionsModel.Instance.BarPosition == BarPosition.Top)
+        // Allow the top bar to follow the editor appearance. Bottom positions use the chrome of their actual host.
+        switch (this._position)
         {
-            switch (GeneralOptionsModel.Instance.VisualStyle)
-            {
-                case VisualStyle.FullRowCommandBar:
-                    this.Background = (Brush)this.FindResource(VsBrushes.CommandBarGradientKey!)!;
-                    this.BorderBrush = (Brush)this.FindResource(SearchControlColors.PopupBorderBrushKey!)!;
-                    this.BorderThickness = new Thickness(0, 0, 0, 1);
-                    break;
-                case VisualStyle.FullRowTransparent:
-                    // copy background from the editor so the theme ImageThemingUtilities.ImageBackgroundColor will work
-                    this.Background = this._textView.Background ?? Brushes.Transparent;
-                    this.BorderBrush = (Brush)this.FindResource(SearchControlColors.PopupBorderBrushKey!)!;
-                    this.BorderThickness = new Thickness(0, 0, 0, 1);
-                    break;
-                case VisualStyle.FullRowToolWindow:
-                    this.Background = (Brush)this.FindResource(VsBrushes.ToolWindowBackgroundKey!)!;
-                    this.BorderBrush = (Brush)this.FindResource(SearchControlColors.PopupBorderBrushKey!)!;
-                    this.BorderThickness = new Thickness(0, 0, 0, 1);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-        else
-        {
-            this.Background = (Brush)this.FindResource(VsBrushes.CommandBarGradientKey!)!;
-            this.BorderBrush = Brushes.Transparent;
-            this.BorderThickness = new Thickness(0);
+            case BarPosition.Top:
+                switch (GeneralOptionsModel.Instance.VisualStyle)
+                {
+                    case VisualStyle.FullRowCommandBar:
+                        this.Background = (Brush)this.FindResource(VsBrushes.CommandBarGradientKey!)!;
+                        this.BorderBrush = (Brush)this.FindResource(SearchControlColors.PopupBorderBrushKey!)!;
+                        this.BorderThickness = new Thickness(0, 0, 0, 1);
+                        break;
+                    case VisualStyle.FullRowTransparent:
+                        // Copy the editor background so ImageThemingUtilities can theme images against it.
+                        this.Background = this._textView.Background ?? Brushes.Transparent;
+                        this.BorderBrush = (Brush)this.FindResource(SearchControlColors.PopupBorderBrushKey!)!;
+                        this.BorderThickness = new Thickness(0, 0, 0, 1);
+                        break;
+                    case VisualStyle.FullRowToolWindow:
+                        this.Background = (Brush)this.FindResource(VsBrushes.ToolWindowBackgroundKey!)!;
+                        this.BorderBrush = (Brush)this.FindResource(SearchControlColors.PopupBorderBrushKey!)!;
+                        this.BorderThickness = new Thickness(0, 0, 0, 1);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                break;
+
+            case BarPosition.Bottom:
+                this.Background = (Brush)this.FindResource(VsBrushes.CommandBarGradientKey!)!;
+                this.BorderBrush = Brushes.Transparent;
+                this.BorderThickness = new Thickness(0);
+                break;
+
+            case BarPosition.BottomControl:
+                this.Background = (Brush)this.FindResource(VsBrushes.ScrollBarBackgroundKey!)!;
+                this.BorderBrush = Brushes.Transparent;
+                this.BorderThickness = new Thickness(0);
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 

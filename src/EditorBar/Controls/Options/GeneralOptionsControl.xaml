@@ -114,7 +114,7 @@
                                         HorizontalItemSpacing="2"
                                         IsItemsHost="True"
                                         ItemHeight="45"
-                                        ItemWidth="90"
+                                        ItemWidth="130"
                                         Orientation="Horizontal"
                                         ShouldStretchItemsToFill="True"
                                         VerticalItemSpacing="2" />

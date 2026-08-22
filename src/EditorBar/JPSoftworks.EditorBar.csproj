@@ -111,6 +111,7 @@
     <Compile Include="Commands\Settings\SettingsToggleNavigationBarCommand.cs" />
     <Compile Include="Commands\Settings\SettingsSetPositionTopCommand.cs" />
     <Compile Include="Commands\Settings\SettingsSetPositionBottomCommand.cs" />
+    <Compile Include="Commands\Settings\SettingsSetPositionBottomControlCommand.cs" />
     <Compile Include="Commands\Settings\SettingsSetDisplayNormalCommand.cs" />
     <Compile Include="Commands\Settings\SettingsSetDisplayCompactCommand.cs" />
     <Compile Include="Commands\Settings\SettingsOpenOptionsCommand.cs" />
@@ -263,6 +264,8 @@
       <DependentUpon>EditorBarControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="MefComponents\EditorBarMargin.cs" />
+    <Compile Include="MefComponents\EditorBarMarginNames.cs" />
+    <Compile Include="MefComponents\BottomControlEditorBarFactory.cs" />
     <Compile Include="Services\LocationProviders\Abstractions\GenericProjectInfo.cs" />
     <Compile Include="Services\LocationProviders\Abstractions\BaseSolutionProjectInfo.cs" />
     <Compile Include="Presentation\ContrastForegroundBrushConverter.cs" />

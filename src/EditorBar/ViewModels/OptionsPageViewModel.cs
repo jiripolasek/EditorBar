@@ -66,7 +66,8 @@ public class OptionsPageViewModel : ObservableObject
     public ObservableCollection<EnumViewModel<BarPosition>> BarPositions { get; } =
     [
         new(BarPosition.Top, "Top"),
-        new(BarPosition.Bottom, "Bottom")
+        new(BarPosition.Bottom, "Bottom"),
+        new(BarPosition.BottomControl, "Horizontal scroll bar")
     ];
 
     /// <summary>
