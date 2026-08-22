@@ -28,7 +28,7 @@ internal static class FileStructureHelper
     /// <summary>
     /// Finds the nearest semantic symbol under (or near) the given caret position,
     /// walking up ancestor nodes if necessary. Treats comments and same-line trailing trivia as
-    /// declaration context, extends single-name field declarations to their full span, and promotes
+    /// declaration context, maps field declarations to their individual members, and promotes
     /// positional record parameters to their properties.
     /// </summary>
     /// <param name="semanticModel">A fresh SemanticModel for the current Document.</param>
@@ -77,7 +77,7 @@ internal static class FileStructureHelper
                 continue;
             }
 
-            var declarationNode = TryGetSoleFieldSymbolDeclaration(node, out var fieldDeclaration)
+            var declarationNode = TryGetFieldSymbolDeclaration(node, sourceText, position, out var fieldDeclaration)
                 ? fieldDeclaration
                 : node;
 
@@ -272,43 +272,96 @@ internal static class FileStructureHelper
             : position;
     }
 
-    private static bool TryGetSoleFieldSymbolDeclaration(
+    private static bool TryGetFieldSymbolDeclaration(
         SyntaxNode node,
+        SourceText sourceText,
+        int position,
         out SyntaxNode declaration)
     {
         if (node is BaseFieldDeclarationSyntax csharpFieldDeclaration &&
-            csharpFieldDeclaration.Declaration.Variables.Count == 1)
+            TryGetDeclarationAtPosition(
+                csharpFieldDeclaration.Declaration.Variables,
+                sourceText,
+                position,
+                out var csharpVariable))
         {
-            declaration = csharpFieldDeclaration.Declaration.Variables[0];
+            declaration = csharpVariable;
             return true;
         }
 
-        if (node is VisualBasicFieldDeclarationSyntax visualBasicFieldDeclaration)
+        if (node is VisualBasicFieldDeclarationSyntax visualBasicFieldDeclaration &&
+            TryGetDeclarationAtPosition(
+                visualBasicFieldDeclaration.Declarators,
+                sourceText,
+                position,
+                out var visualBasicDeclarator) &&
+            TryGetDeclarationAtPosition(
+                visualBasicDeclarator.Names,
+                sourceText,
+                position,
+                out var visualBasicName))
         {
-            SyntaxNode? soleName = null;
-            foreach (var declarator in visualBasicFieldDeclaration.Declarators)
-            {
-                foreach (var name in declarator.Names)
-                {
-                    if (soleName is not null)
-                    {
-                        declaration = null!;
-                        return false;
-                    }
-
-                    soleName = name;
-                }
-            }
-
-            if (soleName is not null)
-            {
-                declaration = soleName;
-                return true;
-            }
+            declaration = visualBasicName;
+            return true;
         }
 
         declaration = null!;
         return false;
+    }
+
+    private static bool TryGetDeclarationAtPosition<TNode>(
+        SeparatedSyntaxList<TNode> declarations,
+        SourceText sourceText,
+        int position,
+        out TNode declaration)
+        where TNode : SyntaxNode
+    {
+        if (declarations.Count == 0)
+        {
+            declaration = null!;
+            return false;
+        }
+
+        declaration = declarations[0];
+        for (var index = 1; index < declarations.Count; index++)
+        {
+            var nextDeclaration = declarations[index];
+            if (position < nextDeclaration.SpanStart)
+            {
+                declaration = GetDeclarationAroundSeparator(
+                    declaration,
+                    declarations.GetSeparator(index - 1),
+                    nextDeclaration,
+                    sourceText,
+                    position);
+                return true;
+            }
+
+            declaration = nextDeclaration;
+        }
+
+        return true;
+    }
+
+    private static TNode GetDeclarationAroundSeparator<TNode>(
+        TNode precedingDeclaration,
+        SyntaxToken separator,
+        TNode followingDeclaration,
+        SourceText sourceText,
+        int position)
+        where TNode : SyntaxNode
+    {
+        if (separator == default || separator.IsMissing || position < separator.Span.End)
+        {
+            return precedingDeclaration;
+        }
+
+        var separatorLine = sourceText.Lines.GetLineFromPosition(separator.SpanStart).LineNumber;
+        var followingDeclarationLine = sourceText.Lines.GetLineFromPosition(followingDeclaration.SpanStart).LineNumber;
+        var positionLine = sourceText.Lines.GetLineFromPosition(position).LineNumber;
+        return separatorLine == followingDeclarationLine || positionLine == followingDeclarationLine
+            ? followingDeclaration
+            : precedingDeclaration;
     }
 
     private static IPropertySymbol? GetAssociatedSynthesizedRecordProperty(
