@@ -28,6 +28,7 @@
                 Command="{Binding Command}"
                 ContextCommand="{Binding ContextCommand}"
                 DataContext="{Binding}"
+                PopupPlacement="{Binding MemberPopupPlacement, RelativeSource={RelativeSource AncestorType={x:Type local:EditorBarControl}}}"
                 ModelsAccessor="{Binding ItemsProvider}"
                 TreeModelsAccessor="{Binding TreeItemsProvider}"
                 ShowRightBorder="True">
