@@ -67,6 +67,10 @@ public partial class MemberList : UserControl
             this.OnItemSelected();
             e.Handled = true;
         }
+        else if (e.Key == Key.Apps || (e.Key == Key.F10 && Keyboard.Modifiers == ModifierKeys.Shift))
+        {
+            e.Handled = this.OpenContextMenuForSelectedItem();
+        }
         else if (IsCtrlEdgeNavigation(e))
         {
             this.MoveSelectionToEdge(e.Key == Key.Up);
@@ -130,6 +134,43 @@ public partial class MemberList : UserControl
         {
             this.OnItemSelected();
         }
+    }
+
+    private void ListBoxItem_OnPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not ListBoxItem { DataContext: MemberListItemViewModel item } container ||
+            !this.OpenContextMenu(item, container))
+        {
+            return;
+        }
+
+        e.Handled = true;
+    }
+
+    private bool OpenContextMenuForSelectedItem()
+    {
+        if (this.ListBox?.SelectedItem is not MemberListItemViewModel item ||
+            this.ListBox.ItemContainerGenerator.ContainerFromItem(item) is not ListBoxItem container)
+        {
+            return false;
+        }
+
+        return this.OpenContextMenu(item, container);
+    }
+
+    private bool OpenContextMenu(MemberListItemViewModel item, ListBoxItem container)
+    {
+        if (item.ContextCommand == null || !item.ContextCommand.CanExecute(null))
+        {
+            return false;
+        }
+
+        container.IsSelected = true;
+        using var popupMenuScope = this.PopupHost != null
+            ? MemberListPopup.EnterMenuInteraction(this.PopupHost)
+            : null;
+        item.ContextCommand.Execute(null);
+        return true;
     }
 
     private void ListBox_OnGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
@@ -203,6 +244,10 @@ public partial class MemberList : UserControl
             }
 
             e.Handled = true;
+        }
+        else if (e.Key == Key.Apps || (e.Key == Key.F10 && Keyboard.Modifiers == ModifierKeys.Shift))
+        {
+            e.Handled = this.OpenContextMenuForSelectedItem();
         }
     }
 

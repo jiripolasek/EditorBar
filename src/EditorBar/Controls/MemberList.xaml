@@ -136,6 +136,7 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+                <EventSetter Event="PreviewMouseRightButtonUp" Handler="ListBoxItem_OnPreviewMouseRightButtonUp" />
             </Style>
 
             <presentation:SymbolDateTemplateSelector

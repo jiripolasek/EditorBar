@@ -444,7 +444,7 @@ internal static class FileStructureHelper
         var result = new List<BaseStructureModel>(declarationsAncherPoints.Length);
         for (var i = declarationsAncherPoints.Length - 1; i >= 0; i--)
         {
-            var model = FormatSymbolName(declarationsAncherPoints[i]);
+            var model = CreateStructureModel(declarationsAncherPoints[i]);
             if (model != null)
             {
                 result.Add(model);
@@ -454,7 +454,7 @@ internal static class FileStructureHelper
         return result.ToImmutableList();
     }
 
-    private static BaseStructureModel? FormatSymbolName(SymbolAnchorPoint anchorPoint)
+    internal static BaseStructureModel? CreateStructureModel(SymbolAnchorPoint anchorPoint)
     {
         // format method name with parameters:
         var symbol = anchorPoint.Symbol;
