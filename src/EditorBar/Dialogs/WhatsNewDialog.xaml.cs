@@ -174,6 +174,7 @@ public partial class WhatsNewDialog : DialogWindow
         var image = new BitmapImage();
         image.BeginInit();
         image.CacheOption = BitmapCacheOption.OnLoad;
+        image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
         image.UriSource = new Uri(path, UriKind.Absolute);
         image.EndInit();
         image.Freeze();
