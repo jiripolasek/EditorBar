@@ -41,6 +41,7 @@ namespace JPSoftworks.EditorBar
         public const int FocusEditorBarProjectsCrumbCommand = 0x0102;
         public const int FocusEditorBarFileCrumbCommand = 0x0103;
         public const int FocusEditorBarInnermostTypeCrumbCommand = 0x0104;
+        public const int ShowWhatsNewCommand = 0x0105;
         public const int EditorBarFileActionMenu = 0x2000;
         public const int EditorBarFileActionMenuCopyPathGroup = 0x2001;
         public const int EditorBarFileActionMenuOpenFileGroup = 0x2002;

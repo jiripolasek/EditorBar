@@ -286,6 +286,21 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     [Browsable(false)]
     public string? VsixVersion { get; set; }
 
+    internal bool HasUnseenWhatsNew
+    {
+        get
+        {
+            if (string.Equals(this.VsixVersion, Vsix.Version, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            return !System.Version.TryParse(this.VsixVersion, out var previouslySeenVersion) ||
+                   !System.Version.TryParse(Vsix.Version, out var currentVersion) ||
+                   currentVersion.CompareTo(previouslySeenVersion) > 0;
+        }
+    }
+
     [Browsable(false)]
     public int RatingRequests { get; set; }
 
@@ -305,16 +320,20 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
     // -------------------------------------------
     // Methods
     // -------------------------------------------
+    internal async Task MarkWhatsNewAsSeenAsync()
+    {
+        if (!this.HasUnseenWhatsNew)
+        {
+            return;
+        }
+
+        this.VsixVersion = Vsix.Version;
+        await this.SaveAsync();
+    }
+
     public async Task UpgradeAsync()
     {
         var changed = false;
-
-        // marked last used extension version; if changed, we can show What's new dialog, etc.
-        if (this.VsixVersion != Vsix.Version)
-        {
-            this.VsixVersion = Vsix.Version;
-            changed = true;
-        }
 
         // check last used config version and upgrade if necessary
         if (this.Version < CurrentConfigVersion)
@@ -328,7 +347,7 @@ public class GeneralOptionsModel : BaseOptionModel<GeneralOptionsModel>, IRating
                 // User can disable these new features and revert to relative paths if they want manually.
                 //
                 // For absolute path, let's just keep the setting as it is. User might be annoyed by the long paths, which may force them to
-                // go to settings. This should be "fixed" later by adding What's new dialog.
+                // go to settings. The What's New experience gives the user a direct path to review these options.
                 this.FileLabelStyle = this.ShowPathRelativeToSolutionRoot ? FileLabel.FileName : FileLabel.AbsolutePath;
             }
 

@@ -89,6 +89,7 @@
     <Compile Include="Commands\General\FocusEditorBarFileCrumbCommand.cs" />
     <Compile Include="Commands\General\FocusEditorBarInnermostTypeCrumbCommand.cs" />
     <Compile Include="Commands\General\FocusEditorBarProjectBreadcrumbCommand.cs" />
+    <Compile Include="Commands\General\ShowWhatsNewCommand.cs" />
     <Compile Include="Commands\Location\BaseLocationMenuContextCommand`1.cs" />
     <Compile Include="Commands\Location\BasePhysicalLocationContextMenuCommand`1.cs" />
     <Compile Include="Commands\Location\LocateProjectInSolutionExplorerCommand.cs" />
@@ -305,6 +306,7 @@
     <Compile Include="Services\LocationProviders\ToolkitLocationProvider.cs" />
     <Compile Include="Services\LocationProviders\WorkspaceLocationProvider.cs" />
     <Compile Include="Services\TextViewExtensions.cs" />
+    <Compile Include="Services\WhatsNewService.cs" />
     <Compile Include="Services\WorkspaceMonitor.cs" />
     <Compile Include="VSCommandTable.cs">
       <AutoGen>True</AutoGen>
@@ -328,6 +330,24 @@
     <Compile Include="Options\GeneralOptionPageSettings.cs" />
     <Compile Include="Controls\Options\GeneralOptionsControl.xaml.cs">
       <DependentUpon>GeneralOptionsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WhatsNewDialog.xaml.cs">
+      <DependentUpon>WhatsNewDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WhatsNewDisplayContext.cs" />
+    <Compile Include="Dialogs\WhatsNewPageDefinition.cs" />
+    <Compile Include="Dialogs\WhatsNewPages\WhatsNewBreadcrumbsPage.xaml.cs">
+      <DependentUpon>WhatsNewBreadcrumbsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WhatsNewPages\WhatsNewCompactPositionPage.xaml.cs">
+      <DependentUpon>WhatsNewCompactPositionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WhatsNewPages\WhatsNewCustomizationPage.xaml.cs">
+      <DependentUpon>WhatsNewCustomizationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WhatsNewPages\WhatsNewPageControl.cs" />
+    <Compile Include="Dialogs\WhatsNewPages\WhatsNewSearchResultsPage.xaml.cs">
+      <DependentUpon>WhatsNewSearchResultsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Options\GeneralOptionsModel.cs" />
     <Compile Include="Presentation\InvertedBooleanToVisibilityConverter.cs" />
@@ -446,6 +466,26 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\WhatsNewDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\WhatsNewPages\WhatsNewBreadcrumbsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\WhatsNewPages\WhatsNewCompactPositionPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\WhatsNewPages\WhatsNewCustomizationPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\WhatsNewPages\WhatsNewSearchResultsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\IconDisplay.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -493,6 +533,16 @@
       <Link>Resources\LICENSE.txt</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Resources\WhatsNewHeader.Dark.png" />
+    <Content Include="Resources\WhatsNewHeader.Light.png" />
+    <Content Include="Resources\WhatsNewCompactPosition.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\WhatsNewSearchResults.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <VSCTCompile Include="VSCommandTable.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <Generator>VsctGenerator</Generator>
@@ -501,6 +551,10 @@
     <Content Include="Resources\CommandIcons.png" />
     <Content Include="Resources\Icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\WhatsNewHeader.*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
   </ItemGroup>
