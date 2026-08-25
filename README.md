@@ -18,7 +18,7 @@
 
 The extension displays the current file path and project name, enabling quick identification of files with similar or identical names (like `launchSettings.json` in every project or `/Pages/Users/Edit.razor` vs `/Pages/Roles/Edit.razor`).
 
-In supported files, it also displays breadcrumbs for symbols or nodes up to the cursor position. This works for C# and VB.NET files, as well as nodes in XML documents. Recent updates added support for C# 14 extension blocks, richer breadcrumb context menus and child popups, Open in Terminal, and expanded appearance customization. Additional formats will be supported in future updates.
+In supported files, it also displays breadcrumbs for symbols or nodes up to the cursor position. This works for C# and VB.NET files, as well as nodes in XML documents. Recent updates added support for C# 14 extension blocks, flat-list member search results, richer breadcrumb context menus and child popups, a compact placement beside the zoom control, Open in Terminal, and expanded appearance customization. Additional formats will be supported in future updates.
 
 
 <div align="center">
@@ -32,7 +32,7 @@ In supported files, it also displays breadcrumbs for symbols or nodes up to the 
 
 ## Features
 
-- **Breadcrumb Navigation** 
+- **Breadcrumb Navigation**
   - Highlights key elements of the file location and for supported files a breadcrumb trail of the current file node or symbol up to the cursor position:
       - Solution and solution folders
       - Project
@@ -57,11 +57,13 @@ In supported files, it also displays breadcrumbs for symbols or nodes up to the 
    - Quickly find and navigate to any member in the current file using a searchable dropdown.
    - Supports glob-style wildcard filtering with `*` and `?`.
    - Switch filtered member tree results between hierarchical tree and flat list views, with a configurable default mode.
+   - Open relevant breadcrumb commands directly from member result context menus.
    - Optionally show or hide the filter box in the member list.
    - Match the filter box background to the active Visual Studio theme.
 
 - **Customizable Options**
    - Select what to display in the breadcrumbs bar.
+   - Place the Editor Bar above or below the editor, or beside the zoom control.
    - Adjust size, colors, and quick-actions to suit your preferences.
    - Control toolbar button visibility.
    - Configure separate light and dark color settings.
@@ -69,6 +71,7 @@ In supported files, it also displays breadcrumbs for symbols or nodes up to the 
 
 - **Seamless Control**:
    - Toggle the Editor Bar on and off using a toolbar icon or a keyboard shortcut.
+   - Review guided feature highlights on first run and after upgrades, or reopen **What's New** from **View > Editor Bar**.
    - Stay out of tool windows where the bar does not belong, including ReSharper windows.
 
 - **Additional Features:**
@@ -78,7 +81,7 @@ In supported files, it also displays breadcrumbs for symbols or nodes up to the 
 
 ![Extension Screenshot](assets/screenshot-dropdowns.png)
 ![Extension Screenshot](assets/screenshot.png)
-![Extension Options Screenshop](assets/options.png)
+![Extension Options Screenshot](assets/options.png)
 
 ## Licence
 

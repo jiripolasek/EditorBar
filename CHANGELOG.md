@@ -1,5 +1,18 @@
 # Change Log
 
+## 4.5.0
+- [x] **Added: Editor Bar can now be placed next to the zoom control and horizontal scrollbar.**
+- [x] **Added: Structural breadcrumb search results can now be shown as a flat list.**
+- [x] **Added: Context menus for items in structural breadcrumb member lists.**
+- [x] Added: A new What's New experience for first runs and upgrades, also available from the View > Editor Bar menu.
+- [x] Changed: Improved structural breadcrumb selection around declaration-line endings, comments, comma-separated enum values, multiple field declarations, records, and multiline declarations.
+- [x] Changed: Refined member popup sizing and item layout.
+- [x] Fixed: File breadcrumbs now reliably populate their children and expand to the active structure after opening a document.
+- [x] Fixed: Roslyn structural breadcrumb refreshes no longer apply stale results and their providers are cleaned up when editors close.
+- [x] Fixed: Structural breadcrumbs refresh after appearance changes, including when the Editor Bar was hidden at the time.
+- [x] Fixed: Breadcrumb popups now open upward when the Editor Bar is at the bottom.
+- [x] Fixed: Settings changed from Editor Bar menus now persist reliably.
+
 ## 4.0.0
 - [x] **Added: Child tree popup for location breadcrumbs.**
 - [x] **Added: Open in Terminal command.**
