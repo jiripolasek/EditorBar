@@ -265,6 +265,17 @@
 				</Strings>
 			</Button>
 
+			<!-- What's New -->
+			<Button guid="EditorBarCmdSet" id="ShowWhatsNewCommand" priority="0x0700" type="Button">
+				<Parent guid="EditorBarCmdSet" id="EditorBarViewSubMenuGroup" />
+				<Strings>
+					<ButtonText>&amp;What's New...</ButtonText>
+					<CommandName>Editor Bar What's New</CommandName>
+					<CanonicalName>EditorBar.WhatsNew</CanonicalName>
+					<LocCanonicalName>EditorBar.WhatsNew</LocCanonicalName>
+				</Strings>
+			</Button>
+
 			<!-- Focus Editor Bar Projects Crumb -->
 			<Button guid="EditorBarCmdSet" id="FocusEditorBarProjectsCrumbCommand" priority="0x0100" type="Button">
 				<Parent guid="EditorBarCmdSet" id="EditorBarViewFocusGroup" />
@@ -784,6 +795,9 @@
 		<CommandPlacement guid="EditorBarCmdSet" id="ToggleEditorBarCommand" priority="0x0300">
 			<Parent guid="EditorBarCmdSet" id="EditorBarTextEditorToolbarGroup" />
 		</CommandPlacement>
+		<CommandPlacement guid="EditorBarCmdSet" id="ShowWhatsNewCommand" priority="0x0200">
+			<Parent guid="EditorBarCmdSet" id="EditorBarSettingsMenu_OptionsGroup" />
+		</CommandPlacement>
 
 		<!--
 		Type Breadcrumb Menu
@@ -915,6 +929,7 @@
 			<IDSymbol name="FocusEditorBarProjectsCrumbCommand" value="0x0102" />
 			<IDSymbol name="FocusEditorBarFileCrumbCommand" value="0x0103" />
 			<IDSymbol name="FocusEditorBarInnermostTypeCrumbCommand" value="0x0104" />
+			<IDSymbol name="ShowWhatsNewCommand" value="0x0105" />
 
 			<IDSymbol name="EditorBarFileActionMenu" value="0x2000" />
 

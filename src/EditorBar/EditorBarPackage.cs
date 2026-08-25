@@ -6,6 +6,7 @@
 
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Threading;
 using Community.VisualStudio.Toolkit;
 using JPSoftworks.EditorBar.Commands.Abstractions;
 using JPSoftworks.EditorBar.Options;
@@ -71,6 +72,8 @@ public sealed class EditorBarPackage : AsyncPackage
         // upgrade settings from previous versions
         var options = await GeneralOptionsModel.GetLiveInstanceAsync();
         var optionPage = (GeneralOptionPage)this.GetDialogPage(typeof(GeneralOptionPage));
+        var shouldShowWhatsNew = options.HasUnseenWhatsNew;
+        var isFirstRun = options.Version == 0 && string.IsNullOrEmpty(options.VsixVersion);
 
         // The dialog page now persists GeneralOptionsModel through Visual Studio's settings system,
         // which enables roaming and Import/Export while preserving the legacy settings store.
@@ -82,6 +85,44 @@ public sealed class EditorBarPackage : AsyncPackage
 
         await this.RegisterCommandsAsync();
 
+        if (shouldShowWhatsNew)
+        {
+            this.ScheduleWhatsNew(isFirstRun);
+        }
+
         RatingService.RegisterSuccessfulUsage();
+    }
+
+    private void ScheduleWhatsNew(bool isFirstRun)
+    {
+        var isScheduled = 0;
+        Action scheduleWhatsNew =
+            () => this.JoinableTaskFactory!.RunAsync(
+                async () =>
+                {
+                    if (Interlocked.Exchange(ref isScheduled, 1) != 0)
+                    {
+                        return;
+                    }
+
+                    await this.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                    // End the solution-load task before opening modal UI. Otherwise Visual Studio
+                    // attributes all the time the user keeps the dialog open to Editor Bar.
+                    var timer = new DispatcherTimer(DispatcherPriority.ApplicationIdle)
+                    {
+                        Interval = TimeSpan.FromSeconds(1),
+                    };
+
+                    timer.Tick += (_, _) =>
+                    {
+                        timer.Stop();
+                        WhatsNewService.ShowIfPendingAsync(isFirstRun).FireAndForget();
+                    };
+                    timer.Start();
+                }).FireAndForget();
+
+        KnownUIContexts.SolutionExistsAndFullyLoadedContext.WhenActivated(scheduleWhatsNew);
+        KnownUIContexts.FolderOpened.WhenActivated(scheduleWhatsNew);
     }
 }
