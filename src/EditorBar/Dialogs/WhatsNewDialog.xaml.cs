@@ -24,9 +24,7 @@ public partial class WhatsNewDialog : DialogWindow
     private const string DarkHeaderArtworkFileName = "WhatsNewHeader.Dark.png";
     private const string CompactPositionArtworkFileName = "WhatsNewCompactPosition.png";
     private const string SearchResultsArtworkFileName = "WhatsNewSearchResults.png";
-
-    // Update this value when the release version is finalized.
-    private static readonly Version CurrentWhatsNewContentVersion = new(4, 1, 0);
+    private static readonly Version CurrentWhatsNewContentVersion = new(4, 5, 0);
 
     private readonly WhatsNewPageDefinition[] _pages;
     private readonly Border[] _pageIndicators;
