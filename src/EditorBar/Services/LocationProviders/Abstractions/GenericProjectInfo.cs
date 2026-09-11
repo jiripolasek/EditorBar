@@ -63,8 +63,24 @@ public class GenericProjectInfo : BaseSolutionProjectInfo, IHasSolutionFolders
 
         this.Project = project;
         this.Solution = solution!;
-        this.SolutionFolderItems = solutionFolderItems;
-        this.SolutionFolders = solutionFolderItems.Select(static item => item.Name).ToList();
+
+        var validSolutionFolderItems = new List<SolutionItem>(solutionFolderItems.Count);
+        var solutionFolders = new List<string>(solutionFolderItems.Count);
+        foreach (var item in solutionFolderItems)
+        {
+            try
+            {
+                solutionFolders.Add(item.Name);
+                validSolutionFolderItems.Add(item);
+            }
+            catch (ObjectDisposedException)
+            {
+                // Hierarchy items can be disposed while the solution is changing.
+            }
+        }
+
+        this.SolutionFolderItems = validSolutionFolderItems;
+        this.SolutionFolders = solutionFolders;
     }
 
     /// <summary>
